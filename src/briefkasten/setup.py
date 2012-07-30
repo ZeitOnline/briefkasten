@@ -5,7 +5,7 @@ version = '0.1'
 
 setup(name='briefkasten',
     version=version,
-    description='A secure drop box',
+    description='a reasonably secure web application for submitting content anonymously',
     long_description="",
     classifiers=[
         "Programming Language :: Python",
