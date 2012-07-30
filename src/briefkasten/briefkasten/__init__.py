@@ -1,9 +1,7 @@
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound
 
-from tmpstore import TempFileTempStore
 from dropbox import DropboxContainer
-tempstore = TempFileTempStore()
 dropbox_container = DropboxContainer()
 
 from pyramid.i18n import TranslationStringFactory
