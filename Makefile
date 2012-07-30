@@ -6,9 +6,6 @@ cfgs = buildout development deployment
 
 all: buildout
 
-docs:
-	$(MAKE) -C $@
-
 $(cfgs): %: %.cfg bin/buildout
 	bin/buildout -c $@.cfg
 
@@ -21,4 +18,4 @@ bin/buildout: buildout.cfg bootstrap.py
 clean:
 	rm -rf .installed.cfg bin/buildout buildout.cfg
 
-.PHONY: all $(cfgs) docs clean
+.PHONY: all $(cfgs) clean
