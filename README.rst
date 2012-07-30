@@ -1,7 +1,7 @@
 Overview
 --------
 
-``briefkasten`` is a reasonably secure web application for submitting anonymous content. It allows to upload attachments which are then sanitized of a number of meta-data which could compromise the submitters identity. Next, the sanitized files are encrypted via GPG and sent via email to a pre-configured list of recipients. The original (potentially 'dirty') files are then deleted from the file system of the server. Thus, neither should admins with access to the server be able to access any submissions, nor should any of the recipients have access to the unsanitized raw material.
+``briefkasten`` is a reasonably secure web application for submitting content anonymously. It allows to upload attachments which are then sanitized of a number of meta-data which could compromise the submitters identity. Next, the sanitized files are encrypted via GPG and sent via email to a pre-configured list of recipients. The original (potentially 'dirty') files are then deleted from the file system of the server. Thus, neither should admins with access to the server be able to access any submissions, nor should any of the recipients have access to the unsanitized raw material.
 
 Upon successful upload the submitter receives a unique URL with a token that he or she can use to access any replies the recipients may post. That reply is the only data persisted on the server.
 
