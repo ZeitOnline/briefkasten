@@ -19,7 +19,7 @@ Then you can start the web application like so::
 
   $ bin/pserve etc/briefkasten.ini
 
-and visit `<http://localhost:6543/>`_
+and visit `<http://localhost:6543/briefkasten/submit>`_
 
 Development
 -----------
