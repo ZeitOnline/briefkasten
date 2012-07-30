@@ -22,7 +22,6 @@ setup(name='briefkasten',
         'deform',
     ],
     extras_require={
-        "sphinx": ["Sphinx", "repoze.sphinx.autointerface"],
         "tests": ['wsgi_intercept', 'zope.testbrowser']
     },
     test_suite="briefkasten",
