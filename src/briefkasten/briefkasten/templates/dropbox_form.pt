@@ -18,7 +18,7 @@
           You can upload documents and submit a messge using a <a target="_new" href="${request.route_url('fingerprint')}" i18n:translate="" i18n:name="fingerprint_link">secured connection</a>.
           Your attachments (i.e. Word, PDF, Excel) will automatically be purged from any meta data (i.e. author name, annotations etc.) and will then be PGP encrypted before transmitted to the editors.
           You will receive a unique URL which you can acces to receive feedback confidentially. See
-          <a href="http://blog.zeit.de/open-data/2012/07/12/daten-technik/" target="_new" i18n:translate="" i18n:name="upload_extra_info">here for further details</a>.
+          <a href="http://blog.zeit.de/open-data/2012/07/30/daten-technik/" target="_new" i18n:translate="" i18n:name="upload_extra_info">here for further details</a>.
         </p>
       </tal:form>
       <form id="briefkasten-form" tal:condition="form_submitted">
