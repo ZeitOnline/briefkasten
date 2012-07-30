@@ -23,13 +23,13 @@ def dropbox_editor_factory(request):
         raise HTTPNotFound('invalid editor token')
 
 
-def germnan_locale(request):
+def german_locale(request):
     return 'de'
 
 
 def main(global_config, **settings):
     """ Configure and create the main application. """
-    config = Configurator(settings=settings, locale_negotiator=germnan_locale)
+    config = Configurator(settings=settings, locale_negotiator=german_locale)
     config.add_translation_dirs('briefkasten:locale')
     config.add_static_view('briefkasten/static/deform', 'deform:static')
     config.add_static_view('briefkasten/static', 'briefkasten:static')
