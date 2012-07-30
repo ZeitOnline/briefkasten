@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="master">
+
+  <div id="subcontent" metal:fill-slot="content">
+	<h2 class="texttitle">Briefkasten</h2>
+	<div class="video"></div>
+	<p class="subtext">Ich bin Blindtext. Von Geburt an. Es hat lange gedauert, bis ich begriffen habe, was es bedeutet, ein blinder Text zu sein: Man macht keinen Sinn. Man wirkt hier und da aus dem Zusammenhang gerissen. Oft wird man gar nicht erst gelesen. Aber bin ich deshalb ein schlechter Text? Ich weiss, dass ich nie die Chance haben werde, im Stern zu erscheinen. Aber bin ich darum weniger wichtig? Ich bin blind! Aber ich bin gerne Text. Und sollten Sie mich jetzt tatsächlich zu Ende lesen, dann habe ich etwas geschafft, was den meisten "normalen" Texten nicht gelingt. </p>
+	<p class="subtext"><span class="contact">Der direkte Kontakt zur Redaktion</span><br>E-Mail: <a href="mailto:leak-it@zeit.de">leak-it@zeit.de</a><br>Tweet an ZEIT ONLINE: <a href="https://twitter.com/#!/zeitonline">https://twitter.com/#!/zeitonline</a></p>
+	<div id="form-content">
+        <h3>Anonymisierte Nachricht an die Redaktion</h3>
+        <p>Bitte klicken Sie hier um die Eingabe zu <a href="${submit_url}" rel="#overlay">aktivieren</a></p>
+		<div class="formtext">
+			<p class="copy">Dateien, die Sie hier einwerfen, werden total sauber gefegt und nichts und Niemand kann ihren Autor zurückverfolgen. Dafür bürgt Tom Lazar mit seinem guten Namen. ZEIT ONLINE ebenso.</p>
+		</div>
+	</div>
+  </div>
+</html>

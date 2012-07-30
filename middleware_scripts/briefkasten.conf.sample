@@ -1,0 +1,21 @@
+# Briefkasten sample config file
+#
+#
+# Note that for all email addresses gpg should have
+# a public key in its keyring
+
+# List of administrator email addresses
+the_admins="erdgeist@erdgeist.org tom@tomster.org"
+
+# List of editors email addresses
+the_editors="fabian.mohr@zeit.de erdgeist@erdgeist.org"
+
+# The default message
+# If the user just sends an attachment, this file is used as the default
+# message
+the_default_message="/usr/local/etc/briefkasten/default_message"
+
+
+# The sender
+# Appears as the sender in the emails sent to all participants
+the_sender="noreply@briefkasten.dtfh.de"

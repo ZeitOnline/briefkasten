@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  i18n:domain="briefkasten"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="master">
+
+  <div metal:fill-slot="content">
+    <form tal:condition="form" tal:replace="structure form" />
+    <p class="subtext" tal:condition="message">${message}</p>
+  </div>
+</html>

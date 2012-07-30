@@ -1,0 +1,8 @@
+<div id="formwrapper">
+    <h1 class="texttitle">Briefkasten</h1>
+    <form tal:condition="form" tal:replace="structure form" />
+  <form id="briefkasten-form" tal:condition="form_submitted">
+    <h2 class="texttitle">Dankesehr!</h2>
+    <p class="subtext">????Ihre Nachricht ist bei uns eingegangen. Ihr Bestätigungscode lautet <em><strong>${drop_id}</strong></em>. Sie können bald <a href="/briefkasten/${drop_id}">auf dieser Seite</a> prüfen, ob eine Nachricht der Redaktion vorliegt.</p>
+  </form>
+</div>

@@ -1,0 +1,8 @@
+[run]
+omit = src/briefkasten/briefkasten/tests/*
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    pragma: no cover
+    NotImplemented
+

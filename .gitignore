@@ -1,0 +1,14 @@
+/bin/
+/etc/
+buildout.cfg
+/docs/html/
+/.coverage
+/htmlcov/
+/coverage.xml
+.installed.cfg
+*.egg-info/
+develop-eggs/
+parts/
+\*.pyc
+__pycache__
+
