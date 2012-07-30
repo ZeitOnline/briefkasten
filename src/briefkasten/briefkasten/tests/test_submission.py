@@ -2,11 +2,6 @@ from os import listdir
 from os.path import join, dirname
 
 
-def test_visit_frontpage(browser):
-    response = browser.get('/briefkasten')
-    response.status == '200 OK'
-
-
 def test_visit_fingerprint(browser):
     response = browser.get('/briefkasten/fingerprint')
     response.status == '200 OK'

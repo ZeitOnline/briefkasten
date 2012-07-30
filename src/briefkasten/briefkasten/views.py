@@ -35,16 +35,6 @@ def get_master():
     return get_renderer('templates/master.pt').implementation().macros['master']
 
 
-@view_config(route_name='frontpage',
-    request_method='GET',
-    renderer='briefkasten:templates/frontpage.pt')
-def fronptage(request):
-    master = get_master()
-    return dict(master=master,
-        submit_url=request.route_url('dropbox_form'),
-        title=title)
-
-
 @view_config(route_name='dropbox_form',
     request_method='GET',
     renderer='briefkasten:templates/dropbox_form.pt')

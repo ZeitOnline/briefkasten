@@ -38,7 +38,6 @@ def main(global_config, **settings):
     config.add_route('dropbox_form', '/briefkasten/submit')
     config.add_route('dropbox_editor', '/briefkasten/{drop_id}/{editor_token}', factory=dropbox_editor_factory)
     config.add_route('dropbox_view', '/briefkasten/{drop_id}', factory=dropbox_factory)
-    config.add_route('frontpage', '/briefkasten')
     config.scan()
     dropbox_container.init(settings)
     return config.make_wsgi_app()
