@@ -11,4 +11,4 @@ develop-eggs/
 parts/
 \*.pyc
 __pycache__
-
+/.codeintel
