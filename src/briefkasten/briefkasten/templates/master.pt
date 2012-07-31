@@ -345,7 +345,7 @@ Lorizzle ma nizzle dolizzle bizzle amizzle, brizzle adipiscing elizzle. Nullizzl
     
     </div>
 
-    <p id="version-info" class="subtext"><a href="https://github.com/ZeitOnline/briefkasten">Version ${version}</a></p>
+    <p id="version-info" class="subtext"><a href="https://github.com/ZeitOnline/briefkasten/blob/master/CHANGES.rst">Version ${version}</a></p>
 
 </div>
 
