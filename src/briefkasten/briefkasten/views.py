@@ -16,7 +16,8 @@ class FileUploadTempStore(dict):
 
 
 tempstore = FileUploadTempStore()
-attachments_min_len = 3
+attachments_min_len = 1
+attachments_max_len = 10
 
 
 class Attachments(colander.SequenceSchema):
@@ -49,8 +50,8 @@ def dropbox_submit(request):
         formid='briefkasten-form')
     form['attachments'].widget = deform.widget.SequenceWidget(
         min_len=attachments_min_len,
-        max_len=attachments_min_len,
-        title=_(u'Add another file'))
+        max_len=attachments_max_len,
+        add_subitem_text_template=_(u'Add another file'))
     appstruct = defaults()
     appstruct.update(drop_id=None,
         form_submitted=False,

@@ -5,6 +5,12 @@ a:visited {
     color: #990000;
 }
 
+#briefkasten-form {
+    width: 50%;
+    float: left;
+}
+
+
 #briefkasten-form .deform li {
     float: left;
 }
@@ -15,12 +21,6 @@ a:visited {
 
 #briefkasten-form #item-deformField1 {
     width: 420px;
-}
-
-#bk p.error,
-#bk .deformClosebutton,
-#bk .deformSeqAdd {
-    display: none!important;
 }
 
 .deformSeq ul {
@@ -89,13 +89,12 @@ p.copy {
 }
 
 #bk_upload_text{
-    width: 420px;
+    width: 50%;
     height: 120px;
     font: 13px Arial;
-    position:absolute;
-    left: 520px;
-    top: 220px;
+    float: right;
     cursor: auto;
+    margin-top: 20px;
  }
 
 
