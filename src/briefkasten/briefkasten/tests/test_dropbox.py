@@ -94,6 +94,18 @@ def test_attachment_creation_and_permissions(dropbox_container):
     assert dropbox.paths_created[3].endswith("/attach/attachment.txt")
     assert open(dropbox.paths_created[3]).read().decode('utf-8') == u'Schönen Guten Tag!'  # contents of attachment.txt
 
+
+def test_attachment_creation_outside_container(dropbox_container):
+    attachment = {
+        'fp': open(os.path.join(os.path.dirname(__file__), 'attachment.txt'), 'r'),
+        'mimetype': 'text/plain',
+        'uid': 'foobar',
+        'preview_url': None,
+        'filename': u'../../authorized_keys',
+        'size': -1}
+    dropbox_container.add_dropbox(message=u'Überraschung!', attachments=[attachment])
+    assert not exists(join(dropbox_container.fs_path, 'authorized_keys'))
+
 import hashlib
 md5 = hashlib.md5()
 
