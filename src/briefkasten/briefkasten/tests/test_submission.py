@@ -47,6 +47,3 @@ def test_submission_with_multiple_attachments(zbrowser):
     fs_attachments = join(dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'attach')
     assert len(listdir(fs_attachments)) == 2
-    fs_attachment = join(fs_attachments, listdir(fs_attachments)[1])
-    assert open(fs_attachment).read().decode('utf-8') == \
-        open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')
