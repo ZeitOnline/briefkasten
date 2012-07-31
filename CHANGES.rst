@@ -4,6 +4,11 @@
  * use a `cryptographically suitable random generator <http://docs.python.org/library/os.html#os.urandom>`_
    This addresses `issue #2 <https://github.com/ZeitOnline/briefkasten/issues/2>`_ 
 
+ * use a `constant time comparison algorithm <http://codahale.com/a-lesson-in-timing-attacks/>`_ to avoid
+   `timing attacks <https://en.wikipedia.org/wiki/Timing_attack>_.
+   This addresses `issue #4 <https://github.com/ZeitOnline/briefkasten/issues/4>`_, thanks to @stefanw (Stefan Wehrmeyer)
+   for reporting this.
+
 0.1.2 - 2010-07-31
 ------------------
 
