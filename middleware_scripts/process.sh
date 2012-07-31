@@ -22,6 +22,9 @@
 # Do not edit anything below this line
 ###
 
+RM=`which srm`
+[ -z "${RM}" ] && RM=`which rm`
+
 # define our bail out shortcut
 exerr () { echo "ERROR: $*" >&2 ; exit 1; }
 
@@ -93,12 +96,12 @@ for the_editor in ${the_editors}; do
     done
   fi
 
-  rm -f ${the_dropdir}/mail.eml
+  ${RM} -f ${the_dropdir}/mail.eml
 done
 
 # We're done with the drop if at least one recipient could be encrypted to
 # wipe it
-rm -rf ${the_dropdir}/message ${the_dropdir}/attach ${the_dropdir}/clean ${the_dropdir}/backup.tar.gpg
+${RM} -rf ${the_dropdir}/message ${the_dropdir}/attach ${the_dropdir}/clean ${the_dropdir}/backup.tar.gpg
 
 # Create directory for editor's replies
 mkdir -p ${the_dropdir}/replies

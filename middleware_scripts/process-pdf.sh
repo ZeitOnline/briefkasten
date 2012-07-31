@@ -15,6 +15,9 @@
 # Do not edit anything below this line
 ###
 
+RM=`which srm`
+[ -z "${RM}" ] && RM=`which rm`
+
 # define our bail out shortcut
 exerr () { echo "ERROR: $*" >&2 ; exit 1; }
 
@@ -32,4 +35,4 @@ the_tempps=`mktemp "${the_tempps}"`
 
 pdf2ps "${the_pdf}" "${the_tempps}"
 ps2pdf "${the_tempps}" "${the_destpdf}"
-rm -f "${the_tempps}"
+${RM} -f "${the_tempps}"
