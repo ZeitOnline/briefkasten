@@ -19,9 +19,13 @@
         
         <!--start: headscripts-->
         <script type="text/javascript" src="${request.static_url('briefkasten:static/jquery-1.4.2.min.js')}"></script>
+    <script type="text/javascript" src="${request.static_url('deform:static/scripts/deform.js')}"></script>
+    <script src="${request.static_url('briefkasten:static/jquery.form.js')}"></script>
         <!--end: headscripts-->
         <!--start: headstyles-->
         <link href="${request.static_url('briefkasten:static/base.css')}" media="screen" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="${request.static_url('deform:static/css/form.css')}" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="${request.static_url('briefkasten:static/main.css')}" type="text/css" media="screen" charset="utf-8" />
 <link rel="shortcut icon" href="${request.static_url('briefkasten:static/favicon.ico')}">
 <link rel="apple-touch-icon-precomposed" href="${request.static_url('briefkasten:static/ZO-icon-72x72.png')}">
 

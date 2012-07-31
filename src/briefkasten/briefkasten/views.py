@@ -48,6 +48,7 @@ def dropbox_submit(request):
         max_len=attachments_min_len,
         title=_(u'Add another file'))
     return dict(title=title,
+        master=get_master(),
         drop_id=None, form_submitted=False,
         form=form.render())
 
@@ -68,12 +69,14 @@ def dropbox_submitted(request):
         except (KeyError, TypeError):
             pass
         return dict(title=title,
+            master=get_master(),
             form=None,
             form_submitted=True,
             drop_id=drop_box.drop_id,
             process_status=process_status)
     except deform.ValidationFailure, exception:
         return dict(title=title,
+            master=get_master(),
             form_submitted=False,
             form=exception.render())
 
