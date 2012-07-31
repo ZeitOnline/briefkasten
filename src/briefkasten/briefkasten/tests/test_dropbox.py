@@ -91,7 +91,7 @@ def test_attachment_creation_and_permissions(dropbox_container):
     assert stat.S_IMODE(os.stat(dropbox.paths_created[2]).st_mode) == 0770
     assert dropbox.paths_created[2].endswith("/attach")
     assert stat.S_IMODE(os.stat(dropbox.paths_created[3]).st_mode) == 0660
-    assert dropbox.paths_created[3].endswith("/attach/attachment.txt")
+    assert not dropbox.paths_created[3].endswith("/attach/attachment.txt")
     assert open(dropbox.paths_created[3]).read().decode('utf-8') == u'Schönen Guten Tag!'  # contents of attachment.txt
 
 
@@ -125,7 +125,7 @@ def test_attachment_is_image(dropbox_container):
         'filename': u'attachment.png',
         'size': -1}
     dropbox = dropbox_container.add_dropbox(message=u'Mit Foto', attachments=[attachment])
-    assert dropbox.paths_created[3].endswith("/attach/attachment.png")
+    assert not dropbox.paths_created[3].endswith("/attach/attachment.png")
     assert md5sum(open(dropbox.paths_created[3], 'rb')) == md5sum(attachment['fp'])
 
 
