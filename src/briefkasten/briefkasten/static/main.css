@@ -48,6 +48,11 @@ h2.texttitle {
     margin: 1em 0 .5em;
 }
 
+p.subtext {
+    font: 400 12px/1.2 Arial,sans-serif;
+    margin-bottom: 2em;
+    line-height: 16px;
+}
 
 #form-content {
 	display: block;

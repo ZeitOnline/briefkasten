@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pkg_resources
 import colander
 import deform
 from pyramid.renderers import get_renderer
@@ -6,6 +7,7 @@ from pyramid.view import view_config
 from briefkasten import dropbox_container, _
 
 title = "ZEIT ONLINE Briefkasten"
+version = pkg_resources.get_distribution("briefkasten").version
 
 
 class FileUploadTempStore(dict):
@@ -31,8 +33,10 @@ class DropboxSchema(colander.MappingSchema):
 dropbox_schema = DropboxSchema()
 
 
-def get_master():
-    return get_renderer('templates/master.pt').implementation().macros['master']
+def defaults():
+    return dict(master=get_renderer('templates/master.pt').implementation().macros['master'],
+        version=version,
+        title=title)
 
 
 @view_config(route_name='dropbox_form',
@@ -47,16 +51,18 @@ def dropbox_submit(request):
         min_len=attachments_min_len,
         max_len=attachments_min_len,
         title=_(u'Add another file'))
-    return dict(title=title,
-        master=get_master(),
-        drop_id=None, form_submitted=False,
+    appstruct = defaults()
+    appstruct.update(drop_id=None,
+        form_submitted=False,
         form=form.render())
+    return appstruct
 
 
 @view_config(route_name='dropbox_form',
     request_method='POST',
     renderer='briefkasten:templates/dropbox_form.pt')
 def dropbox_submitted(request):
+    appstruct = defaults()
     try:
         data = deform.Form(dropbox_schema,
             formid='briefkasten-form',
@@ -68,27 +74,25 @@ def dropbox_submitted(request):
             del tempstore[data['attachment']['uid']]
         except (KeyError, TypeError):
             pass
-        return dict(title=title,
-            master=get_master(),
-            form=None,
+        appstruct.update(form=None,
             form_submitted=True,
             drop_id=drop_box.drop_id,
             process_status=process_status)
     except deform.ValidationFailure, exception:
-        return dict(title=title,
-            master=get_master(),
-            form_submitted=False,
+        appstruct.update(form_submitted=False,
             form=exception.render())
+    return appstruct
 
 
 @view_config(route_name="dropbox_view",
     renderer='briefkasten:templates/dropbox_view.pt')
 def dropbox_view(dropbox, request):
-    return dict(master=get_master(),
-        title='%s - %s' % (title, dropbox.status),
+    appstruct = defaults()
+    appstruct.update(title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
         status=dropbox.status,
         replies=dropbox.replies)
+    return appstruct
 
 
 class DropboxReplySchema(colander.MappingSchema):
@@ -102,38 +106,36 @@ dropboxreply_schema = DropboxReplySchema()
     request_method='GET',
     renderer='briefkasten:templates/dropbox_reply_form.pt')
 def dropbox_editor_view(dropbox, request):
-    return dict(master=get_master(),
-        title='%s - %s' % (title, dropbox.status),
+    appstruct = defaults()
+    appstruct.update(title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
         status=dropbox.status,
         replies=dropbox.replies,
         message=None,
         form=deform.Form(dropboxreply_schema, buttons=('submit',)).render())
+    return appstruct
 
 
 @view_config(route_name="dropbox_editor",
     request_method='POST',
     renderer='briefkasten:templates/dropbox_reply_form.pt')
 def dropbox_reply_submitted(dropbox, request):
+    appstruct = defaults()
     try:
         data = deform.Form(dropboxreply_schema,
             buttons=('submit',)).validate(request.POST.items())
         dropbox.add_reply(data)
-        return dict(master=get_master(),
-            title=u'%s – Reply sent.' % title,
+        appstruct.update(title=u'%s – Reply sent.' % title,
             message=u'Reply sent',
             form=None)
     except deform.ValidationFailure, exception:
-        return dict(master=get_master(),
-            title=title,
-            message=None,
+        appstruct.update(message=None,
             form=exception.render())
+    return appstruct
 
 
 @view_config(route_name='fingerprint',
     request_method='GET',
     renderer='briefkasten:templates/fingerprint.pt')
 def fingerprint(request):
-    master = get_master()
-    return dict(master=master,
-        title=title)
+    return defaults()
