@@ -1,4 +1,4 @@
-0.1.3 - Unreleased
+0.1.3 - 2010-07-31
 ------------------
 
  * use a `cryptographically suitable random generator <http://docs.python.org/library/os.html#os.urandom>`_
