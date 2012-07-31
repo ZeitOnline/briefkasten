@@ -15,6 +15,7 @@
    lead to files outside the dropbox container being overwritten.
    Thanks to Alexander Klink (@alech) for pointing out this flaw.
 
+ * Use secure rm instead of rm, if it is available.
 
 0.1.2 - 2010-07-31
 ------------------
