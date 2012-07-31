@@ -26,9 +26,11 @@ def test_submission_with_one_attachment_post(zbrowser):
     zbrowser.getForm(index=1).submit()
     fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
     assert len(listdir(join(fs_dropbox, 'attach'))) == 1
-    fs_attachment = join(dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'attach', 'attachment.txt')
-    assert open(fs_attachment).read().decode('utf-8') == open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')
+    fs_attachments = join(dropbox_container.fs_path,
+        listdir(dropbox_container.fs_path)[0], 'attach')
+    fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
+    assert open(fs_attachment).read().decode('utf-8') == \
+        open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')
 
 
 def test_submission_with_multiple_attachments(zbrowser):
@@ -42,8 +44,9 @@ def test_submission_with_multiple_attachments(zbrowser):
         'image/png', 'attachment.png')
     zbrowser.getControl(name='message').value = 'Hello there'
     zbrowser.getForm(index=1).submit()
-    fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
-    assert len(listdir(join(fs_dropbox, 'attach'))) == 2
-    fs_attachment = join(fs_dropbox, 'attach', 'attachment.txt')
-    assert open(fs_attachment).read().decode('utf-8') == open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')
-    fs_attachment = join(fs_dropbox, 'attach', 'attachment.png')
+    fs_attachments = join(dropbox_container.fs_path,
+        listdir(dropbox_container.fs_path)[0], 'attach')
+    assert len(listdir(fs_attachments)) == 2
+    fs_attachment = join(fs_attachments, listdir(fs_attachments)[1])
+    assert open(fs_attachment).read().decode('utf-8') == \
+        open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')

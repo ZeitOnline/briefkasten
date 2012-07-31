@@ -76,7 +76,7 @@ class Dropbox(object):
                 for attachment in attachments:
                     if attachment is None:
                         continue
-                    fs_attachment_path = join(fs_attachment_container, attachment['filename'])
+                    fs_attachment_path = join(fs_attachment_container, generate_drop_id())
                     fs_attachment = open(fs_attachment_path, 'w')
                     for line in attachment['fp'].readlines():
                         if isinstance(line, unicode):

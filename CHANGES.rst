@@ -10,6 +10,12 @@
    This addresses `issue #4 <https://github.com/ZeitOnline/briefkasten/issues/4>`_
    thanks to @stefanw (Stefan Wehrmeyer) for reporting this.
 
+ * generate random filenames when saving uploaded attachments.
+   this is both because their names may contain compromising information but also this could otherwise
+   lead to files outside the dropbox container being overwritten.
+   Thanks to Alexander Klink (@alech) for pointing out this flaw.
+
+
 0.1.2 - 2010-07-31
 ------------------
 
