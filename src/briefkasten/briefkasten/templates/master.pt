@@ -102,17 +102,6 @@ margin: 0pt 0pt 10px;
     cursor: pointer;
 }
 
-#bk .bk_upload_text{
-    width: 420px;
-    height: 120px;
-    font: 13px Arial;
-    position:absolute;
-    right: 0px;
-    top: 13px;
-    cursor: auto;
-    display: none;
-}
-
 #bk .bk_tablet{
     background-color: #FFFFFF;
     font: 13px Arial;

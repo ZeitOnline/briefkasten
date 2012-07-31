@@ -87,3 +87,15 @@ p.subtext {
 p.copy {
     font: 400 14px/1.4 Georgia,serif;
 }
+
+#bk_upload_text{
+    width: 420px;
+    height: 120px;
+    font: 13px Arial;
+    position:absolute;
+    left: 520px;
+    top: 220px;
+    cursor: auto;
+ }
+
+
