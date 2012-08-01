@@ -1,7 +1,7 @@
 from json import load, dumps
 from os import mkdir, chmod, environ
 from os.path import exists, join
-from random import Random
+from random import SystemRandom
 from shutil import rmtree
 from subprocess import call
 
@@ -10,7 +10,7 @@ allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
 
 
 def generate_drop_id(length=8):
-    rng = Random()
+    rng = SystemRandom()
     drop_id = ""
     for i in range(length):
         drop_id += rng.choice(allchars)
@@ -76,7 +76,7 @@ class Dropbox(object):
                 for attachment in attachments:
                     if attachment is None:
                         continue
-                    fs_attachment_path = join(fs_attachment_container, attachment['filename'])
+                    fs_attachment_path = join(fs_attachment_container, generate_drop_id())
                     fs_attachment = open(fs_attachment_path, 'w')
                     for line in attachment['fp'].readlines():
                         if isinstance(line, unicode):

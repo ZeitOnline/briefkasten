@@ -15,9 +15,23 @@ def dropbox_factory(request):
         raise HTTPNotFound('no such dropbox')
 
 
+def is_equal(a, b):
+    """ a constant time comparison implementation taken from
+        http://codahale.com/a-lesson-in-timing-attacks/ and
+        Django's `util` module https://github.com/django/django/blob/master/django/utils/crypto.py#L82
+    """
+    if len(a) != len(b):
+        return False
+
+    result = 0
+    for x, y in zip(a, b):
+        result |= ord(x) ^ ord(y)
+    return result == 0
+
+
 def dropbox_editor_factory(request):
     dropbox = dropbox_factory(request)
-    if dropbox.editor_token == request.matchdict['editor_token']:
+    if is_equal(dropbox.editor_token, request.matchdict['editor_token'].encode('utf-8')):
         return dropbox
     else:
         raise HTTPNotFound('invalid editor token')

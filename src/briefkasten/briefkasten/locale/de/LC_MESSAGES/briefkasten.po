@@ -32,7 +32,7 @@ msgstr "Abschicken"
 
 #: briefkasten/views.py:59
 msgid "Add another file"
-msgstr "Weitere Datei hinzufügsen"
+msgstr "Weitere Datei hinzufügen"
 
 #: briefkasten/templates/dropbox_form.pt:19
 msgid "secured connection"
