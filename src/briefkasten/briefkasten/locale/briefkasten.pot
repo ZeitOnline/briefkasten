@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: briefkasten 0.1\n"
+"Project-Id-Version: briefkasten 0.1.6-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-07-30 12:50+0200\n"
+"POT-Creation-Date: 2012-08-06 17:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,27 +17,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: briefkasten/views.py:28 briefkasten/templates/dropbox_form.pt:26
+#: briefkasten/views.py:31 briefkasten/templates/dropbox_form.pt:19
 msgid "Anonymous submission to the editors"
 msgstr ""
 
-#: briefkasten/views.py:30
+#: briefkasten/views.py:33
 msgid "Upload files"
 msgstr ""
 
-#: briefkasten/views.py:53
+#: briefkasten/views.py:48
 msgid "Submit"
 msgstr ""
 
-#: briefkasten/views.py:59
+#: briefkasten/views.py:54
 msgid "Add another file"
 msgstr ""
 
-#: briefkasten/templates/dropbox_form.pt:19
+#: briefkasten/templates/dropbox_form.pt:12
 msgid "secured connection"
 msgstr ""
 
-#: briefkasten/templates/dropbox_form.pt:22
+#: briefkasten/templates/dropbox_form.pt:15
 msgid "here for further details"
 msgstr ""
 
@@ -47,26 +47,26 @@ msgstr ""
 #. be PGP encrypted before transmitted to the editors. You will receive a unique
 #. URL which you can acces to receive feedback confidentially. See
 #. ${upload_extra_info}.
-#: briefkasten/templates/dropbox_form.pt:18
+#: briefkasten/templates/dropbox_form.pt:11
 msgid "upload_text"
 msgstr ""
 
-#: briefkasten/templates/dropbox_form.pt:27
+#: briefkasten/templates/dropbox_form.pt:20
 msgid "We have received your documents. Thank you!"
 msgstr ""
 
-#: briefkasten/templates/dropbox_form.pt:30
+#: briefkasten/templates/dropbox_form.pt:23
 msgid "here"
 msgstr ""
 
 #. Default: Your submission has been received under the following token ${drop_id}.
 #. You will shortly be able to use it ${location} to check for a reply from one of
 #. our editors.
-#: briefkasten/templates/dropbox_form.pt:28
+#: briefkasten/templates/dropbox_form.pt:21
 msgid "submission_success"
 msgstr ""
 
-#: briefkasten/templates/dropbox_form.pt:31
+#: briefkasten/templates/dropbox_form.pt:24
 msgid "Submit further documents"
 msgstr ""
 
@@ -89,17 +89,21 @@ msgstr ""
 msgid "Your submission is uploaded over a secured connection."
 msgstr ""
 
-#: briefkasten/templates/fingerprint.pt:10
+#: briefkasten/templates/fingerprint.pt:11
 msgid ""
 "You can verify the integrity of that connection using a fingerprint. You can "
 "find an icon of a pad lock in the address bar of your browser which contains "
 "the necessary information."
 msgstr ""
 
-#: briefkasten/templates/fingerprint.pt:11
+#: briefkasten/templates/fingerprint.pt:12
 msgid ""
 "You will find the fingerprint under the heading 'SHA1'. Compare its value "
 "with that published in the paper edition of the ZEIT. They both must match. "
 "Only then can you be certain that the connection has not been compromised."
+msgstr ""
+
+#: briefkasten/templates/fingerprint.pt:13
+msgid "Submit documents"
 msgstr ""
 
