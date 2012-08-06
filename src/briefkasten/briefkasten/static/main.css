@@ -20,6 +20,11 @@ a.deformSeqAdd:visited {
     float: left;
 }
 
+#briefkasten-form .deformSeqAdd {
+    display: block;
+    clear: both;
+}
+
 #briefkasten-form #item-deformField1 {
     width: 420px;
 }
@@ -81,7 +86,6 @@ p.subtext {
 	width: 400px;
 	height: 120px;
 }
-
 
 .formtext {
 	float: right;
