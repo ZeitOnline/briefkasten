@@ -481,7 +481,11 @@ Lorizzle ma nizzle dolizzle bizzle amizzle, brizzle adipiscing elizzle. Nullizzl
 </ul>
 <div class="GvHGroup"><a href="#gvh">Weitere Angebote der Holtzbrinck-Gruppe</a></div>
 </div></div>
-<!--start: breadcrumbs--><div class="breadcrumbs"><div class="center"><ul><li class="first "><strong>Sie befinden sich hier:</strong></li></ul></div></div>
+<!--start: breadcrumbs--><div class="breadcrumbs"><div class="center">
+    <ul>
+        <li class="first "><strong>Sie befinden sich hier:</strong></li>
+        <li class="last"><a href="${request.route_url('dropbox_form')}">Briefkasten</a></li>
+    </ul></div></div>
 <!--end: breadcrumbs--><div class="hidden"><div id="bildrechte"><ol></ol></div></div>
 <!--end: bottom-->
 </div>
