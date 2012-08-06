@@ -97,4 +97,7 @@ p.copy {
     margin-top: 20px;
  }
 
-
+#fingerprint-editorial {
+    float: left;
+    padding: .5em 1em 0 0;
+}
