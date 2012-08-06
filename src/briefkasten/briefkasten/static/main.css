@@ -1,7 +1,8 @@
 /* briefkasten specific styling goes here */
 
 a,
-a:visited {
+a:visited,
+a.deformSeqAdd:visited {
     color: #990000;
 }
 
@@ -41,6 +42,10 @@ a:visited {
     background-color: transparent;
 }
 
+a {
+    font-family: Arial,Helvetica,FreeSans,sans-serif;
+
+}
 
 #bk h1,
 h2.texttitle {
