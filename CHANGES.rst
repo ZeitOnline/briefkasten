@@ -1,7 +1,7 @@
 0.1.5 - Unreleased
 ------------------
 
- *
+ * preserve the file ending of attachments (but still replace the actual name with a random token)
 
 0.1.4 - 2010-08-01
 ------------------

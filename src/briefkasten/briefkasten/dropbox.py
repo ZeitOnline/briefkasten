@@ -1,6 +1,6 @@
 from json import load, dumps
 from os import mkdir, chmod, environ
-from os.path import exists, join
+from os.path import exists, join, splitext
 from random import SystemRandom
 from shutil import rmtree
 from subprocess import call
@@ -15,6 +15,16 @@ def generate_drop_id(length=8):
     for i in range(length):
         drop_id += rng.choice(allchars)
     return drop_id
+
+
+def sanitize_filename(filename):
+    """preserve the file ending, but replace the name with a random token """
+    token = generate_drop_id()
+    name, extension = splitext(filename)
+    if extension:
+        return '%s.%s' % (token, extension)
+    else:
+        return token
 
 
 class DropboxContainer(object):
@@ -76,7 +86,7 @@ class Dropbox(object):
                 for attachment in attachments:
                     if attachment is None:
                         continue
-                    fs_attachment_path = join(fs_attachment_container, generate_drop_id())
+                    fs_attachment_path = join(fs_attachment_container, sanitize_filename(attachment['filename']))
                     fs_attachment = open(fs_attachment_path, 'w')
                     for line in attachment['fp'].readlines():
                         if isinstance(line, unicode):

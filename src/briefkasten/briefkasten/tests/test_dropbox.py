@@ -91,7 +91,10 @@ def test_attachment_creation_and_permissions(dropbox_container):
     assert stat.S_IMODE(os.stat(dropbox.paths_created[2]).st_mode) == 0770
     assert dropbox.paths_created[2].endswith("/attach")
     assert stat.S_IMODE(os.stat(dropbox.paths_created[3]).st_mode) == 0660
+    # we strip the original filename
     assert not dropbox.paths_created[3].endswith("/attach/attachment.txt")
+    # but preserve the file ending
+    assert dropbox.paths_created[3].endswith(".txt")
     assert open(dropbox.paths_created[3]).read().decode('utf-8') == u'Schönen Guten Tag!'  # contents of attachment.txt
 
 
@@ -125,7 +128,10 @@ def test_attachment_is_image(dropbox_container):
         'filename': u'attachment.png',
         'size': -1}
     dropbox = dropbox_container.add_dropbox(message=u'Mit Foto', attachments=[attachment])
+    # we strip the original filename
     assert not dropbox.paths_created[3].endswith("/attach/attachment.png")
+    # but preserve the file ending
+    assert dropbox.paths_created[3].endswith(".png")
     assert md5sum(open(dropbox.paths_created[3], 'rb')) == md5sum(attachment['fp'])
 
 
@@ -173,3 +179,14 @@ def test_dropid_length():
 def test_process_script(dropbox_container):
     dropbox = dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
     assert dropbox.process() == 0
+
+
+def test_filename_sanitizing():
+    from briefkasten.dropbox import sanitize_filename
+    assert not sanitize_filename('attachment.txt') == 'attachment.txt'
+    assert sanitize_filename('attachment.txt').endswith('.txt')
+
+
+def test_filename_has_no_ending():
+    from briefkasten.dropbox import sanitize_filename
+    assert not sanitize_filename('blubber') == 'blubber'
