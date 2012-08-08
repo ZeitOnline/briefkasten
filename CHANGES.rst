@@ -31,7 +31,7 @@
    thanks to @alech (Alexander Klink) for reporting this.
 
  * use a `constant time comparison algorithm <http://codahale.com/a-lesson-in-timing-attacks/>`_ to avoid
-   `timing attacks <https://en.wikipedia.org/wiki/Timing_attack>_.
+   `timing attacks <https://en.wikipedia.org/wiki/Timing_attack>`_.
    This addresses `issue #4 <https://github.com/ZeitOnline/briefkasten/issues/4>`_
    thanks to @stefanw (Stefan Wehrmeyer) for reporting this.
 
