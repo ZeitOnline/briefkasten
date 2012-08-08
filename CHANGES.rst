@@ -1,4 +1,4 @@
-0.1.7 - Unreleased
+0.1.7 - 2012-08-08
 ------------------
 
  * generate the message to the editors via template (instead of hard-coding it in the processing shell script)
