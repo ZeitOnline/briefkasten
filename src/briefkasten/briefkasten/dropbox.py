@@ -76,8 +76,10 @@ class Dropbox(object):
 
             # write the message into a file
             self._write_message(fs_dropbox_path, 'message', message)
+            self.message = message
 
             # write the attachment into a file
+            self.num_attachments = 0
             if attachments is not None:
                 fs_attachment_container = join(fs_dropbox_path, 'attach')
                 mkdir(fs_attachment_container)
@@ -95,6 +97,7 @@ class Dropbox(object):
                     fs_attachment.close()
                     chmod(fs_attachment_path, 0660)
                     self.paths_created.append(fs_attachment_path)
+                    self.num_attachments += 1
 
             # create an editor token
             self.editor_token = editor_token = generate_drop_id()
@@ -105,6 +108,10 @@ class Dropbox(object):
             self.fs_path = join(container.fs_path, drop_id)
             self.editor_token = open(join(self.fs_path, 'editor_token')).readline()
         self.fs_replies_path = join(self.fs_path, 'replies')
+
+    def update_message(self, newtext):
+        """ overwrite the message text. this also updates the corresponding file. """
+        self._write_message(self.fs_path, 'message', newtext)
 
     def process(self, purge_meta_data=True):
         """ Calls the external helper scripts to (optionally) purge the meta data and then

@@ -3,6 +3,7 @@ import pkg_resources
 import colander
 import deform
 from pyramid.renderers import get_renderer
+from pyramid.renderers import render
 from pyramid.view import view_config
 from briefkasten import dropbox_container, _
 
@@ -70,6 +71,11 @@ def dropbox_submitted(request):
             action=request.url,
             buttons=('submit',)).validate(request.POST.items())
         drop_box = dropbox_container.add_dropbox(**data)
+        text = render('briefkasten:templates/editor_email.pt', dict(
+            reply_url=request.route_url('dropbox_editor', drop_id=drop_box.drop_id, editor_token=drop_box.editor_token),
+            message=drop_box.message,
+            num_attachments=drop_box.num_attachments), request)
+        drop_box.update_message(text)
         process_status = drop_box.process()
         try:
             del tempstore[data['attachment']['uid']]

@@ -48,3 +48,15 @@ def test_submission_with_multiple_attachments(zbrowser):
     fs_attachments = join(dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'attach')
     assert len(listdir(fs_attachments)) == 2
+
+
+def test_submission_generates_message_to_editors(browser):
+    browser.post('/briefkasten/submit', params=dict(message=u'Hello'))
+    from briefkasten import dropbox_container
+    fs_message = join(dropbox_container.fs_path,
+        listdir(dropbox_container.fs_path)[0], 'message')
+    created_message = open(fs_message).read().decode('utf-8')
+    assert u'Hello' in created_message
+    editor_token = open(join(dropbox_container.fs_path,
+        listdir(dropbox_container.fs_path)[0], 'editor_token')).read().decode('utf-8')
+    assert editor_token in created_message
