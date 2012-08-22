@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from json import load, dumps
 from os import mkdir, chmod, environ
 from os.path import exists, join, splitext
