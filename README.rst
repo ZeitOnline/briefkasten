@@ -90,3 +90,12 @@ For more details check these links:
  * `pyramid.i18n <http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/i18n.html>`_
  * `Chameleon <http://chameleon.repoze.org/docs/latest/i18n.html>`_
  * `Babel <http://babel.edgewall.org/wiki/Documentation/0.9/index.html>`_ 
+
+Roadmap
+-------
+
+While the original releases were geared towards an instance of the briefkasten application hosted by `ZEIT ONLINE <https://ssl.zeit.de/briefkasten/submit>`_ further development is planned to make the application useful 'out of the box'. In particular:
+
+ * provide 'clean' default markup
+ * provide means to customize the look of an instance without having to modify the application's markup itself
+ * provide fully functional deployment scripts that create a 'best practice' installation from scratch, including web server, SSL setup, installation of all dependencies etc.
