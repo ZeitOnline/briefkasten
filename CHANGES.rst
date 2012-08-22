@@ -1,7 +1,8 @@
 0.1.8 - Unreleased
 ------------------
 
- *
+ * added BSD 3-clause license.
+   This addresses `issue #8 <https://github.com/ZeitOnline/briefkasten/issues/8>`_
 
 0.1.7 - 2012-08-08
 ------------------
