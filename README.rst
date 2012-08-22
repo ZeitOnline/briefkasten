@@ -70,12 +70,11 @@ It's recommended to use virtualenv::
 
 To find untranslated text and create entries for them, do this::
 
-     cd src/briefkasten
      python setup.py extract_messages update_catalog
 
-Then you can edit the message catalog in ``src/briefkasten/briefkasten/locale/XX/LCMESSAGES/briefkasten.po``
+Then you can edit the message catalog in ``briefkasten/locale/XX/LCMESSAGES/briefkasten.po``
 
-Finally (still in `src/briefkasten`)::
+Finally::
 
  python setup.py compile_catalog
 
