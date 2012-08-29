@@ -28,7 +28,7 @@ Simply run::
 
 Then you can start the web application like so::
 
-  $ bin/pserve etc/briefkasten.ini
+  $ bin/pserve briefkasten.ini
 
 and visit `<http://localhost:6543/briefkasten/submit>`_
 

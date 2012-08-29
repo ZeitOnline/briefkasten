@@ -1,5 +1,5 @@
 /bin/
-/etc/
+/briefkasten.ini
 buildout.cfg
 /docs/html/
 /.coverage
