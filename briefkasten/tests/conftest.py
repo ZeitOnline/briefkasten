@@ -13,6 +13,7 @@ from briefkasten import main
 def setup_dropbox():
     fs_dropbox_root = mkdtemp()
     return main({},
+        appserver_root_url='/briefkasten/',
         fs_dropbox_root=fs_dropbox_root,
         fs_bin_path=join(dirname(__file__), 'bin')
     )

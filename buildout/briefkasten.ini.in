@@ -13,6 +13,7 @@ pyramid.default_locale_name = de
 pyramid.includes = ${config:debug_includes}
 fs_dropbox_root = ${config:fs_dropbox_root}
 fs_bin_path = ${config:fs_bin_path}
+appserver_root_url = ${config:appserver_root_url}
 
 [server:main]
 use = egg:pyramid#wsgiref
@@ -21,8 +22,8 @@ port = ${config:appserver-port}
 
 [composite:main]
 use = egg:Paste#urlmap
-/briefkasten/assets = assets
-/ = default
+${config:appserver_root_url}assets = assets
+${config:appserver_root_url} = default
 
 [app:assets]
 use = egg:Paste#static
