@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: briefkasten 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-08-06 17:43+0200\n"
+"POT-Creation-Date: 2012-08-29 13:24+0200\n"
 "PO-Revision-Date: 2012-06-26 18:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -18,55 +18,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: briefkasten/views.py:31 briefkasten/templates/dropbox_form.pt:19
+#: briefkasten/views.py:32 briefkasten/templates/dropbox_form.pt:13
 msgid "Anonymous submission to the editors"
 msgstr "Anonymisierte Nachricht an die Redaktion"
 
-#: briefkasten/views.py:33
+#: briefkasten/views.py:34
 msgid "Upload files"
 msgstr "Datei(en) anhängen"
 
-#: briefkasten/views.py:48
+#: briefkasten/views.py:49
 msgid "Submit"
 msgstr "Abschicken"
 
-#: briefkasten/views.py:54
+#: briefkasten/views.py:55
 msgid "Add another file"
 msgstr "Weitere Datei hinzufügen"
 
-#: briefkasten/templates/dropbox_form.pt:12
-msgid "secured connection"
-msgstr "verschlüsselte Verbindung"
-
-#: briefkasten/templates/dropbox_form.pt:15
-msgid "here for further details"
-msgstr "erfahren Sie hier"
-
-#. Default: You can upload documents and submit a messge using a
-#. ${fingerprint_link}. Your attachments (i.e. Word, PDF, Excel) will
-#. automatically
-#. be purged from any meta data (i.e. author name, annotations etc.) and will
-#. then
-#. be PGP encrypted before transmitted to the editors. You will receive a
-#. unique
-#. URL which you can acces to receive feedback confidentially. See
-#. ${upload_extra_info}.
-#: briefkasten/templates/dropbox_form.pt:11
-msgid "upload_text"
-msgstr ""
-"Sie können uns hier über eine ${fingerprint_link} Dokumente und eine "
-"Nachricht hochladen. Ihre Dateien (z.B. Word, PDF, Excel) werden "
-"automatisch von allen versteckt gespeicherten Informationen im Dokument "
-"(z.B. Autor, Firma) bereinigt und anschließend PGP-verschlüsselt an die "
-"Redaktion übermittelt. Nach dem Hochladen erhalten Sie Zugang zu einer "
-"Webseite, deren Adresse nur Sie kennen und auf der wir Ihnen Nachrichten "
-"zukommen lassen können. Was das im Detail bedeutet, ${upload_extra_info}."
-
-#: briefkasten/templates/dropbox_form.pt:20
+#: briefkasten/templates/dropbox_form.pt:14
 msgid "We have received your documents. Thank you!"
 msgstr "Wir haben Ihre Dokumente erhalten. Vielen Dank!"
 
-#: briefkasten/templates/dropbox_form.pt:23
+#: briefkasten/templates/dropbox_form.pt:17
 msgid "here"
 msgstr "auf dieser Seite"
 
@@ -75,14 +47,14 @@ msgstr "auf dieser Seite"
 #. You will shortly be able to use it ${location} to check for a reply from one
 #. of
 #. our editors.
-#: briefkasten/templates/dropbox_form.pt:21
+#: briefkasten/templates/dropbox_form.pt:15
 msgid "submission_success"
 msgstr ""
 "Ihre Nachricht ist bei uns eingegangen. Ihr Bestätigungscode lautet "
 "${drop_id}. Sie können bald ${location} prüfen, ob eine Nachricht der "
 "Redaktion vorliegt."
 
-#: briefkasten/templates/dropbox_form.pt:24
+#: briefkasten/templates/dropbox_form.pt:18
 msgid "Submit further documents"
 msgstr "Weitere Dokumente hochladen"
 
@@ -90,7 +62,7 @@ msgstr "Weitere Dokumente hochladen"
 msgid "Reply to your anonymous submission ${drop_id}"
 msgstr "Nachricht zu Ihrer anonymen Datenspende ${drop_id}"
 
-#: briefkasten/templates/dropbox_view.pt:15
+#: briefkasten/templates/dropbox_view.pt:14
 msgid ""
 "No reply has been posted so far. Please save the URL of this page in a "
 "secure location to check for a response at a later time. Please don't "
@@ -101,7 +73,7 @@ msgstr ""
 "keinen Bookmark in Ihrem Browser an — er kann von Dritten gefunden "
 "werden."
 
-#: briefkasten/templates/dropbox_view.pt:16
+#: briefkasten/templates/dropbox_view.pt:15
 msgid "Return to the submission form"
 msgstr "Zurück zur Startseite"
 
@@ -111,7 +83,7 @@ msgstr ""
 "Die Übermittlung Ihrer hochgeladenen Texte und Dokumente an ZEIT ONLINE "
 "erfolgt über eine verschlüsselte Verbindung."
 
-#: briefkasten/templates/fingerprint.pt:11
+#: briefkasten/templates/fingerprint.pt:10
 msgid ""
 "You can verify the integrity of that connection using a fingerprint. You "
 "can find an icon of a pad lock in the address bar of your browser which "
@@ -122,7 +94,7 @@ msgstr ""
 "Addresszeile ein Schloss-Symbol; dahinter verbergen sich die "
 "Zertifikatsinformationen für diese Seite."
 
-#: briefkasten/templates/fingerprint.pt:12
+#: briefkasten/templates/fingerprint.pt:11
 msgid ""
 "You will find the fingerprint under the heading 'SHA1'. Compare its value"
 " with that published in the paper edition of the ZEIT. They both must "
@@ -136,7 +108,6 @@ msgstr ""
 " ist sichergestellt, dass der Daten-Upload über eine integre, geschützte "
 "Verbindung stattfindet."
 
-#: briefkasten/templates/fingerprint.pt:13
+#: briefkasten/templates/fingerprint.pt:12
 msgid "Submit documents"
 msgstr "Jetzt Dokumente hochladen"
-

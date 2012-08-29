@@ -24,7 +24,7 @@ def test_submission_with_one_attachment_post(zbrowser):
     zbrowser.getControl(name='upload', index=0).add_file(open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
         'text/plain', 'attachment.txt')
     zbrowser.getControl(name='message').value = 'Hello there'
-    zbrowser.getForm(index=1).submit()
+    zbrowser.getForm().submit()
     fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
     assert len(listdir(join(fs_dropbox, 'attach'))) == 1
     fs_attachments = join(dropbox_container.fs_path,
@@ -45,7 +45,7 @@ def test_submission_with_multiple_attachments(zbrowser):
     zbrowser.getControl(name='upload', index=2).add_file(open(join(dirname(__file__), 'attachment.png'), 'r').read(),
         'image/png', 'attachment.png')
     zbrowser.getControl(name='message').value = 'Hello there'
-    zbrowser.getForm(index=1).submit()
+    zbrowser.getForm().submit()
     fs_attachments = join(dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'attach')
     assert len(listdir(fs_attachments)) == 2

@@ -5,7 +5,7 @@ Overview
 
 Upon successful upload the submitter receives a unique URL with a token that he or she can use to access any replies the recipients may post. That reply is the only data persisted on the server.
 
-The current implementation should be ready for general use on a functional level, the only part that is (currently) hard-coded for the specific deployment at ZEIT ONLINE is the HTML markup in the templates and static assets such as logos and CSS, but these are easily modified, so in theory anybody should be able to host their own secure ``briefkasten`` with minimal setup pain.
+The current implementation should be ready for general use on a functional level, so in theory anybody should be able to host their own secure ``briefkasten`` with minimal setup pain.
 
 A future release may contain more configurable options, but for now the main goal of publishing the code is transparency with re-usability coming in second.
 
@@ -95,6 +95,5 @@ Roadmap
 
 While the original releases were geared towards an instance of the briefkasten application hosted by `ZEIT ONLINE <https://ssl.zeit.de/briefkasten/submit>`_ further development is planned to make the application useful 'out of the box'. In particular:
 
- * provide 'clean' default markup
  * provide means to customize the look of an instance without having to modify the application's markup itself
  * provide fully functional deployment scripts that create a 'best practice' installation from scratch, including web server, SSL setup, installation of all dependencies etc.

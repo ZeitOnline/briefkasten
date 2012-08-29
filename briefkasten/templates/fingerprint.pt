@@ -7,7 +7,6 @@
 
   <div metal:fill-slot="content">
     <p><strong i18n:translate="">Your submission is uploaded over a secured connection.</strong></p>
-    <img id="fingerprint-editorial" src="${request.static_url('briefkasten:static/fingerprint.jpg')}" alt="Screenshot" />
     <p i18n:translate="">You can verify the integrity of that connection using a fingerprint. You can find an icon of a pad lock in the address bar of your browser which contains the necessary information.</p>
     <p i18n:translate="">You will find the fingerprint under the heading 'SHA1'. Compare its value with that published in the paper edition of the ZEIT. They both must match. Only then can you be certain that the connection has not been compromised.</p>
     <p><a i18n:translate="" href="${request.route_url('dropbox_form')}">Submit documents</a>.</p>
