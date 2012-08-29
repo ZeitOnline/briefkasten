@@ -16,7 +16,9 @@
   </head>
 
   <body>
-    <div metal:define-slot="content" id="content">
+    <div id="content">
+    <metal:content metal:define-slot="content">
+    </metal:content>
     </div>
     <p id="version-info" class="subtext">
         <a href="https://github.com/ZeitOnline/briefkasten/blob/master/CHANGES.rst">Version ${version}</a>

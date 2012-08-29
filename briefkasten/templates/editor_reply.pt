@@ -5,8 +5,8 @@
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="master">
 
-  <div metal:fill-slot="content">
+  <tal:content metal:fill-slot="content">
     <form tal:condition="form" tal:replace="structure form" />
     <p class="subtext" tal:condition="message">${message}</p>
-  </div>
+  </tal:content>
 </html>

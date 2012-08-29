@@ -5,7 +5,7 @@
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="master">
 
-  <div class="bk_left"  metal:fill-slot="content">
+  <tal:content  metal:fill-slot="content">
     <h4 i18n:translate="">Reply to your anonymous submission <span i18n:name="drop_id">"${drop_id}"</span></h4>
     <tal:replies tal:condition="replies">
       <p class="byline"><span class="author">${replies[0]['author']}</span></p>
@@ -14,5 +14,5 @@
     <tal:noreplies tal:condition="not replies"><p i18n:translate="">No reply has been posted so far. Please save the URL of this page in a secure location to check for a response at a later time. Please don't bookmark this page, though, as those could be found by third parties.</p>
     <p><a href="http://www.zeit.de/briefkasten" i18n:translate="">Return to the submission form</a></p>
     </tal:noreplies>
-  </div>
+  </tal:content>
 </html>
