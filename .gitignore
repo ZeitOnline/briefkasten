@@ -15,4 +15,5 @@ __pycache__
 /include/
 /lib/
 /var/
+/fabfile.py
 
