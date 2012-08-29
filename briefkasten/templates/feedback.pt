@@ -12,7 +12,7 @@
       <p>${replies[0]['reply']}</p>
     </tal:replies>
     <tal:noreplies tal:condition="not replies"><p i18n:translate="">No reply has been posted so far. Please save the URL of this page in a secure location to check for a response at a later time. Please don't bookmark this page, though, as those could be found by third parties.</p>
-    <p><a href="http://www.zeit.de/briefkasten" i18n:translate="">Return to the submission form</a></p>
+    <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Return to the submission form</a></p>
     </tal:noreplies>
   </tal:content>
 </html>
