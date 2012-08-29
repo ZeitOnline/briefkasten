@@ -4,23 +4,20 @@ use = egg:PasteDeploy#prefix
 [app:briefkasten]
 use = egg:briefkasten
 filter-with = paste_prefix
-pyramid.reload_templates = ${:debug}
-pyramid.debug_authorization = ${:debug}
-pyramid.debug_notfound = ${:debug}
-pyramid.debug_routematch = ${:debug}
-pyramid.debug_templates = ${:debug}
+pyramid.reload_templates = ${config:debug}
+pyramid.debug_authorization = ${config:debug}
+pyramid.debug_notfound = ${config:debug}
+pyramid.debug_routematch = ${config:debug}
+pyramid.debug_templates = ${config:debug}
 pyramid.default_locale_name = de
-pyramid.includes = ${:debug_includes}
-fs_dropbox_root = ${:fs_dropbox_root}
-fs_bin_path = ${:fs_bin_path}
-fs_dropbox_owner = ${:fs_dropbox_owner}
-fs_dropbox_group = ${:fs_dropbox_group}
-editor_network_whitelist = ${:editor_network_whitelist}
+pyramid.includes = ${config:debug_includes}
+fs_dropbox_root = ${config:fs_dropbox_root}
+fs_bin_path = ${config:fs_bin_path}
 
 [server:main]
 use = egg:pyramid#wsgiref
 host = 0.0.0.0
-port = ${:port}
+port = ${config:appserver-port}
 
 [composite:main]
 use = egg:Paste#urlmap
@@ -38,4 +35,4 @@ pipeline = theme
 [filter:theme]
 use = egg:diazo
 rules = %(here)s/themes/default/rules.xml
-debug = ${:debug}
+debug = ${config:debug}
