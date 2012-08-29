@@ -12,3 +12,7 @@ parts/
 \*.pyc
 __pycache__
 /.codeintel
+/include/
+/lib/
+/var/
+
