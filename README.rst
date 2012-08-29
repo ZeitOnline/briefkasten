@@ -30,7 +30,7 @@ Then you can start the web application like so::
 
   $ bin/pserve briefkasten.ini
 
-and visit `<http://localhost:6543/briefkasten/submit>`_
+and visit `<http://localhost:6543/submit>`_
 
 
 Customization

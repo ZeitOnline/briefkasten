@@ -27,7 +27,7 @@ ${config:appserver_root_url} = default
 
 [app:assets]
 use = egg:Paste#static
-document_root = %(here)s/themes/default/assets
+document_root = ${config:fs_theme_path}/assets
 
 [pipeline:default]
 pipeline = theme
@@ -35,5 +35,5 @@ pipeline = theme
 
 [filter:theme]
 use = egg:diazo
-rules = %(here)s/themes/default/rules.xml
+rules = ${config:fs_theme_path}/rules.xml
 debug = ${config:debug}
