@@ -32,6 +32,15 @@ Then you can start the web application like so::
 
 and visit `<http://localhost:6543/briefkasten/submit>`_
 
+
+Customization
+-------------
+
+The briefkasten application deliberately only serves a very minimalistic markup by default. While you could go ahead and fork the project and modifiy the templates directly, that is not encouraged. Instead we provide a generic 'theming' approach using `Diazo <http://docs.diazo.org/en/latest/index.html>`_, where you simply add static HTML and CSS files which are then applied at runtime to the application's markup.
+
+This means you neither have to learn how the application works in detail nor do you risk accidentally breaking its functionality.
+
+
 Development
 -----------
 

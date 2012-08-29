@@ -1,6 +1,8 @@
 0.1.8 - Unreleased
 ------------------
 
+ * allow theming of the application via `Diazo <http://docs.diazo.org/en/latest/index.html>`_
+
  * remove all ZEIT ONLINE specific branding and assets from markup
    This addresses issues `#3 <https://github.com/ZeitOnline/briefkasten/issues/3>`_
    and `#10 <https://github.com/ZeitOnline/briefkasten/issues/10>`_ 
