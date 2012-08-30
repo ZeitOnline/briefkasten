@@ -6,17 +6,15 @@
   metal:use-macro="master">
   <body>
     <tal:content metal:fill-slot="content">
-      <tal:form tal:condition="form">
-      	<form tal:replace="structure form" />
-      </tal:form>
-      <form id="briefkasten-form" tal:condition="form_submitted">
+      <form tal:condition="form" tal:replace="structure form" />
+      <tal:submitted tal:condition="form_submitted">
         <h2 i18n:translate="">Anonymous submission to the editors</h2>
         <h1 i18n:translate="" class="texttitle">We have received your documents. Thank you!</h1>
         <p i18n:translate="submission_success">Your submission has been received under the
           following token <strong i18n:name="drop_id">${drop_id}</strong>.
           You will shortly be able to use it <a i18n:translate="" i18n:name="location" href="${request.route_url('dropbox_view', drop_id=drop_id)}">here</a> to check for a reply from one of our editors.</p>
         <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Submit further documents</a>.</p>
-      </form>
+      </tal:submitted>
     </tal:content>
   </body>
 </html>
