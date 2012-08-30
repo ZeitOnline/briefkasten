@@ -1,4 +1,4 @@
-0.1.8 - Unreleased
+0.1.8 - 2012-08-30
 ------------------
 
  * allow theming of the application via `Diazo <http://docs.diazo.org/en/latest/index.html>`_
