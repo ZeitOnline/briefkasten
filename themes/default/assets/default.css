@@ -1,0 +1,25 @@
+h1 {
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+#warning {
+    background-color: red;
+    border: 2px solid black;
+    padding: 2em;
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: 1.3em;
+    color: white;
+}
+
+a {
+    color: #222;
+    text-decoration: none;
+}
+
+#version-info {
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: .6em;
+    text-align: right;
+
+}

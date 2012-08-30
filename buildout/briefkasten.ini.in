@@ -1,0 +1,39 @@
+[filter:paste_prefix]
+use = egg:PasteDeploy#prefix
+
+[app:briefkasten]
+use = egg:briefkasten
+filter-with = paste_prefix
+pyramid.reload_templates = ${config:debug}
+pyramid.debug_authorization = ${config:debug}
+pyramid.debug_notfound = ${config:debug}
+pyramid.debug_routematch = ${config:debug}
+pyramid.debug_templates = ${config:debug}
+pyramid.default_locale_name = de
+pyramid.includes = ${config:debug_includes}
+fs_dropbox_root = ${config:fs_dropbox_root}
+fs_bin_path = ${config:fs_bin_path}
+appserver_root_url = ${config:appserver_root_url}
+
+[server:main]
+use = egg:pyramid#wsgiref
+host = 0.0.0.0
+port = ${config:appserver-port}
+
+[composite:main]
+use = egg:Paste#urlmap
+${config:appserver_root_url}assets = assets
+/ = default
+
+[app:assets]
+use = egg:Paste#static
+document_root = ${config:fs_theme_path}/assets
+
+[pipeline:default]
+pipeline = theme
+   briefkasten
+
+[filter:theme]
+use = egg:diazo
+rules = ${config:fs_theme_path}/rules.xml
+debug = ${config:debug}

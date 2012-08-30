@@ -5,7 +5,7 @@ Overview
 
 Upon successful upload the submitter receives a unique URL with a token that he or she can use to access any replies the recipients may post. That reply is the only data persisted on the server.
 
-The current implementation should be ready for general use on a functional level, the only part that is (currently) hard-coded for the specific deployment at ZEIT ONLINE is the HTML markup in the templates and static assets such as logos and CSS, but these are easily modified, so in theory anybody should be able to host their own secure ``briefkasten`` with minimal setup pain.
+The current implementation should be ready for general use on a functional level, so in theory anybody should be able to host their own secure ``briefkasten`` with minimal setup pain.
 
 A future release may contain more configurable options, but for now the main goal of publishing the code is transparency with re-usability coming in second.
 
@@ -28,9 +28,60 @@ Simply run::
 
 Then you can start the web application like so::
 
-  $ bin/pserve etc/briefkasten.ini
+  $ bin/pserve briefkasten.ini
 
-and visit `<http://localhost:6543/briefkasten/submit>`_
+and visit `<http://localhost:6543/submit>`_
+
+
+Customization
+-------------
+
+The briefkasten application deliberately only serves a very minimalistic markup by default. While you could go ahead and fork the project and modifiy the templates directly, that is not encouraged. Instead we provide a generic 'theming' approach using `Diazo <http://docs.diazo.org/en/latest/index.html>`_, where you simply add static HTML and CSS files which are then applied at runtime to the application's markup.
+
+This means you neither have to learn how the application works in detail nor do you risk accidentally breaking its functionality.
+
+Changing the default look
+=========================
+
+To change the default you look you need to do four things:
+
+ * create a theme directory
+ * add the path to the buildout configuration file
+ * re-run buildout
+ * restart the application
+
+A theme directory must conform to the following structure::
+
+    rules.xml
+    theme.html
+    assets/
+
+``rules.xml`` must be a valid diazo rule, which needs to point to (at least) one html template (i.e. ``theme.html``). Any files located inside the ``assets/`` directory can be referenced from the theme, so you can add any images, CSS, JS and whatnot there. It's best to reference those assets with relative paths, that way you can develop the theme simply by opening the theme HTML file in a browser.
+
+For further information on how to create additional rules see the `official Diazo documentation <http://docs.diazo.org/en/latest/basic.html>`_.
+
+To use the theme, point the buildout to it. The easiest way is to replace the ``buildout.cfg`` symlink that the Makefile created with an actual file containing the following stub::
+
+    [buildout]
+    extends = development.cfg
+
+    [config]
+    fs_theme_path = XXXX
+
+Where ``XXXX`` is the absolute path to the theme you created. Note that you can use the following syntax to refer to a location relative to the project file path::
+
+    [config]
+    fs_theme_path = ${buildout:directory}/themes/mycustomtheme
+
+Once you've done this, you need to re-run buildout like so::
+
+    bin/buildout -No
+
+(The ``-No`` flags force buildout to run in offline mode, thus speeding the process up significantly, since we're only regenerating the configuration)
+
+You then need to restart the application, i.e. by hitting ``CTRL-c`` in the foreground process and re-running ``bin/pserve briefkasten.ini``.
+
+Once you've performed these steps you can keep the server running while you're developing the theme, because in debug mode changes to the theme and the rules are picked up instantly without requiring a restart.
 
 Development
 -----------
@@ -95,6 +146,4 @@ Roadmap
 
 While the original releases were geared towards an instance of the briefkasten application hosted by `ZEIT ONLINE <https://ssl.zeit.de/briefkasten/submit>`_ further development is planned to make the application useful 'out of the box'. In particular:
 
- * provide 'clean' default markup
- * provide means to customize the look of an instance without having to modify the application's markup itself
  * provide fully functional deployment scripts that create a 'best practice' installation from scratch, including web server, SSL setup, installation of all dependencies etc.

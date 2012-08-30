@@ -1,5 +1,5 @@
 /bin/
-/etc/
+/briefkasten.ini
 buildout.cfg
 /docs/html/
 /.coverage
@@ -12,3 +12,8 @@ parts/
 \*.pyc
 __pycache__
 /.codeintel
+/include/
+/lib/
+/var/
+/fabfile.py
+
