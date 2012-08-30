@@ -6,5 +6,6 @@
     <before content="/html/head/*"
         theme-children="/html/head" />
     <replace css:theme-children="#content" css:content-children="#content" />
+    <after css:theme="#content" css:content="#version-info" />
 
 </rules>

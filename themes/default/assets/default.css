@@ -12,7 +12,14 @@ h1 {
     color: white;
 }
 
-#warning a {
+a {
     color: #222;
     text-decoration: none;
+}
+
+#version-info {
+    font-family: Verdana, Helvetica, Arial, sans-serif;
+    font-size: .6em;
+    text-align: right;
+
 }
