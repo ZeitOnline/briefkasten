@@ -23,7 +23,7 @@ port = ${config:appserver-port}
 [composite:main]
 use = egg:Paste#urlmap
 ${config:appserver_root_url}assets = assets
-${config:appserver_root_url} = default
+/ = default
 
 [app:assets]
 use = egg:Paste#static
