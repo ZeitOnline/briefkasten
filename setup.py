@@ -23,12 +23,15 @@ setup(name='briefkasten',
         'deform',
     ],
     extras_require={
-        "tests": ['wsgi_intercept', 'zope.testbrowser']
+        "tests": ['wsgi_intercept', 'zope.testbrowser'],
+        "freebsd-deployment": ["ezjailremote", ],
     },
     test_suite="briefkasten",
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main
+        [console_scripts]
+        deploy=deployment:commandline
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),
