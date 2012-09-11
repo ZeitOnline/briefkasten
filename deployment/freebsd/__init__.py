@@ -8,7 +8,9 @@ def deploy(config):
     fab.env['host_string'] = config['host']['ip_addr']
     bootstrap(config)
     create_appserver(config)
+    jexec(config['appserver']['ip_addr'], configure_appserver, config)
     create_webserver(config)
+    jexec(config['webserver']['ip_addr'], configure_webserver, config)
 
 
 def bootstrap(config):
@@ -41,30 +43,28 @@ def create_appserver(config):
     ezjail.create('appserver',
         config['appserver']['ip_addr'], ctype='zfs')
 
-    def configure_appserver():
-        # upload site root
-        # install ports
-        # * lang/python27
-        # * sysutils/py-supervisor
-        # upload sources
-        # bootstrap and run buildout
-        # configure supervisor
-        # start supervisor
-        pass
 
-    jexec(config['appserver']['ip_addr'], configure_appserver)
+def configure_appserver(config):
+    # upload site root
+    # install ports
+    # * lang/python27
+    # * sysutils/py-supervisor
+    # upload sources
+    # bootstrap and run buildout
+    # configure supervisor
+    # start supervisor
+    pass
 
 
 def create_webserver(config):
     ezjail.create('webserver',
         config['webserver']['ip_addr'], ctype='zfs')
 
-    def configure_webserver():
-        # upload site root
-        # install nginx via ports
-        # create or upload pem
-        # configure nginx
-        # start nginx
-        pass
 
-    jexec(config['webserver']['ip_addr'], configure_webserver)
+def configure_webserver():
+    # upload site root
+    # install nginx via ports
+    # create or upload pem
+    # configure nginx
+    # start nginx
+    pass
