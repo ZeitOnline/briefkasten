@@ -1,3 +1,4 @@
+from os import path
 from fabric import api as fab
 from ezjailremote import fabfile as ezjail
 from ezjailremote.utils import jexec
@@ -45,10 +46,16 @@ def create_appserver(config):
 
 
 def configure_appserver(config):
-    # upload site root
+    # upload port configuration
+    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+    fab.sudo("mkdir -p /var/db/ports/")
+    fab.put(path.join(local_resource_dir, 'appserver/var/db/ports/*'),
+        "/var/db/ports/",
+        use_sudo=True)
     # install ports
-    # * lang/python27
-    # * sysutils/py-supervisor
+    for port in ['lang/python', 'sysutils/py-supervisor']:
+        with fab.cd('/usr/ports/%s' % port):
+            fab.sudo('make install')
     # upload sources
     # bootstrap and run buildout
     # configure supervisor
