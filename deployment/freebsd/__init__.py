@@ -19,6 +19,10 @@ def bootstrap(config):
         fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
         fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
 
+    # set the time
+    fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host']['timezone'])
+    fab.sudo("ntpdate %s" % config['host']['timeserver'])
+
     # configure crypto volume for jails
     fab.sudo("""gpart add -t freebsd-zfs -l jails -a8 %s""" % config['host']['root_device'])
     fab.puts("You will need to enter the passphrase for the crypto volume THREE times")

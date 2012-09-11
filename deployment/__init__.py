@@ -24,6 +24,8 @@ DEFAULTS = dict(
     host=dict(
         os='freebsd',
         iface='em0',
+        timeserver='time.euro.apple.com',
+        timezone='Europe/Berlin',  # relative path to /usr/share/zoneinfo/
     ),
     appserver=dict(ip_addr='127.0.0.2'),
     webserver=dict(ip_addr='127.0.0.3'),
