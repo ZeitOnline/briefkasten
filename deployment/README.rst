@@ -1,7 +1,7 @@
 Installing a briefkasten instance in production
 -----------------------------------------------
 
-While the provided development.cfg makes it easy to get a local instance of the briefkasten application server up and running, setting up a secure, publicly reachable instance for real people to make submissions is a completely different story.
+While the provided development.cfg makes it easy to get a local instance of the briefkasten application server up and running, setting up a secure, publicly reachable instance for real people to make submissions to is a completely different story.
 
 Since any chain is only so strong as its weakest link, `briefkasten` comes with a set of deployment scripts that - given a simple configuration file - can install a fully functional instance, including an HTTPS capable webserver, the actual web application and a mail server to send out the encrypted submissions, all pre-configured according to what we consider best practices and ready to interact with each other.
 
@@ -11,7 +11,7 @@ If you want to add another platform, take a look at `deployment/__init__.py`, fo
 
 While we could simply provide pre-built installation images, this would defeat the whole idea of running a trustworthy, open source dropbox in the first place, because then you and your submitters would have to blindly trust these binaries without being able to verify their integrity.
 
-Instead the idea is to use as little pre-built ingredients as possible and aquire them from trusted sources (i.e. from the official FreeBSD repositories). In essence we provide you with a grocery list of ingredients along with a recipe and let you do all the shopping and cooking yourself instead of serving a finished meal :-)
+Instead the idea is to use as little pre-built ingredients as possible and aquire them from trusted sources (i.e. from the official FreeBSD repositories). In essence we provide you with a grocery list of ingredients along with a recipe and let you do all the shopping and cooking yourself instead of serving a finished meal!
 
 
 Architecture
@@ -25,6 +25,7 @@ The briefkasten functionality is split into three parts, each of which is instal
  * an email jail for sending out the encrypted submissions
 
 The disk that hosts the jails is encrypted, so even if the server should be lost or stolen while a submission was being processed, the new owners wouldn't be able to gain access to the data.
+
 
 Procedure
 =========
@@ -62,7 +63,7 @@ You can now start the machine and it should boot from the USB stick.
 Installing the OS
 *****************
 
-Virtual or real, now the machine is up and running and we can install FreeBSD. We use helper script that allows us to install the operating system itself on ZFS.
+Virtual or real, now the machine is up and running and we can install FreeBSD. We use a helper script that allows us to install the operating system itself on ZFS, which we download
 
 Once booted into the installer, select 'Live CD' and login as ``root`` (no password required), then::
 
@@ -90,6 +91,8 @@ login again, then::
 note the IP_ADDR received, give root user a password::
 
     passwd
+
+..note: Alternatively, at this point it could be a good idea to replace the DHCP configuration with a permanent, static IP address.
 
 Now we can let the deployment scripts take over. You need a full checkout of the briefkasten repository, i.e.::
 

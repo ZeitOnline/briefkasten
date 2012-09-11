@@ -43,7 +43,7 @@ This means you neither have to learn how the application works in detail nor do 
 Changing the default look
 =========================
 
-To change the default you look you need to do four things:
+To change the default look you need to do four things:
 
  * create a theme directory
  * add the path to the buildout configuration file
