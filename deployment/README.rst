@@ -95,8 +95,11 @@ Now we can let the deployment scripts take over. You need a full checkout of the
 
     git clone git://github.com/ZeitOnline/briefkasten.git
     cd briefkasten
-    python bootstrap.py
-    bin/buildout -c development.cfg
+    python bootstrap.py -d
+
+But for deploying the application you only need a very minimal buildout (i.o.w. you won't need to install the whole stack and its dependencies)::
+
+    bin/buildout -c deployment.cfg
 
 Now the deployment scripts are ready to run. However, you still need to configure your particular installation. This is done by creating a `.ini` file. Take a look at the following example::
 
