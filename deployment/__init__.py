@@ -2,7 +2,7 @@ import sys
 import ConfigParser as ConfigParser_
 
 
-class ConfigParser(ConfigParser_.ConfigParser):
+class ConfigParser(ConfigParser_.SafeConfigParser):
     """ a ConfigParser that can provide is values as simple dictionary.
     taken from http://stackoverflow.com/questions/3220670/read-all-the-contents-in-ini-file-into-dictionary-with-python"""
 
@@ -20,13 +20,32 @@ def usage():
     """ % sys.argv[0]
 
 
+DEFAULTS = dict(
+    host=dict(
+        os='freebsd',
+        iface='em0',
+    ),
+    appserver=dict(ip_addr='127.0.0.2'),
+    webserver=dict(ip_addr='127.0.0.3'),
+)
+
+
 def commandline():
     if len(sys.argv) != 2:
         usage()
         exit()
-    parser = ConfigParser()
+
+    # apply config file to default configuration
+    parser = ConfigParser(allow_no_value=True)
     parser.read(sys.argv[1])
-    config = parser.as_dict()
+    parsed_dict = parser.as_dict()
+    config = DEFAULTS.copy()
+    for key in parsed_dict.keys():
+        if key in config:
+            config[key].update(parsed_dict.get(key, dict()))
+        else:
+            config[key] = parsed_dict[key]
+
     # determine the host os (we only support -- and default to -- FreeBSD atm)
     host_os = config['host'].get('os', 'freebsd').lower()
     if host_os == 'freebsd':
