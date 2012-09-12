@@ -78,9 +78,20 @@ def configure_appserver(config):
         with fab.cd('/usr/ports/%s' % port):
             fab.sudo('make install')
     fab.sudo('mkdir -p %s' % app_home)
+    fab.sudo('''echo 'supervisord_enable="YES"' >> /etc/rc.conf ''')
+    # create custom buildout.cfg
+    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+    # configure supervisor (make sure logging is off!)
+    upload_template(filename=path.join(local_resource_dir, 'supervisord.conf.in'),
+        context=dict(app_home=app_home, app_user=app_user),
+        destination='/usr/local/etc/supervisord.conf',
+        backup=False,
+        use_sudo=True)
+    config['appserver']['configure-hasrun'] = True
 
 
 def update_appserver(config):
+    configure_hasrun = config['appserver'].get('configure-hasrun', False)
     # upload sources
     import briefkasten
     from deployment import APP_SRC
@@ -109,8 +120,11 @@ def update_appserver(config):
     with fab.cd(app_home):
         fab.sudo('python2.7 bootstrap.py', user=app_user)
         fab.sudo('bin/buildout', user=app_user)
-    # configure supervisor (make sure logging is off!)
     # start supervisor
+    if configure_hasrun:
+        fab.sudo('/usr/local/etc/rc.d/supervisord start')
+    else:
+        fab.sudo('supervisorctl restart briefkasten')
 
 
 def create_webserver(config):
