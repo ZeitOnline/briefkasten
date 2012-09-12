@@ -2,23 +2,33 @@ from os import path
 from fabric import api as fab
 from fabric.contrib.project import rsync_project
 from fabric.contrib.files import upload_template
-
 from ezjailremote import fabfile as ezjail
 from ezjailremote.utils import jexec
 
+from deployment import ALL_STEPS
 
-def deploy(config):
+
+def deploy(config, steps=[]):
     print "Deploying on FreeBSD."
+    # by default, all steps are performed on the jailhost
     fab.env['host_string'] = config['host']['ip_addr']
-    bootstrap(config)
-    create_appserver(config)
-    jexec(config['appserver']['ip_addr'], configure_appserver, config)
-    jexec(config['appserver']['ip_addr'], update_appserver, config)
-    create_webserver(config)
-    jexec(config['webserver']['ip_addr'], configure_webserver, config)
+
+    all_steps = {
+        'bootstrap': (bootstrap, (config,)),
+        'create-appserver': (create_appserver, (config,)),
+        'configure-appserver': (jexec, (config['appserver']['ip_addr'], configure_appserver, config)),
+        'update-appserver': (jexec, (config['appserver']['ip_addr'], update_appserver, config)),
+        }
+
+    for step in ALL_STEPS:
+        if not steps or step in steps:
+            funk, arx = all_steps[step]
+            print step
+            funk(*arx)
 
 
 def bootstrap(config):
+    # run ezjailremote's basic bootstrap
     ezjail.bootstrap(primary_ip=config['host']['ip_addr'])
 
     # configure IP addresses for the jails
@@ -108,7 +118,7 @@ def create_webserver(config):
         config['webserver']['ip_addr'], ctype='zfs')
 
 
-def configure_webserver():
+def configure_webserver(config):
     # upload site root
     # install nginx via ports
     # create or upload pem

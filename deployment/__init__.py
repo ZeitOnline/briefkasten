@@ -4,7 +4,7 @@ import ConfigParser as ConfigParser_
 
 
 class ConfigParser(ConfigParser_.SafeConfigParser):
-    """ a ConfigParser that can provide is values as simple dictionary.
+    """ a ConfigParser that can provide its values as simple dictionary.
     taken from http://stackoverflow.com/questions/3220670/read-all-the-contents-in-ini-file-into-dictionary-with-python"""
 
     def as_dict(self):
@@ -15,13 +15,13 @@ class ConfigParser(ConfigParser_.SafeConfigParser):
         return d
 
 
-def usage():
-    print """Usage:
-    %s config-file
-    """ % sys.argv[0]
+ALL_STEPS = ['bootstrap',
+    'create-appserver',
+    'configure-appserver',
+    'update-appserver']
 
 
-DEFAULTS = dict(
+DEFAULT_CONFIG = dict(
     host=dict(
         os='freebsd',
         iface='em0',
@@ -38,6 +38,14 @@ DEFAULTS = dict(
     webserver=dict(ip_addr='127.0.0.3'),
 )
 
+
+def usage():
+    print """Usage:
+    %s config-file [%s]
+
+    performs the given deployment steps (or all if none are given) using the specified configuration
+    """ % (sys.argv[0], ', '.join(ALL_STEPS))
+
 # top level listing of what to upload for the application server
 APP_SRC = [
     'briefkasten',
@@ -51,7 +59,7 @@ APP_SRC = [
 
 
 def commandline():
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         usage()
         exit()
 
@@ -59,7 +67,7 @@ def commandline():
     parser = ConfigParser(allow_no_value=True)
     parser.read(sys.argv[1])
     parsed_dict = parser.as_dict()
-    config = DEFAULTS.copy()
+    config = DEFAULT_CONFIG.copy()
     for key in parsed_dict.keys():
         if key in config:
             config[key].update(parsed_dict.get(key, dict()))
@@ -71,6 +79,6 @@ def commandline():
     host_os = config['host'].get('os', 'freebsd').lower()
     if host_os == 'freebsd':
         from freebsd import deploy
-        deploy(config)
+        deploy(config, steps=sys.argv[2:])
     else:
         print "%s is not supported as host operating system." % host_os

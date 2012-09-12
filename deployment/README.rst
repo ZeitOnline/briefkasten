@@ -123,4 +123,6 @@ Simply call::
 
     bin/deploy yourconfig.ini
 
-Look at ``deployment/freebsd/__init__.py`` to see what exactly happens...
+You can also only perform specific deployment steps, i.e. if you already installed ezjail etc. Run ``bin/deploy`` without arguments to see the list of available steps.
+
+Look inside ``deployment/freebsd/__init__.py`` to see what exactly happens during each step.
