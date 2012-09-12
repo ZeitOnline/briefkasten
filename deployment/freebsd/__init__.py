@@ -1,5 +1,8 @@
 from os import path
 from fabric import api as fab
+from fabric.contrib.project import rsync_project
+from fabric.contrib.files import upload_template
+
 from ezjailremote import fabfile as ezjail
 from ezjailremote.utils import jexec
 
@@ -10,6 +13,7 @@ def deploy(config):
     bootstrap(config)
     create_appserver(config)
     jexec(config['appserver']['ip_addr'], configure_appserver, config)
+    jexec(config['appserver']['ip_addr'], update_appserver, config)
     create_webserver(config)
     jexec(config['webserver']['ip_addr'], configure_webserver, config)
 
@@ -46,6 +50,10 @@ def create_appserver(config):
 
 
 def configure_appserver(config):
+    # create application user
+    app_user = config['appserver']['app_user']
+    app_home = config['appserver']['app_home']
+    fab.sudo("pw user add %s" % app_user)
     # upload port configuration
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
     fab.sudo("mkdir -p /var/db/ports/")
@@ -53,14 +61,43 @@ def configure_appserver(config):
         "/var/db/ports/",
         use_sudo=True)
     # install ports
-    for port in ['lang/python', 'sysutils/py-supervisor']:
+    for port in ['lang/python', 'sysutils/py-supervisor', 'net/rsync']:
         with fab.cd('/usr/ports/%s' % port):
             fab.sudo('make install')
+    fab.sudo('mkdir -p %s' % app_home)
+
+
+def update_appserver(config):
     # upload sources
+    import briefkasten
+    from deployment import APP_SRC
+    app_home = config['appserver']['app_home']
+    app_user = config['appserver']['app_user']
+    base_path = path.abspath(path.join(path.dirname(briefkasten.__file__), '..'))
+    local_paths = ' '.join([path.join(base_path, app_path) for app_path in APP_SRC])
+    fab.sudo('chown -R %s %s' % (fab.env['user'], app_home))
+    rsync_project(app_home, local_paths, delete=True)
+    # upload theme
+    fs_remote_theme = path.join(app_home, 'themes')
+    config['appserver']['fs_remote_theme'] = path.join(fs_remote_theme, path.split(config['appserver']['fs_theme_path'])[-1])
+    fab.run('mkdir -p %s' % fs_remote_theme)
+    rsync_project(fs_remote_theme,
+        path.abspath(path.join(config['fs_path'], config['appserver']['fs_theme_path'])),
+        delete=True)
+    # create custom buildout.cfg
+    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+    upload_template(filename=path.join(local_resource_dir, 'buildout.cfg.in'),
+        context=config['appserver'],
+        destination=path.join(app_home, 'buildout.cfg'),
+        backup=False)
+
+    fab.sudo('chown -R %s %s' % (app_user, app_home))
     # bootstrap and run buildout
-    # configure supervisor
+    with fab.cd(app_home):
+        fab.sudo('python2.7 bootstrap.py', user=app_user)
+        fab.sudo('bin/buildout', user=app_user)
+    # configure supervisor (make sure logging is off!)
     # start supervisor
-    pass
 
 
 def create_webserver(config):

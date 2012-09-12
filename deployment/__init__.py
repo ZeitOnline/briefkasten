@@ -1,4 +1,5 @@
 import sys
+from os import path
 import ConfigParser as ConfigParser_
 
 
@@ -27,9 +28,26 @@ DEFAULTS = dict(
         timeserver='time.euro.apple.com',
         timezone='Europe/Berlin',  # relative path to /usr/share/zoneinfo/
     ),
-    appserver=dict(ip_addr='127.0.0.2'),
+    appserver=dict(
+        ip_addr='127.0.0.2',
+        port=6543,
+        app_user='pyramid',
+        app_home='/usr/local/briefkasten/',
+        root_url='/',
+        ),
     webserver=dict(ip_addr='127.0.0.3'),
 )
+
+# top level listing of what to upload for the application server
+APP_SRC = [
+    'briefkasten',
+    'middleware_scripts',
+    'appserver.cfg',
+    'bootstrap.py',
+    'briefkasten.ini.in',
+    'setup.cfg',
+    'setup.py',
+]
 
 
 def commandline():
@@ -47,7 +65,8 @@ def commandline():
             config[key].update(parsed_dict.get(key, dict()))
         else:
             config[key] = parsed_dict[key]
-
+    # inject the absolute location of the config file so consumers can resolve relative paths
+    config['fs_path'] = path.dirname(path.abspath(sys.argv[1]))
     # determine the host os (we only support -- and default to -- FreeBSD atm)
     host_os = config['host'].get('os', 'freebsd').lower()
     if host_os == 'freebsd':
