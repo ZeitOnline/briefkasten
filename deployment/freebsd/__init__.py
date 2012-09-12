@@ -118,7 +118,8 @@ def update_appserver(config):
     fab.sudo('chown -R %s %s' % (app_user, app_home))
     # bootstrap and run buildout
     with fab.cd(app_home):
-        fab.sudo('python2.7 bootstrap.py', user=app_user)
+        if configure_hasrun:
+            fab.sudo('python2.7 bootstrap.py', user=app_user)
         fab.sudo('bin/buildout', user=app_user)
     # start supervisor
     if configure_hasrun:
