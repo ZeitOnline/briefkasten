@@ -61,7 +61,10 @@ def configure_appserver(config):
         "/var/db/ports/",
         use_sudo=True)
     # install ports
-    for port in ['lang/python', 'sysutils/py-supervisor', 'net/rsync']:
+    for port in ['lang/python',
+        'sysutils/py-supervisor',
+        'net/rsync',
+        'textproc/libxslt']:
         with fab.cd('/usr/ports/%s' % port):
             fab.sudo('make install')
     fab.sudo('mkdir -p %s' % app_home)
