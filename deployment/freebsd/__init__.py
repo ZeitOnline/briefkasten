@@ -79,7 +79,6 @@ def configure_appserver(config):
             fab.sudo('make install')
     fab.sudo('mkdir -p %s' % app_home)
     fab.sudo('''echo 'supervisord_enable="YES"' >> /etc/rc.conf ''')
-    # create custom buildout.cfg
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
     # configure supervisor (make sure logging is off!)
     upload_template(filename=path.join(local_resource_dir, 'supervisord.conf.in'),
