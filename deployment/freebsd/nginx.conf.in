@@ -30,6 +30,8 @@ http {
         listen       443;
         server_name  %(fqdn)s;
     
+        client_max_body_size 2048m;
+
         ssl                  on;
         ssl_certificate      briefkasten.crt;
         ssl_certificate_key  briefkasten.key;
