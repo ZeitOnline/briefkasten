@@ -22,6 +22,11 @@ http {
     error_page   500 502 503 504  /50x.html;
 
     server {
+        listen         80;
+        return 301 https://$host$request_uri;
+    }
+
+    server {
         listen       443;
         server_name  %(fqdn)s;
     
