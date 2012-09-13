@@ -26,6 +26,7 @@ def deploy(config, steps=[]):
         'update-appserver': (jexec, (config['appserver']['ip_addr'], update_appserver, config)),
         'create-webserver': (create_webserver, (config,)),
         'configure-webserver': (jexec, (config['webserver']['ip_addr'], configure_webserver, config)),
+        'update-webserver': (jexec, (config['webserver']['ip_addr'], update_webserver, config)),
         }
 
     for step in ALL_STEPS:
@@ -142,8 +143,7 @@ def create_webserver(config):
 
 def configure_webserver(config):
     # create www user
-    wwwuser = config['webserver']['wwwuser']
-    fab.sudo("pw user add %s" % wwwuser)
+    fab.sudo("pw user add %s" % config['webserver']['wwwuser'])
     # upload port configuration
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
     fab.sudo("mkdir -p /var/db/ports/")
@@ -155,17 +155,6 @@ def configure_webserver(config):
         with fab.cd('/usr/ports/%s' % port):
             fab.sudo('make install')
     fab.sudo('''echo 'nginx_enable="YES"' >> /etc/rc.conf ''')
-    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    # configure nginx (make sure logging is off!)
-    upload_template(filename=path.join(local_resource_dir, 'nginx.conf.in'),
-        context=dict(
-            fqdn=config['webserver']['fqdn'],
-            app_ip=config['appserver']['ip_addr'],
-            app_port=config['appserver']['port'],
-            wwwuser=wwwuser),
-        destination='/usr/local/etc/nginx/nginx.conf',
-        backup=False,
-        use_sudo=True)
     # create or upload pem
     cert_file = config['webserver']['cert_file']
     key_file = config['webserver']['key_file']
@@ -201,5 +190,23 @@ def configure_webserver(config):
     fab.put(key_file, '/usr/local/etc/nginx/briefkasten.key', use_sudo=True)
     if tempdir:
         rmtree(tempdir)
+    config['webserver']['configure-hasrun'] = True
+
+
+def update_webserver(config):
+    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+    # configure nginx (make sure logging is off!)
+    upload_template(filename=path.join(local_resource_dir, 'nginx.conf.in'),
+        context=dict(
+            fqdn=config['webserver']['fqdn'],
+            app_ip=config['appserver']['ip_addr'],
+            app_port=config['appserver']['port'],
+            wwwuser=config['webserver']['wwwuser']),
+        destination='/usr/local/etc/nginx/nginx.conf',
+        backup=False,
+        use_sudo=True)
     # start nginx
-    fab.sudo('/usr/local/etc/rc.d/nginx start')
+    if config['webserver'].get('configure-hasrun', False):
+        fab.sudo('/usr/local/etc/rc.d/nginx start')
+    else:
+        fab.sudo('/usr/local/etc/rc.d/nginx reload')

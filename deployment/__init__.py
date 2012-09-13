@@ -21,6 +21,7 @@ ALL_STEPS = ['bootstrap',
     'update-appserver',
     'create-webserver',
     'configure-webserver',
+    'update-webserver',
 ]
 
 
