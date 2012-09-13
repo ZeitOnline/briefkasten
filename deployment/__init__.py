@@ -18,7 +18,10 @@ class ConfigParser(ConfigParser_.SafeConfigParser):
 ALL_STEPS = ['bootstrap',
     'create-appserver',
     'configure-appserver',
-    'update-appserver']
+    'update-appserver',
+    'create-webserver',
+    'configure-webserver',
+]
 
 
 DEFAULT_CONFIG = dict(
@@ -34,8 +37,14 @@ DEFAULT_CONFIG = dict(
         app_user='pyramid',
         app_home='/usr/local/briefkasten/',
         root_url='/',
-        ),
-    webserver=dict(ip_addr='127.0.0.3'),
+    ),
+    webserver=dict(
+        ip_addr='127.0.0.3',
+        wwwuser='www',
+        fqdn='briefkasten.local',
+        cert_file=None,
+        key_file=None
+    ),
 )
 
 

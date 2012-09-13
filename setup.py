@@ -24,7 +24,7 @@ setup(name='briefkasten',
     ],
     extras_require={
         "tests": ['wsgi_intercept', 'zope.testbrowser'],
-        "freebsd-deployment": ["ezjailremote", ],
+        "freebsd-deployment": ['ezjailremote', 'pyopenssl'],
     },
     test_suite="briefkasten",
     entry_points="""

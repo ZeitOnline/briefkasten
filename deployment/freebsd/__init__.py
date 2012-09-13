@@ -1,4 +1,7 @@
 from os import path
+from shutil import rmtree
+from tempfile import mkdtemp
+from OpenSSL import crypto
 from fabric import api as fab
 from fabric.contrib.project import rsync_project
 from fabric.contrib.files import upload_template
@@ -14,13 +17,15 @@ def deploy(config, steps=[]):
     fab.env['host_string'] = config['host']['ip_addr']
 
     # TODO: step execution should be moved up to general deployment,
-    # it's not OS specific
+    # it's not OS specific (actually, it should move to ezjail-remote eventually)
 
     all_steps = {
         'bootstrap': (bootstrap, (config,)),
         'create-appserver': (create_appserver, (config,)),
         'configure-appserver': (jexec, (config['appserver']['ip_addr'], configure_appserver, config)),
         'update-appserver': (jexec, (config['appserver']['ip_addr'], update_appserver, config)),
+        'create-webserver': (create_webserver, (config,)),
+        'configure-webserver': (jexec, (config['webserver']['ip_addr'], configure_webserver, config)),
         }
 
     for step in ALL_STEPS:
@@ -136,9 +141,65 @@ def create_webserver(config):
 
 
 def configure_webserver(config):
-    # upload site root
-    # install nginx via ports
+    # create www user
+    wwwuser = config['webserver']['wwwuser']
+    fab.sudo("pw user add %s" % wwwuser)
+    # upload port configuration
+    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+    fab.sudo("mkdir -p /var/db/ports/")
+    fab.put(path.join(local_resource_dir, 'webserver/var/db/ports/*'),
+        "/var/db/ports/",
+        use_sudo=True)
+    # install ports
+    for port in ['www/nginx', ]:
+        with fab.cd('/usr/ports/%s' % port):
+            fab.sudo('make install')
+    fab.sudo('''echo 'nginx_enable="YES"' >> /etc/rc.conf ''')
+    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+    # configure nginx (make sure logging is off!)
+    upload_template(filename=path.join(local_resource_dir, 'nginx.conf.in'),
+        context=dict(
+            fqdn=config['webserver']['fqdn'],
+            app_ip=config['appserver']['ip_addr'],
+            app_port=config['appserver']['port'],
+            wwwuser=wwwuser),
+        destination='/usr/local/etc/nginx/nginx.conf',
+        backup=False,
+        use_sudo=True)
     # create or upload pem
-    # configure nginx
+    cert_file = config['webserver']['cert_file']
+    key_file = config['webserver']['key_file']
+    tempdir = None
+
+    # if no files were given, create an ad-hoc certificate and key
+    if not (path.exists(cert_file)
+        or path.exists(key_file)):
+
+        tempdir = mkdtemp()
+        cert_file = path.join(tempdir, 'briefkasten.crt')
+        key_file = path.join(tempdir, 'briefkasten.key')
+
+        # create a key pair
+        # based on http://skippylovesmalorie.wordpress.com/2010/02/12/how-to-generate-a-self-signed-certificate-using-pyopenssl/
+        pkey = crypto.PKey()
+        pkey.generate_key(crypto.TYPE_RSA, 1024)
+
+        # create a minimal self-signed cert
+        cert = crypto.X509()
+        cert.get_subject().CN = config['webserver']['fqdn']
+        cert.set_serial_number(1000)
+        cert.gmtime_adj_notBefore(0)
+        cert.gmtime_adj_notAfter(365 * 24 * 60 * 60)
+        cert.set_issuer(cert.get_subject())
+        cert.set_pubkey(pkey)
+        cert.sign(pkey, 'sha1')
+        open(cert_file, "wt").write(
+            crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+        open(key_file, "wt").write(
+            crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
+    fab.put(cert_file, '/usr/local/etc/nginx/briefkasten.crt', use_sudo=True)
+    fab.put(key_file, '/usr/local/etc/nginx/briefkasten.key', use_sudo=True)
+    if tempdir:
+        rmtree(tempdir)
     # start nginx
-    pass
+    fab.sudo('/usr/local/etc/rc.d/nginx start')
