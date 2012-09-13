@@ -38,7 +38,9 @@ def deploy(config, steps=[]):
 
 def bootstrap(config):
     # run ezjailremote's basic bootstrap
+    orig_user = fab.env['user']
     ezjail.bootstrap(primary_ip=config['host']['ip_addr'])
+    fab.env['user'] = orig_user
 
     # configure IP addresses for the jails
     for jailhost in ['webserver', 'appserver']:
