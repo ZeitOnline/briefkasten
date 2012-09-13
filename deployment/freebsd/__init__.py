@@ -13,6 +13,9 @@ def deploy(config, steps=[]):
     # by default, all steps are performed on the jailhost
     fab.env['host_string'] = config['host']['ip_addr']
 
+    # TODO: step execution should be moved up to general deployment,
+    # it's not OS specific
+
     all_steps = {
         'bootstrap': (bootstrap, (config,)),
         'create-appserver': (create_appserver, (config,)),
