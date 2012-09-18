@@ -22,7 +22,7 @@ def deploy(config, steps=[]):
     all_steps = {
         'bootstrap': (bootstrap, (config,)),
         'create-appserver': (create_appserver, (config,)),
-        'configure-appserver': (jexec, (config['appserver']['ip_addr'], configure_appserver, config)),
+        'configure-appserver': (configure_appserver, (config,)),
         'update-appserver': (jexec, (config['appserver']['ip_addr'], update_appserver, config)),
         'create-webserver': (create_webserver, (config,)),
         'configure-webserver': (jexec, (config['webserver']['ip_addr'], configure_webserver, config)),
@@ -81,27 +81,27 @@ def configure_appserver(config):
     # create application user
     app_user = config['appserver']['app_user']
     app_home = config['appserver']['app_home']
-    fab.sudo("pw user add %s" % app_user)
+    jail_root = '/usr/jails/appserver'
+    fab.sudo("pw user add %s -V %s/etc -b %s/home/" % (app_user, jail_root, jail_root))
     # upload port configuration
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    fab.sudo("mkdir -p /var/db/ports/")
+    fab.sudo("mkdir -p %s/var/db/ports/" % jail_root)
     fab.put(path.join(local_resource_dir, 'appserver/var/db/ports/*'),
-        "/var/db/ports/",
+        "%s/var/db/ports/" % jail_root,
         use_sudo=True)
     # install ports
     for port in ['lang/python',
         'sysutils/py-supervisor',
         'net/rsync',
         'textproc/libxslt']:
-        with fab.cd('/usr/ports/%s' % port):
-            fab.sudo('make install')
-    fab.sudo('mkdir -p %s' % app_home)
-    fab.sudo('''echo 'supervisord_enable="YES"' >> /etc/rc.conf ''')
+        fab.sudo("""ezjail-admin console webserver make -C '/usr/ports/%s install""" % port)
+    fab.sudo('mkdir -p %s' % path.join(jail_root, app_home))
+    fab.sudo('''echo 'supervisord_enable="YES"' >> %s/etc/rc.conf ''' % jail_root)
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
     # configure supervisor (make sure logging is off!)
     upload_template(filename=path.join(local_resource_dir, 'supervisord.conf.in'),
         context=dict(app_home=app_home, app_user=app_user),
-        destination='/usr/local/etc/supervisord.conf',
+        destination='%s/usr/local/etc/supervisord.conf' % jail_root,
         backup=False,
         use_sudo=True)
     config['appserver']['configure-hasrun'] = True
