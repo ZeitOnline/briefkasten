@@ -39,14 +39,21 @@ def deploy(config, steps=[]):
 def bootstrap(config):
     # run ezjailremote's basic bootstrap
     orig_user = fab.env['user']
-    ezjail.bootstrap(primary_ip=config['host']['ip_addr'])
+    host_ip = config['host']['ip_addr']
+    ezjail.bootstrap(primary_ip=host_ip)
     fab.env['user'] = orig_user
 
     # configure IP addresses for the jails
+    fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
+    fab.sudo("""echo 'ipv4_addrs_lo1="127.0.0.2-10/32"' >> /etc.rc.conf""")
+    fab.sudo('ifconfig lo1 create')
+    for ip in range(2, 11):
+        fab.sudo('ifconfig lo1 alias 127.0.0.%s' % ip)
     for jailhost in ['webserver', 'appserver']:
         alias = config[jailhost]['ip_addr']
-        fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
-        fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
+        if alias != host_ip and not alias.startswith('127.0.0.'):
+            fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
+            fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
 
     # set the time
     fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host']['timezone'])
