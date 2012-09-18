@@ -67,7 +67,7 @@ def bootstrap(config):
 
 def create_appserver(config):
     ezjail.create('appserver',
-        config['appserver']['ip_addr'], ctype='zfs')
+        config['appserver']['ip_addr'])
 
 
 def configure_appserver(config):
@@ -140,7 +140,7 @@ def update_appserver(config):
 
 def create_webserver(config):
     ezjail.create('webserver',
-        config['webserver']['ip_addr'], ctype='zfs')
+        config['webserver']['ip_addr'])
 
 
 def configure_webserver(config):
