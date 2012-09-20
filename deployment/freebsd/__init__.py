@@ -69,7 +69,7 @@ def bootstrap(config):
     fab.sudo("""sudo zfs mount -a""")  # sometimes the newly created pool is not mounted automatically
 
     # install ezjail
-    ezjail.install(source='cvs', jailzfs='jails/ezjail', p=True)
+    ezjail.install(source='cvs', jailzfs='%s/ezjail' % config['host']['zpool'], p=True)
 
 
 def create_appserver(config):

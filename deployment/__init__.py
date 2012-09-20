@@ -32,6 +32,7 @@ DEFAULT_CONFIG = dict(
         root_device='ada0',
         timeserver='time.euro.apple.com',
         timezone='Europe/Berlin',  # relative path to /usr/share/zoneinfo/
+        zpool='jails',
     ),
     appserver=dict(
         ip_addr='127.0.0.2',
