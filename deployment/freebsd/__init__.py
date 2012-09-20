@@ -55,6 +55,12 @@ def bootstrap(config):
             fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
             fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
 
+    # set up NAT for the jails
+    fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host']['iface'], host_ip))
+    fab.sudo("""echo 'pf_enable="YES"' >> /etc/rc.conf""")
+    fab.sudo("""/etc/rc.d/pf start""")
+    # TODO: should deactivate net access for the jails after they've built their packages?
+
     # set the time
     fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host']['timezone'])
     fab.sudo("ntpdate %s" % config['host']['timeserver'])
