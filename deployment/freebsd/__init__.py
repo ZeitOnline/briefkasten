@@ -100,7 +100,7 @@ def configure_appserver(config):
         'sysutils/py-supervisor',
         'net/rsync',
         'textproc/libxslt']:
-        fab.sudo("""ezjail-admin console webserver make -C '/usr/ports/%s install""" % port)
+        fab.sudo("""ezjail-admin console -e 'make -C /usr/ports/%s install' appserver""" % port)
     fab.sudo('mkdir -p %s' % path.join(jail_root, app_home))
     fab.sudo('''echo 'supervisord_enable="YES"' >> %s/etc/rc.conf ''' % jail_root)
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
