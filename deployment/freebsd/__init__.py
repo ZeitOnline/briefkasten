@@ -23,7 +23,7 @@ def deploy(config, steps=[]):
         'bootstrap': (bootstrap, (config,)),
         'create-appserver': (create_appserver, (config,)),
         'configure-appserver': (configure_appserver, (config,)),
-        'update-appserver': (jexec, (config['appserver']['ip_addr'], update_appserver, config)),
+        'update-appserver': (update_appserver, (config,)),
         'create-webserver': (create_webserver, (config,)),
         'configure-webserver': (jexec, (config['webserver']['ip_addr'], configure_webserver, config)),
         'update-webserver': (jexec, (config['webserver']['ip_addr'], update_webserver, config)),
@@ -118,37 +118,47 @@ def update_appserver(config):
     # upload sources
     import briefkasten
     from deployment import APP_SRC
+    jail_root = '/usr/jails/appserver'
     app_home = config['appserver']['app_home']
     app_user = config['appserver']['app_user']
+    userinfo = fab.sudo('pw usershow -V %s/etc -n %s' % (jail_root, app_user))
+    numeric_app_user = userinfo.split(':')[3]
     base_path = path.abspath(path.join(path.dirname(briefkasten.__file__), '..'))
     local_paths = ' '.join([path.join(base_path, app_path) for app_path in APP_SRC])
-    fab.sudo('chown -R %s %s' % (fab.env['user'], app_home))
-    rsync_project(app_home, local_paths, delete=True)
+
+    # upload project
+    fab.sudo("""mkdir -p %s%s""" % (jail_root, app_home))
+    fab.sudo('chown -R %s %s%s' % (fab.env['user'], jail_root, app_home))
+    rsync_project('%s%s' % (jail_root, app_home), local_paths, delete=True)
+
     # upload theme
     fs_remote_theme = path.join(app_home, 'themes')
     config['appserver']['fs_remote_theme'] = path.join(fs_remote_theme, path.split(config['appserver']['fs_theme_path'])[-1])
-    fab.run('mkdir -p %s' % fs_remote_theme)
-    rsync_project(fs_remote_theme,
+    fab.run('mkdir -p %s%s' % (jail_root, fs_remote_theme))
+    rsync_project('%s%s' % (jail_root, fs_remote_theme),
         path.abspath(path.join(config['fs_path'], config['appserver']['fs_theme_path'])),
         delete=True)
+
     # create custom buildout.cfg
     local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
     upload_template(filename=path.join(local_resource_dir, 'buildout.cfg.in'),
         context=config['appserver'],
-        destination=path.join(app_home, 'buildout.cfg'),
+        destination=path.join('%s%s' % (jail_root, app_home), 'buildout.cfg'),
         backup=False)
 
-    fab.sudo('chown -R %s %s' % (app_user, app_home))
+    fab.sudo('chown -R %s %s%s' % (numeric_app_user, jail_root, app_home))
+
     # bootstrap and run buildout
-    with fab.cd(app_home):
-        if configure_hasrun:
-            fab.sudo('python2.7 bootstrap.py', user=app_user)
-        fab.sudo('bin/buildout', user=app_user)
+    if configure_hasrun:
+        fab.sudo('''ezjail-admin console -e "sudo -u %s python2.7 %s/bootstrap.py -c %s/buildout.cfg"  appserver'''
+            % (app_user, app_home, app_home))
+        fab.sudo('''ezjail-admin console -e "sudo -u %s %s/bin/buildout -c %s/buildout.cfg"  appserver'''
+            % (app_user, app_home, app_home))
     # start supervisor
     if configure_hasrun:
-        fab.sudo('/usr/local/etc/rc.d/supervisord start')
+        fab.sudo('''ezjail-admin console -e "/usr/local/etc/rc.d/supervisord start" appserver''')
     else:
-        fab.sudo('supervisorctl restart briefkasten')
+        fab.sudo('''ezjail-admin console -e "supervisorctl restart briefkasten" appserver''')
 
 
 def create_webserver(config):
