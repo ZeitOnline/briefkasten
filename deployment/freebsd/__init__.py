@@ -6,7 +6,7 @@ from fabric import api as fab
 from fabric.contrib.project import rsync_project
 from fabric.contrib.files import upload_template
 from ezjailremote import fabfile as ezjail
-from ezjailremote.utils import jexec
+from ezjailremote.api import BaseJail
 
 from deployment import ALL_STEPS
 
@@ -19,14 +19,17 @@ def deploy(config, steps=[]):
     # TODO: step execution should be moved up to general deployment,
     # it's not OS specific (actually, it should move to ezjail-remote eventually)
 
+    webserver = WebserverJail(**config['webserver'])
+    webserver.app_config = config['appserver']
+
     all_steps = {
         'bootstrap': (bootstrap, (config,)),
         'create-appserver': (create_appserver, (config,)),
         'configure-appserver': (configure_appserver, (config,)),
         'update-appserver': (update_appserver, (config,)),
-        'create-webserver': (create_webserver, (config,)),
-        'configure-webserver': (jexec, (config['webserver']['ip_addr'], configure_webserver, config)),
-        'update-webserver': (jexec, (config['webserver']['ip_addr'], update_webserver, config)),
+        'create-webserver': (webserver.create, ()),
+        'configure-webserver': (webserver.configure, ()),
+        'update-webserver': (webserver.update, ()),
         }
 
     for step in ALL_STEPS:
@@ -161,77 +164,65 @@ def update_appserver(config):
         fab.sudo('''ezjail-admin console -e "supervisorctl restart briefkasten" appserver''')
 
 
-def create_webserver(config):
-    ezjail.create('webserver',
-        config['webserver']['ip_addr'])
+class WebserverJail(BaseJail):
 
+    name = "webserver"
+    ctype = 'zfs'
+    sshd = False
+    ports_to_install = ['www/nginx', ]
 
-def configure_webserver(config):
-    # create www user
-    fab.sudo("pw user add %s" % config['webserver']['wwwuser'])
-    # upload port configuration
-    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    fab.sudo("mkdir -p /var/db/ports/")
-    fab.put(path.join(local_resource_dir, 'webserver/var/db/ports/*'),
-        "/var/db/ports/",
-        use_sudo=True)
-    # install ports
-    for port in ['www/nginx', ]:
-        with fab.cd('/usr/ports/%s' % port):
-            fab.sudo('make install')
-    fab.sudo('''echo 'nginx_enable="YES"' >> /etc/rc.conf ''')
-    # create or upload pem
-    cert_file = config['webserver']['cert_file']
-    key_file = config['webserver']['key_file']
-    tempdir = None
+    def extra_configure(self):
+        # enable nginx
+        fab.sudo('''echo 'nginx_enable="YES"' >> %s/etc/rc.conf ''' % self.fs_remote_root)
+        # create or upload pem
+        tempdir = None
 
-    # if no files were given, create an ad-hoc certificate and key
-    if not (path.exists(cert_file)
-        or path.exists(key_file)):
+        # if no files were given, create an ad-hoc certificate and key
+        if not (path.exists(self.cert_file)
+            or path.exists(self.key_file)):
 
-        tempdir = mkdtemp()
-        cert_file = path.join(tempdir, 'briefkasten.crt')
-        key_file = path.join(tempdir, 'briefkasten.key')
+            tempdir = mkdtemp()
+            cert_file = path.join(tempdir, 'briefkasten.crt')
+            key_file = path.join(tempdir, 'briefkasten.key')
 
-        # create a key pair
-        # based on http://skippylovesmalorie.wordpress.com/2010/02/12/how-to-generate-a-self-signed-certificate-using-pyopenssl/
-        pkey = crypto.PKey()
-        pkey.generate_key(crypto.TYPE_RSA, 1024)
+            # create a key pair
+            # based on http://skippylovesmalorie.wordpress.com/2010/02/12/how-to-generate-a-self-signed-certificate-using-pyopenssl/
+            pkey = crypto.PKey()
+            pkey.generate_key(crypto.TYPE_RSA, 1024)
 
-        # create a minimal self-signed cert
-        cert = crypto.X509()
-        cert.get_subject().CN = config['webserver']['fqdn']
-        cert.set_serial_number(1000)
-        cert.gmtime_adj_notBefore(0)
-        cert.gmtime_adj_notAfter(365 * 24 * 60 * 60)
-        cert.set_issuer(cert.get_subject())
-        cert.set_pubkey(pkey)
-        cert.sign(pkey, 'sha1')
-        open(cert_file, "wt").write(
-            crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
-        open(key_file, "wt").write(
-            crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
-    fab.put(cert_file, '/usr/local/etc/nginx/briefkasten.crt', use_sudo=True)
-    fab.put(key_file, '/usr/local/etc/nginx/briefkasten.key', use_sudo=True)
-    if tempdir:
-        rmtree(tempdir)
-    config['webserver']['configure-hasrun'] = True
+            # create a minimal self-signed cert
+            cert = crypto.X509()
+            cert.get_subject().CN = self.fqdn
+            cert.set_serial_number(1000)
+            cert.gmtime_adj_notBefore(0)
+            cert.gmtime_adj_notAfter(365 * 24 * 60 * 60)
+            cert.set_issuer(cert.get_subject())
+            cert.set_pubkey(pkey)
+            cert.sign(pkey, 'sha1')
+            open(cert_file, "wt").write(
+                crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
+            open(key_file, "wt").write(
+                crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
 
+        fab.put(cert_file, '%s/usr/local/etc/nginx/briefkasten.crt' % self.fs_remote_root, use_sudo=True)
+        fab.put(key_file, '%s/usr/local/etc/nginx/briefkasten.key' % self.fs_remote_root, use_sudo=True)
+        if tempdir:
+            rmtree(tempdir)
 
-def update_webserver(config):
-    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    # configure nginx (make sure logging is off!)
-    upload_template(filename=path.join(local_resource_dir, 'nginx.conf.in'),
-        context=dict(
-            fqdn=config['webserver']['fqdn'],
-            app_ip=config['appserver']['ip_addr'],
-            app_port=config['appserver']['port'],
-            wwwuser=config['webserver']['wwwuser']),
-        destination='/usr/local/etc/nginx/nginx.conf',
-        backup=False,
-        use_sudo=True)
-    # start nginx
-    if config['webserver'].get('configure-hasrun', False):
-        fab.sudo('/usr/local/etc/rc.d/nginx start')
-    else:
-        fab.sudo('/usr/local/etc/rc.d/nginx reload')
+    def update(self):
+        local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+        # configure nginx (make sure logging is off!)
+        upload_template(filename=path.join(local_resource_dir, 'nginx.conf.in'),
+            context=dict(
+                fqdn=self.fqdn,
+                app_ip=self.app_config['ip_addr'],
+                app_port=self.app_config['port'],
+                wwwuser=self.wwwuser),
+            destination='%s/usr/local/etc/nginx/nginx.conf' % self.fs_remote_root,
+            backup=False,
+            use_sudo=True)
+        # start nginx
+        if self.configurehasrun:
+            self.console('/usr/local/etc/rc.d/nginx start')
+        else:
+            self.console('/usr/local/etc/rc.d/nginx reload')

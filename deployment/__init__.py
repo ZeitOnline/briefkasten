@@ -42,7 +42,6 @@ DEFAULT_CONFIG = dict(
         root_url='/',
     ),
     webserver=dict(
-        ip_addr='127.0.0.3',
         wwwuser='www',
         fqdn='briefkasten.local',
         cert_file=None,
