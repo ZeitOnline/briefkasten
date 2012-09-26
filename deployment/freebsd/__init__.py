@@ -4,6 +4,7 @@ from tempfile import mkdtemp
 from OpenSSL import crypto
 from fabric import api as fab
 from fabric.contrib.project import rsync_project
+from fabric.contrib.files import exists as fabexists
 from fabric.contrib.files import upload_template
 from ezjailremote import fabfile as ezjail
 from ezjailremote.api import BaseJail
@@ -19,14 +20,16 @@ def deploy(config, steps=[]):
     # TODO: step execution should be moved up to general deployment,
     # it's not OS specific (actually, it should move to ezjail-remote eventually)
 
+    appserver = AppserverJail(**config['appserver'])
+    appserver.config_fs_path = config['fs_path']
     webserver = WebserverJail(**config['webserver'])
     webserver.app_config = config['appserver']
 
     all_steps = {
         'bootstrap': (bootstrap, (config,)),
-        'create-appserver': (create_appserver, (config,)),
-        'configure-appserver': (configure_appserver, (config,)),
-        'update-appserver': (update_appserver, (config,)),
+        'create-appserver': (appserver.create, ()),
+        'configure-appserver': (appserver.configure, ()),
+        'update-appserver': (appserver.update, ()),
         'create-webserver': (webserver.create, ()),
         'configure-webserver': (webserver.configure, ()),
         'update-webserver': (webserver.update, ()),
@@ -81,87 +84,72 @@ def bootstrap(config):
     ezjail.install(source='cvs', jailzfs='%s/ezjail' % config['host']['zpool'], p=True)
 
 
-def create_appserver(config):
-    ezjail.create('appserver',
-        config['appserver']['ip_addr'])
+class AppserverJail(BaseJail):
 
-
-def configure_appserver(config):
-    # create application user
-    app_user = config['appserver']['app_user']
-    app_home = config['appserver']['app_home']
-    jail_root = '/usr/jails/appserver'
-    fab.sudo("pw user add %s -V %s/etc -b %s/home/" % (app_user, jail_root, jail_root))
-    # upload port configuration
-    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    fab.sudo("mkdir -p %s/var/db/ports/" % jail_root)
-    fab.put(path.join(local_resource_dir, 'appserver/var/db/ports/*'),
-        "%s/var/db/ports/" % jail_root,
-        use_sudo=True)
-    # install ports
-    for port in ['lang/python',
+    name = "appserver"
+    ctype = 'zfs'
+    sshd = False
+    ports_to_install = ['lang/python',
         'sysutils/py-supervisor',
         'net/rsync',
-        'textproc/libxslt']:
-        fab.sudo("""ezjail-admin console -e 'make -C /usr/ports/%s install' appserver""" % port)
-    fab.sudo('mkdir -p %s' % path.join(jail_root, app_home))
-    fab.sudo('''echo 'supervisord_enable="YES"' >> %s/etc/rc.conf ''' % jail_root)
-    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    # configure supervisor (make sure logging is off!)
-    upload_template(filename=path.join(local_resource_dir, 'supervisord.conf.in'),
-        context=dict(app_home=app_home, app_user=app_user),
-        destination='%s/usr/local/etc/supervisord.conf' % jail_root,
-        backup=False,
-        use_sudo=True)
-    config['appserver']['configure-hasrun'] = True
+        'textproc/libxslt']
 
+    def extra_configure(self):
+        # create application user
+        with fab.settings(fab.show("output"), warn_only=True):
+            self.console("pw user add %s" % self.app_user)
+            fab.sudo('mkdir -p %s' % path.join(self.fs_remote_root, self.app_home))
+        fab.sudo('''echo 'supervisord_enable="YES"' >> %s/etc/rc.conf ''' % self.fs_remote_root)
+        local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+        # configure supervisor (make sure logging is off!)
+        upload_template(filename=path.join(local_resource_dir, 'supervisord.conf.in'),
+            context=dict(app_home=self.app_home, app_user=self.app_user),
+            destination='%s/usr/local/etc/supervisord.conf' % self.fs_remote_root,
+            backup=False,
+            use_sudo=True)
 
-def update_appserver(config):
-    configure_hasrun = config['appserver'].get('configure-hasrun', False)
-    # upload sources
-    import briefkasten
-    from deployment import APP_SRC
-    jail_root = '/usr/jails/appserver'
-    app_home = config['appserver']['app_home']
-    app_user = config['appserver']['app_user']
-    userinfo = fab.sudo('pw usershow -V %s/etc -n %s' % (jail_root, app_user))
-    numeric_app_user = userinfo.split(':')[3]
-    base_path = path.abspath(path.join(path.dirname(briefkasten.__file__), '..'))
-    local_paths = ' '.join([path.join(base_path, app_path) for app_path in APP_SRC])
+    def update(self):
+        # upload sources
+        import briefkasten
+        from deployment import APP_SRC
+        userinfo = fab.sudo('pw usershow -V %s/etc -n %s' % (self.fs_remote_root, self.app_user))
+        numeric_app_user = userinfo.split(':')[3]
+        base_path = path.abspath(path.join(path.dirname(briefkasten.__file__), '..'))
+        local_paths = ' '.join([path.join(base_path, app_path) for app_path in APP_SRC])
 
-    # upload project
-    fab.sudo("""mkdir -p %s%s""" % (jail_root, app_home))
-    fab.sudo('chown -R %s %s%s' % (fab.env['user'], jail_root, app_home))
-    rsync_project('%s%s' % (jail_root, app_home), local_paths, delete=True)
+        # upload project
+        fab.sudo("""mkdir -p %s%s""" % (self.fs_remote_root, self.app_home))
+        fab.sudo('chown -R %s %s%s' % (fab.env['user'], self.fs_remote_root, self.app_home))
+        rsync_project('%s%s' % (self.fs_remote_root, self.app_home), local_paths, delete=True)
 
-    # upload theme
-    fs_remote_theme = path.join(app_home, 'themes')
-    config['appserver']['fs_remote_theme'] = path.join(fs_remote_theme, path.split(config['appserver']['fs_theme_path'])[-1])
-    fab.run('mkdir -p %s%s' % (jail_root, fs_remote_theme))
-    rsync_project('%s%s' % (jail_root, fs_remote_theme),
-        path.abspath(path.join(config['fs_path'], config['appserver']['fs_theme_path'])),
-        delete=True)
+        # upload theme
+        fs_remote_theme = path.join(self.app_home, 'themes')
+        self.fs_remote_theme = fs_remote_theme = path.join(fs_remote_theme, path.split(self.fs_theme_path)[-1])
+        fab.run('mkdir -p %s%s' % (self.fs_remote_root, fs_remote_theme))
+        rsync_project('%s%s/' % (self.fs_remote_root, fs_remote_theme),
+            '%s/' % path.abspath(path.join(self.config_fs_path, self.fs_theme_path)),
+            delete=True)
 
-    # create custom buildout.cfg
-    local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-    upload_template(filename=path.join(local_resource_dir, 'buildout.cfg.in'),
-        context=config['appserver'],
-        destination=path.join('%s%s' % (jail_root, app_home), 'buildout.cfg'),
-        backup=False)
+        # create custom buildout.cfg
+        local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+        upload_template(filename=path.join(local_resource_dir, 'buildout.cfg.in'),
+            context=self.__dict__,
+            destination=path.join('%s%s' % (self.fs_remote_root, self.app_home), 'buildout.cfg'),
+            backup=False)
 
-    fab.sudo('chown -R %s %s%s' % (numeric_app_user, jail_root, app_home))
+        fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
 
-    # bootstrap and run buildout
-    if configure_hasrun:
-        fab.sudo('''ezjail-admin console -e "sudo -u %s python2.7 %s/bootstrap.py -c %s/buildout.cfg"  appserver'''
-            % (app_user, app_home, app_home))
-        fab.sudo('''ezjail-admin console -e "sudo -u %s %s/bin/buildout -c %s/buildout.cfg"  appserver'''
-            % (app_user, app_home, app_home))
-    # start supervisor
-    if configure_hasrun:
-        fab.sudo('''ezjail-admin console -e "/usr/local/etc/rc.d/supervisord start" appserver''')
-    else:
-        fab.sudo('''ezjail-admin console -e "supervisorctl restart briefkasten" appserver''')
+        # bootstrap and run buildout
+        if self.configurehasrun or not fabexists('%s%s/bin/buildout' % (self.fs_remote_root, self.app_home)):
+            self.console('sudo -u %s python2.7 %s/bootstrap.py -c %s/buildout.cfg'
+                % (self.app_user, self.app_home, self.app_home))
+            self.console('sudo -u %s %s/bin/buildout -c %s/buildout.cfg'
+                % (self.app_user, self.app_home, self.app_home))
+        # start supervisor
+        if self.configurehasrun:
+            self.console('/usr/local/etc/rc.d/supervisord start')
+        else:
+            self.console('supervisorctl restart briefkasten')
 
 
 class WebserverJail(BaseJail):
