@@ -14,74 +14,78 @@ from deployment import ALL_STEPS
 
 def deploy(config, steps=[]):
     print "Deploying on FreeBSD."
-    # by default, all steps are performed on the jailhost
     fab.env['host_string'] = config['host']['ip_addr']
-
     # TODO: step execution should be moved up to general deployment,
     # it's not OS specific (actually, it should move to ezjail-remote eventually)
 
+    bootstrap = BootstrapHost(config)
     appserver = AppserverJail(**config['appserver'])
     appserver.config_fs_path = config['fs_path']
     webserver = WebserverJail(**config['webserver'])
     webserver.app_config = config['appserver']
 
     all_steps = {
-        'bootstrap': (bootstrap, (config,)),
-        'create-appserver': (appserver.create, ()),
-        'configure-appserver': (appserver.configure, ()),
-        'update-appserver': (appserver.update, ()),
-        'create-webserver': (webserver.create, ()),
-        'configure-webserver': (webserver.configure, ()),
-        'update-webserver': (webserver.update, ()),
+        'bootstrap': bootstrap,
+        'create-appserver': appserver.create,
+        'configure-appserver': appserver.configure,
+        'update-appserver': appserver.update,
+        'create-webserver': webserver.create,
+        'configure-webserver': webserver.configure,
+        'update-webserver': webserver.update,
         }
 
     for step in ALL_STEPS:
         if not steps or step in steps:
-            funk, arx = all_steps[step]
+            all_steps[step]()
             print step
-            funk(*arx)
 
 
-def bootstrap(config):
-    # run ezjailremote's basic bootstrap
-    orig_user = fab.env['user']
-    host_ip = config['host']['ip_addr']
-    ezjail.bootstrap(primary_ip=host_ip)
-    fab.env['user'] = orig_user
+class BootstrapHost(object):
 
-    # configure IP addresses for the jails
-    fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
-    fab.sudo("""echo 'ipv4_addrs_lo1="127.0.0.2-10/32"' >> /etc.rc.conf""")
-    fab.sudo('ifconfig lo1 create')
-    for ip in range(2, 11):
-        fab.sudo('ifconfig lo1 alias 127.0.0.%s' % ip)
-    for jailhost in ['webserver', 'appserver']:
-        alias = config[jailhost]['ip_addr']
-        if alias != host_ip and not alias.startswith('127.0.0.'):
-            fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
-            fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
+    def __init__(self, config):
+        self.config = config
 
-    # set up NAT for the jails
-    fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host']['iface'], host_ip))
-    fab.sudo("""echo 'pf_enable="YES"' >> /etc/rc.conf""")
-    fab.sudo("""/etc/rc.d/pf start""")
-    # TODO: should deactivate net access for the jails after they've built their packages?
+    def __call__(self):
+        config = self.config
+        # run ezjailremote's basic bootstrap
+        orig_user = fab.env['user']
+        host_ip = config['host']['ip_addr']
+        ezjail.bootstrap(primary_ip=host_ip)
+        fab.env['user'] = orig_user
 
-    # set the time
-    fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host']['timezone'])
-    fab.sudo("ntpdate %s" % config['host']['timeserver'])
+        # configure IP addresses for the jails
+        fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
+        fab.sudo("""echo 'ipv4_addrs_lo1="127.0.0.2-10/32"' >> /etc.rc.conf""")
+        fab.sudo('ifconfig lo1 create')
+        for ip in range(2, 11):
+            fab.sudo('ifconfig lo1 alias 127.0.0.%s' % ip)
+        for jailhost in ['webserver', 'appserver']:
+            alias = config[jailhost]['ip_addr']
+            if alias != host_ip and not alias.startswith('127.0.0.'):
+                fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
+                fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
 
-    # configure crypto volume for jails
-    fab.sudo("""gpart add -t freebsd-zfs -l jails -a8 %s""" % config['host']['root_device'])
-    fab.puts("You will need to enter the passphrase for the crypto volume THREE times")
-    fab.puts("Once to provide it for encrypting, a second time to confirm it and a third time to mount the volume")
-    fab.sudo("""geli init gpt/jails""")
-    fab.sudo("""geli attach gpt/jails""")
-    fab.sudo("""zpool create jails gpt/jails.eli""")
-    fab.sudo("""sudo zfs mount -a""")  # sometimes the newly created pool is not mounted automatically
+        # set up NAT for the jails
+        fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host']['iface'], host_ip))
+        fab.sudo("""echo 'pf_enable="YES"' >> /etc/rc.conf""")
+        fab.sudo("""/etc/rc.d/pf start""")
+        # TODO: should deactivate net access for the jails after they've built their packages?
 
-    # install ezjail
-    ezjail.install(source='cvs', jailzfs='%s/ezjail' % config['host']['zpool'], p=True)
+        # set the time
+        fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host']['timezone'])
+        fab.sudo("ntpdate %s" % config['host']['timeserver'])
+
+        # configure crypto volume for jails
+        fab.sudo("""gpart add -t freebsd-zfs -l jails -a8 %s""" % config['host']['root_device'])
+        fab.puts("You will need to enter the passphrase for the crypto volume THREE times")
+        fab.puts("Once to provide it for encrypting, a second time to confirm it and a third time to mount the volume")
+        fab.sudo("""geli init gpt/jails""")
+        fab.sudo("""geli attach gpt/jails""")
+        fab.sudo("""zpool create jails gpt/jails.eli""")
+        fab.sudo("""sudo zfs mount -a""")  # sometimes the newly created pool is not mounted automatically
+
+        # install ezjail
+        ezjail.install(source='cvs', jailzfs='%s/ezjail' % config['host']['zpool'], p=True)
 
 
 class AppserverJail(BaseJail):
