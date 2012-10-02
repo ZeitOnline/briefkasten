@@ -18,14 +18,14 @@ def deploy(config, steps=[]):
     # TODO: step execution should be moved up to general deployment,
     # it's not OS specific (actually, it should move to ezjail-remote eventually)
 
-    bootstrap = BootstrapHost(config)
+    jailhost = BootstrapHost(config)
     appserver = AppserverJail(**config['appserver'])
     appserver.config_fs_path = config['fs_path']
     webserver = WebserverJail(**config['webserver'])
     webserver.app_config = config['appserver']
 
     all_steps = {
-        'bootstrap': bootstrap,
+        'bootstrap': jailhost.bootstrap,
         'create-appserver': appserver.create,
         'configure-appserver': appserver.configure,
         'update-appserver': appserver.update,
@@ -45,7 +45,7 @@ class BootstrapHost(object):
     def __init__(self, config):
         self.config = config
 
-    def __call__(self):
+    def bootstrap(self):
         config = self.config
         # run ezjailremote's basic bootstrap
         orig_user = fab.env['user']
@@ -98,7 +98,7 @@ class AppserverJail(BaseJail):
         'net/rsync',
         'textproc/libxslt']
 
-    def extra_configure(self):
+    def configure(self):
         # create application user
         with fab.settings(fab.show("output"), warn_only=True):
             self.console("pw user add %s" % self.app_user)
@@ -163,7 +163,7 @@ class WebserverJail(BaseJail):
     sshd = False
     ports_to_install = ['www/nginx', ]
 
-    def extra_configure(self):
+    def configure(self):
         # enable nginx
         fab.sudo('''echo 'nginx_enable="YES"' >> %s/etc/rc.conf ''' % self.fs_remote_root)
         # create or upload pem
