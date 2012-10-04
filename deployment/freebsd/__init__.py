@@ -204,3 +204,16 @@ class WebserverJail(api.BaseJail):
                 reloaded = self.console('/usr/local/etc/rc.d/nginx reload')
                 if 'nginx not running' in reloaded:
                     self.console('/usr/local/etc/rc.d/nginx start')
+
+
+class CleanserJail(api.BaseJail):
+
+    ctype = 'zfs'
+    sshd = True
+    ip_addr = '127.0.0.3'
+    ports_to_install = [
+        'graphics/netpbm',
+        'print/ghostscript9',
+        'editors/libreoffice',
+        'archive/zip',
+    ]
