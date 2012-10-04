@@ -30,8 +30,6 @@ setup(name='briefkasten',
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main
-        [console_scripts]
-        deploy=deployment:commandline
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),

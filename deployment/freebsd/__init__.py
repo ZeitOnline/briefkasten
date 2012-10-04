@@ -7,51 +7,21 @@ from fabric.contrib.project import rsync_project
 from fabric.contrib.files import exists as fabexists
 from fabric.contrib.files import upload_template
 from ezjailremote import fabfile as ezjail
-from ezjailremote.api import BaseJail
-
-from deployment import ALL_STEPS
+from ezjailremote import api
 
 
-def deploy(config, steps=[]):
-    print "Deploying on FreeBSD."
-    fab.env['host_string'] = config['host']['ip_addr']
-    # TODO: step execution should be moved up to general deployment,
-    # it's not OS specific (actually, it should move to ezjail-remote eventually)
+class JailHost(api.JailHost):
 
-    jailhost = BootstrapHost(config)
-    appserver = AppserverJail(**config['appserver'])
-    appserver.config_fs_path = config['fs_path']
-    webserver = WebserverJail(**config['webserver'])
-    webserver.app_config = config['appserver']
-
-    all_steps = {
-        'bootstrap': jailhost.bootstrap,
-        'create-appserver': appserver.create,
-        'configure-appserver': appserver.configure,
-        'update-appserver': appserver.update,
-        'create-webserver': webserver.create,
-        'configure-webserver': webserver.configure,
-        'update-webserver': webserver.update,
-        }
-
-    for step in ALL_STEPS:
-        if not steps or step in steps:
-            all_steps[step]()
-            print step
-
-
-class BootstrapHost(object):
-
-    def __init__(self, config):
-        self.config = config
+    iface = 'em0'
+    root_device='ada0'
+    timeserver = 'time.euro.apple.com'
+    timezone = 'Europe/Berlin'  # relative path to /usr/share/zoneinfo
+    zpool = 'jails'
 
     def bootstrap(self):
         config = self.config
         # run ezjailremote's basic bootstrap
-        orig_user = fab.env['user']
-        host_ip = config['host']['ip_addr']
-        ezjail.bootstrap(primary_ip=host_ip)
-        fab.env['user'] = orig_user
+        ezjail.bootstrap(primary_ip=self.ip_addr)
 
         # configure IP addresses for the jails
         fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
@@ -88,11 +58,15 @@ class BootstrapHost(object):
         ezjail.install(source='cvs', jailzfs='%s/ezjail' % config['host']['zpool'], p=True)
 
 
-class AppserverJail(BaseJail):
+class AppserverJail(api.BaseJail):
 
-    name = "appserver"
     ctype = 'zfs'
     sshd = False
+    ip_addr = '127.0.0.2'
+    port = 6543
+    app_user = 'pyramid'
+    app_home = '/usr/local/briefkasten/'
+    root_url = '/'
     ports_to_install = ['lang/python',
         'sysutils/py-supervisor',
         'net/rsync',
@@ -130,8 +104,9 @@ class AppserverJail(BaseJail):
         fs_remote_theme = path.join(self.app_home, 'themes')
         self.fs_remote_theme = fs_remote_theme = path.join(fs_remote_theme, path.split(self.fs_theme_path)[-1])
         fab.run('mkdir -p %s%s' % (self.fs_remote_root, fs_remote_theme))
+
         rsync_project('%s%s/' % (self.fs_remote_root, fs_remote_theme),
-            '%s/' % path.abspath(path.join(self.config_fs_path, self.fs_theme_path)),
+            '%s/' % path.abspath(path.join(self.jailhost.config['_fs_config'], self.fs_theme_path)),
             delete=True)
 
         # create custom buildout.cfg
@@ -144,24 +119,31 @@ class AppserverJail(BaseJail):
         fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
 
         # bootstrap and run buildout
-        if self.configurehasrun or not fabexists('%s%s/bin/buildout' % (self.fs_remote_root, self.app_home)):
+        if self.preparehasrun or not fabexists('%s%s/bin/buildout' % (self.fs_remote_root, self.app_home)):
             self.console('sudo -u %s python2.7 %s/bootstrap.py -c %s/buildout.cfg'
                 % (self.app_user, self.app_home, self.app_home))
             self.console('sudo -u %s %s/bin/buildout -c %s/buildout.cfg'
                 % (self.app_user, self.app_home, self.app_home))
         # start supervisor
-        if self.configurehasrun:
-            self.console('/usr/local/etc/rc.d/supervisord start')
-        else:
-            self.console('supervisorctl restart briefkasten')
+        with fab.settings(fab.show("output"), warn_only=True):
+            if self.preparehasrun:
+                self.console('/usr/local/etc/rc.d/supervisord start')
+            else:
+                restarted = self.console('supervisorctl restart briefkasten')
+                if 'no such file' in restarted:
+                    self.console('/usr/local/etc/rc.d/supervisord start')
 
 
-class WebserverJail(BaseJail):
 
-    name = "webserver"
+class WebserverJail(api.BaseJail):
+
     ctype = 'zfs'
     sshd = False
     ports_to_install = ['www/nginx', ]
+    fqdn = 'briefkasten.local'
+    wwwuser = 'www'
+    cert_file = None
+    key_file = None
 
     def configure(self):
         # enable nginx
@@ -204,17 +186,21 @@ class WebserverJail(BaseJail):
     def update(self):
         local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
         # configure nginx (make sure logging is off!)
+        appserver = self.jailhost.jails['appserver']
         upload_template(filename=path.join(local_resource_dir, 'nginx.conf.in'),
             context=dict(
                 fqdn=self.fqdn,
-                app_ip=self.app_config['ip_addr'],
-                app_port=self.app_config['port'],
+                app_ip=appserver.ip_addr,
+                app_port=appserver.port,
                 wwwuser=self.wwwuser),
             destination='%s/usr/local/etc/nginx/nginx.conf' % self.fs_remote_root,
             backup=False,
             use_sudo=True)
         # start nginx
-        if self.configurehasrun:
-            self.console('/usr/local/etc/rc.d/nginx start')
-        else:
-            self.console('/usr/local/etc/rc.d/nginx reload')
+        with fab.settings(fab.show("output"), warn_only=True):
+            if self.preparehasrun:
+                started = self.console('/usr/local/etc/rc.d/nginx start')
+            else:
+                reloaded = self.console('/usr/local/etc/rc.d/nginx reload')
+                if 'nginx not running' in reloaded:
+                    self.console('/usr/local/etc/rc.d/nginx start')
