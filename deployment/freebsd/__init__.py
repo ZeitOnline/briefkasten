@@ -16,7 +16,8 @@ class JailHost(api.JailHost):
     root_device = 'ada0'
     timeserver = 'time.euro.apple.com'
     timezone = 'Europe/Berlin'  # relative path to /usr/share/zoneinfo
-    zpool = 'jails'
+    jailzfs = 'jails/ezjail'
+    install_from = 'cvs'
 
     def bootstrap(self):
         config = self.config
@@ -31,12 +32,12 @@ class JailHost(api.JailHost):
             fab.sudo('ifconfig lo1 alias 127.0.0.%s' % ip)
         for jailhost in ['webserver', 'appserver']:
             alias = config[jailhost]['ip_addr']
-            if alias != host_ip and not alias.startswith('127.0.0.'):
+            if alias != self.ip_addr and not alias.startswith('127.0.0.'):
                 fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
                 fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
 
         # set up NAT for the jails
-        fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host']['iface'], host_ip))
+        fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host']['iface'], self.ip_addr))
         fab.sudo("""echo 'pf_enable="YES"' >> /etc/rc.conf""")
         fab.sudo("""/etc/rc.d/pf start""")
         # TODO: should deactivate net access for the jails after they've built their packages?
@@ -46,16 +47,14 @@ class JailHost(api.JailHost):
         fab.sudo("ntpdate %s" % config['host']['timeserver'])
 
         # configure crypto volume for jails
-        fab.sudo("""gpart add -t freebsd-zfs -l jails -a8 %s""" % config['host']['root_device'])
+        label = self.jailzfs.split('/')[0]
+        fab.sudo("""gpart add -t freebsd-zfs -l %s -a8 %s""" % (label, config['host']['root_device']))
         fab.puts("You will need to enter the passphrase for the crypto volume THREE times")
         fab.puts("Once to provide it for encrypting, a second time to confirm it and a third time to mount the volume")
-        fab.sudo("""geli init gpt/jails""")
-        fab.sudo("""geli attach gpt/jails""")
-        fab.sudo("""zpool create jails gpt/jails.eli""")
+        fab.sudo("""geli init gpt/%s""" % label)
+        fab.sudo("""geli attach gpt/%s""" % label)
+        fab.sudo("""zpool create %s gpt/%s.eli""" % (label, label))
         fab.sudo("""sudo zfs mount -a""")  # sometimes the newly created pool is not mounted automatically
-
-        # install ezjail
-        ezjail.install(source='cvs', jailzfs='%s/ezjail' % config['host']['zpool'], p=True)
 
 
 class AppserverJail(api.BaseJail):
