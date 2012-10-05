@@ -13,7 +13,7 @@ from ezjailremote import api
 class JailHost(api.JailHost):
 
     iface = 'em0'
-    root_device='ada0'
+    root_device = 'ada0'
     timeserver = 'time.euro.apple.com'
     timezone = 'Europe/Berlin'  # relative path to /usr/share/zoneinfo
     zpool = 'jails'
