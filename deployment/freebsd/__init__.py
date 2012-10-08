@@ -133,7 +133,6 @@ class AppserverJail(api.BaseJail):
                     self.console('/usr/local/etc/rc.d/supervisord start')
 
 
-
 class WebserverJail(api.BaseJail):
 
     ctype = 'zfs'
@@ -198,7 +197,7 @@ class WebserverJail(api.BaseJail):
         # start nginx
         with fab.settings(fab.show("output"), warn_only=True):
             if self.preparehasrun:
-                started = self.console('/usr/local/etc/rc.d/nginx start')
+                self.console('/usr/local/etc/rc.d/nginx start')
             else:
                 reloaded = self.console('/usr/local/etc/rc.d/nginx reload')
                 if 'nginx not running' in reloaded:
