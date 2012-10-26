@@ -213,5 +213,5 @@ class CleanserJail(api.BaseJail):
         'graphics/netpbm',
         'print/ghostscript9',
         'editors/libreoffice',
-        'archive/zip',
+        'archivers/zip',
     ]
