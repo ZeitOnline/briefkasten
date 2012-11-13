@@ -5,7 +5,7 @@ PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 # Warn 14 days before expiry
 the_now=`date +%s`
-the_expirywarndate=$(( ${the_now} + 140 * 60 * 60 * 24 ))
+the_expirywarndate=$(( ${the_now} + 14 * 60 * 60 * 24 ))
 
 case `uname -s` in
   Darwin)  the_sendmail_bin="/usr/sbin/sendmail";;
