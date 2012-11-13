@@ -91,7 +91,7 @@ for the_editor in ${the_editors}; do
     ${the_sendmail_bin} -t ${the_sender} < ${the_dropdir}/mail.eml
   else
     for the_admin in ${the_admins}; do
-      echo | create-multipart.sh -f ${the_sender} -t ${the_admin} -s "FAILURE: Drop ID `basename ${the_dropdir}`" -p ${the_dropdir}/report > ${the_dropdir}/fail.eml 2> /dev/null
+      echo -n | create-multipart.sh -f ${the_sender} -t ${the_admin} -s "FAILURE: Drop ID `basename ${the_dropdir}`" -p ${the_dropdir}/report > ${the_dropdir}/fail.eml 2> /dev/null
       ${the_sendmail_bin} -t ${the_sender} < ${the_dropdir}/fail.eml
     done
   fi

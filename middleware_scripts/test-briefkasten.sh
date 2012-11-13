@@ -32,7 +32,7 @@ report_error_gpg() {
    the_report=`mktemp /tmp/report_XXXXXXX`
    the_failreport=`mktemp /tmp/report_XXXXXXX`
    echo "$*" > ${the_report}
-   echo | ${the_midware}/create-multipart.sh -f ${the_sender} -t ${the_admin} -s "Report for briefkasten daily script" -p ${the_report} > ${the_failreport} 2>/dev/null
+   echo -n | ${the_midware}/create-multipart.sh -f ${the_sender} -t ${the_admin} -s "Report for briefkasten daily script" -p ${the_report} > ${the_failreport} 2>/dev/null
    ${the_sendmail_bin} -t ${the_sender} < ${the_failreport}
    rm -f ${the_report} ${the_failreport}
  done
