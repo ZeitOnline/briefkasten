@@ -5,7 +5,7 @@ PATH="${PATH}":/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 # Warn 14 days before expiry
 the_now=`date +%s`
-the_expirywarndate=$(( ${the_now} + 14 * 60 * 60 * 24 ))
+the_expirywarndate=$(( ${the_now} + 140 * 60 * 60 * 24 ))
 
 case `uname -s` in
   Darwin)  the_sendmail_bin="/usr/sbin/sendmail";;
@@ -52,11 +52,11 @@ report_error_user_expires() {
   fi
 
   ( echo "Subject: WARNUNG: Ihr PGP-Key auf dem briefkasten ist nur noch ${the_days} gueltig"
-    echo "To: $the_admins"
+    echo "To: $the_user"
     echo Date: `date +"%a, %d %b %Y %T %z"`
     echo
-    echo Die Administratoren werden sich demnaechst darum kuemmern. ${the_user}
-  ) | ${the_sendmail_bin} -t ${the_sender} ${the_admin}
+    echo Die Administratoren werden sich demnaechst darum kuemmern.
+  ) | ${the_sendmail_bin} -t ${the_sender} ${the_user}
 }
 
 # Check for proper parameters
