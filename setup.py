@@ -21,14 +21,18 @@ setup(name='briefkasten',
         'Pyramid',
         'pyramid_deform',
         'deform',
+        'zope.testbrowser',
+        'pyquery',
     ],
     extras_require={
-        "tests": ['wsgi_intercept', 'zope.testbrowser']
+        "tests": ['wsgi_intercept', 'zope.testbrowser'],
     },
     test_suite="briefkasten",
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main
+        [console_scripts]
+        watchdog = briefkasten.watchdog:main
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),
