@@ -121,7 +121,7 @@ It expects its configuration in ``etc/watchdog.ini`` with the following values::
 
     app_url = # full URL to the submit form, i.e. ``https://ssl.zeit.de/briefkasten/submit``
     test_token = # a unique string that will trigger the test submission when the watchdog submits a POST
-    max_process_time = # time in seconds which it allows a submission to take to complete before it deems it failed.
+    max_process_secs = # time in seconds which it allows a submission to take to complete before it deems it failed.
     imap_recipient = # email address to which the test submission should be sent to
     imap_host =
     imap_user =
