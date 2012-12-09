@@ -116,7 +116,7 @@ def main():
     history = fetch_test_submissions(previous_history=history, config=config)
 
     # check for failed test submissions
-    max_process_secs = config.get('max_process_secs', 600)
+    max_process_secs = int(config.get('max_process_secs', 600))
     now = datetime.now()
     for token, timestamp_str in history.items():
         timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
