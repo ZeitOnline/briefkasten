@@ -126,9 +126,10 @@ def main():
                 message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (token, timestamp, max_process_secs)))
 
     # perform test submission
-    token, errors = perform_submission(app_url=config['app_url'],
+    token, submission_errors = perform_submission(app_url=config['app_url'],
         testing_secret=config['testing_secret'])
     history[token] = datetime.now().isoformat()
+    errors += submission_errors
 
     # record result of test submission
     file_history = open(fs_history, 'w')
