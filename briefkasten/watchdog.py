@@ -27,7 +27,7 @@ class ConfigParser(ConfigParser_.SafeConfigParser):
         return d
 
 
-class SubmissionError(object):
+class WatchdogError(object):
 
     subject = ''
     message = ''
@@ -48,7 +48,7 @@ def perform_submission(app_url, testing_secret):
     try:
         submit_form = browser.getForm(id='briefkasten-form')
     except LookupError:
-        errors.append(SubmissionError(subject=u"Couldn't find submission form",
+        errors.append(WatchdogError(subject=u"Couldn't find submission form",
             message=u""""""))
         return token
     submit_form.getControl(name='message').value = u'Hello there'
@@ -60,7 +60,7 @@ def perform_submission(app_url, testing_secret):
     if token_element is not None:
         token = token_element.text()
     else:
-        errors.append(SubmissionError(subject="Couldn't get feedback token",
+        errors.append(WatchdogError(subject="Couldn't get feedback token",
             message=u"The form submission was successful, but no feedback-token was given at %s" % browser.url))
     return token, errors
 
@@ -122,7 +122,7 @@ def main():
         timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
         age = now - timestamp
         if age.seconds > max_process_secs:
-            errors.append(SubmissionError(subject="Submission '%s' not received" % token,
+            errors.append(WatchdogError(subject="Submission '%s' not received" % token,
                 message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (token, timestamp, max_process_secs)))
 
     # perform test submission
