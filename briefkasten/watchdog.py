@@ -40,7 +40,7 @@ class SubmissionError(object):
         return "[%s] %s" % (self.submit_form, self.message)
 
 
-def perform_submission(app_url=None):
+def perform_submission(app_url, testing_secret):
     token = None
     errors = []
     browser = Browser()
@@ -52,6 +52,7 @@ def perform_submission(app_url=None):
             message=u""""""))
         return token
     submit_form.getControl(name='message').value = u'Hello there'
+    submit_form.getControl(name='testing_secret').value = testing_secret
     # TODO: submit attachment
     submit_form.submit()
     response = PyQuery(browser.contents)
@@ -125,7 +126,8 @@ def main():
                 message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (token, timestamp, max_process_secs)))
 
     # perform test submission
-    token, errors = perform_submission(app_url=config['app_url'])
+    token, errors = perform_submission(app_url=config['app_url'],
+        testing_secret=config['testing_secret'])
     history[token] = datetime.now().isoformat()
 
     # record result of test submission
