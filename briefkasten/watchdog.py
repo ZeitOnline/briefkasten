@@ -1,5 +1,7 @@
+import re
 import time
 import json
+from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
 from os import path
@@ -8,6 +10,8 @@ from pyquery import PyQuery
 
 
 import ConfigParser as ConfigParser_
+
+find_drop_id = re.compile('Drop ID\W(\w+)\s.*')
 
 
 class ConfigParser(ConfigParser_.SafeConfigParser):
@@ -60,7 +64,7 @@ def perform_submission(app_url=None):
     return token, errors
 
 
-def fetch_test_submissions(history=None, config=None):
+def fetch_test_submissions(previous_history, config):
     """ fetch emails from IMAP server using the given configuration
         each email is parsed to see whether it matches a submission
         if so, its token is extracted and checked against the given
@@ -69,6 +73,26 @@ def fetch_test_submissions(history=None, config=None):
         is removed from the history.
         any entries left in the history are returned
     """
+    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True)
+    server.login(config['imap_user'], config['imap_passwd'])
+    server.select_folder('INBOX')
+    history = previous_history.copy()
+    candidates = server.fetch(server.search(criteria=['NOT DELETED',
+        'SUBJECT "Drop ID"']), ['BODY[HEADER.FIELDS (SUBJECT)]'])
+    for imap_id, message in candidates.items():
+        subject = message.get('BODY[HEADER.FIELDS (SUBJECT)]', 'Subject: ')
+        try:
+            drop_id = find_drop_id.findall(subject)[0]
+        except IndexError:
+            # ignore emails that are not test submissions
+            continue
+        print "Found submission '%s'" % drop_id
+        server.delete_messages([imap_id])
+        try:
+            del history[drop_id]
+        except KeyError:
+            pass  # TODO: log this?
+    server.logout()
     return history
 
 
@@ -88,7 +112,7 @@ def main():
         history = dict()
 
     # fetch submissions from mail server
-    history = fetch_test_submissions(history=history, config=config)
+    history = fetch_test_submissions(previous_history=history, config=config)
 
     # check for failed test submissions
     max_process_secs = config.get('max_process_secs', 600)
