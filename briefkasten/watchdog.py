@@ -37,7 +37,7 @@ class WatchdogError(object):
         self.message = message
 
     def __repr__(self):
-        return "[%s] %s" % (self.submit_form, self.message)
+        return "[%s] %s" % (self.subject, self.message)
 
 
 def perform_submission(app_url, testing_secret):
