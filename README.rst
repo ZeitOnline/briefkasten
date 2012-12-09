@@ -127,6 +127,13 @@ It expects its configuration in ``etc/watchdog.ini`` with the following values::
     imap_user =
     imap_passwd =
     notify_email = one or more (one per line) email recipients that should receive notification if something went wrong.
+    # smtp settings for pyramid_mailer, see
+    # http://docs.pylonsproject.org/projects/pyramid_mailer/en/latest/
+    smtp_host = localhost
+    smtp_port = 25
+    smtp_username = blubber
+    smtp_password = fooberific
+    smtp_tls = true
 
 When run, the script will:
 

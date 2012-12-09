@@ -131,13 +131,22 @@ def main():
     history[token] = datetime.now().isoformat()
     errors += submission_errors
 
-    # record result of test submission
+    # record updated history
     file_history = open(fs_history, 'w')
     file_history.write(json.dumps(history).encode('utf-8'))
     file_history.close()
-    for error in errors:
-        print error
 
+    if len(errors) == 0:
+        exit()
 
-def send_notification(subject=u'', message=u''):
-    pass
+    from pyramid_mailer import mailer_factory_from_settings
+    from pyramid_mailer.message import Message
+    from urlparse import urlparse
+    mailer = mailer_factory_from_settings(config, prefix='smtp_')
+    hostname = urlparse(config['app_url']).hostname
+    recipients = [recipient for recipient in config['notify_email'].split('\n') if recipient]
+    message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
+        sender=config['the_sender'],
+        recipients=recipients,
+        body="\n".join([str(error) for error in errors]))
+    mailer.send_immediately(message, fail_silently=False)

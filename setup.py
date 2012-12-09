@@ -26,7 +26,11 @@ setup(name='briefkasten',
     ],
     extras_require={
         "tests": ['wsgi_intercept', 'zope.testbrowser'],
-        "watchdog": ['imapclient', 'zope.testbrowser', 'pyquery'],
+        "watchdog": [
+            'imapclient',
+            'zope.testbrowser',
+            'pyquery',
+            'pyramid_mailer'],
     },
     test_suite="briefkasten",
     entry_points="""
