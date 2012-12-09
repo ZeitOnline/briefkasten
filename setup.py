@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1.9-dev'
+version = '0.1.9-watchdog'
 
 
 setup(name='briefkasten',
