@@ -5,7 +5,7 @@ import deform
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render
 from pyramid.view import view_config
-from briefkasten import dropbox_container, _
+from briefkasten import dropbox_container, _, is_equal
 
 title = "ZEIT ONLINE Briefkasten"
 version = pkg_resources.get_distribution("briefkasten").version
@@ -32,6 +32,8 @@ class DropboxSchema(colander.MappingSchema):
         title=_(u'Anonymous submission to the editors'),
         widget=deform.widget.TextAreaWidget(rows=10, cols=60),)
     attachments = Attachments(title=_(u'Upload files'), missing=None)
+    testing_secret = colander.SchemaNode(colander.String(),
+        widget=deform.widget.HiddenWidget(), missing=u'')
 dropbox_schema = DropboxSchema()
 
 
@@ -70,13 +72,16 @@ def dropbox_submitted(request):
             formid='briefkasten-form',
             action=request.url,
             buttons=('submit',)).validate(request.POST.items())
+        testing_secret = request.registry.settings.get('test_submission_secret', '')
+        is_test_submission = is_equal(testing_secret,
+            data.pop('testing_secret', ''))
         drop_box = dropbox_container.add_dropbox(**data)
         text = render('briefkasten:templates/editor_email.pt', dict(
             reply_url=request.route_url('dropbox_editor', drop_id=drop_box.drop_id, editor_token=drop_box.editor_token),
             message=drop_box.message,
             num_attachments=drop_box.num_attachments), request)
         drop_box.update_message(text)
-        process_status = drop_box.process()
+        process_status = drop_box.process(testing=is_test_submission)
         try:
             del tempstore[data['attachment']['uid']]
         except (KeyError, TypeError):
