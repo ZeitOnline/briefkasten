@@ -1,4 +1,4 @@
-0.1.9 - Unreleased
+0.1.9 - 2013-02-23
 ------------------
 
  * added a middleware_scripts/test_briefkasten.sh script that does local housekeeping on the server.
