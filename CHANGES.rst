@@ -1,6 +1,9 @@
 0.1.9 - Unreleased
 ------------------
 
+ * add a standalone 'watchdog' script that ensures that the whole stack is up and running as expected
+ * add a helper script that warns if any editor's PGP keys are about to expire
+
 
 0.1.8 - 2012-08-30
 ------------------
