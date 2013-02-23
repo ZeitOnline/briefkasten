@@ -104,7 +104,7 @@ This generates a pretty report in `htmlcov/index.html` where you can browse the 
 Monitoring
 ==========
 
-Since the whole system is configured by design not to log anything in order to protect the identity of submitters in case of a break-in it is pretty much impossible to perform any post-mortem anyalysis when something has gone wrong. At the same time it is vital that you can be sure, that the system is up and running at all times. Even if the web application is running and submitters can post data (and even receive a token as confirmation) any other part of the chain (sanitizing, encrypting and sending of the submitted material) could be broken without anybody noticing it. To this end, we've included a dedicated **watchdog** application which performs regular **end to end** tests of a ``briefkasten`` instance.
+Since the whole system is configured by design not to log anything in order to protect the identity of submitters in case of a break-in, it is pretty much impossible to perform any post-mortem anyalysis when something has gone wrong. At the same time it is vital that you can be sure that the system is up and running at all times. Even if the web application is running and submitters can post data (and even receive a token as confirmation) any other part of the chain (sanitizing, encrypting and sending of the submitted material) could be broken without anybody noticing it. To this end, we've included a dedicated **watchdog** application which performs regular **end to end** tests of a ``briefkasten`` instance.
 
 Ideally, the watchdog is installed on another machine, preferably on another network (afterall, that's where your users will be coming from, too).
 
