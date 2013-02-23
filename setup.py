@@ -18,15 +18,20 @@ setup(name='briefkasten',
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Pyramid',
-        'pyramid_deform',
-        'deform',
-        'zope.testbrowser',
-        'pyquery',
     ],
     extras_require={
-        "tests": ['wsgi_intercept', 'zope.testbrowser'],
-        "freebsd-deployment": ['ezjaildeploy', 'pyopenssl'],
+        "webapp": [
+            'Pyramid',
+            'pyramid_deform',
+            'deform',
+            'zope.testbrowser',
+            'pyquery'],
+        "tests": [
+            'wsgi_intercept',
+            'zope.testbrowser'],
+        "freebsd-deployment": [
+            'ezjaildeploy',
+            'pyopenssl'],
         "watchdog": [
             'imapclient',
             'zope.testbrowser',
