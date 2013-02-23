@@ -7,7 +7,7 @@ from fabric.contrib.project import rsync_project
 from fabric.contrib.files import exists as fabexists
 from fabric.contrib.files import upload_template
 from ezjailremote import fabfile as ezjail
-from ezjailremote import api
+from ezjaildeploy import api
 
 
 class JailHost(api.JailHost):
