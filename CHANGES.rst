@@ -4,6 +4,8 @@
  * added a middleware_scripts/test_briefkasten.sh script that does local housekeeping on the server.
    The script takes the webapp directory and the pgp directory (usually ~/.gnupg/) as parameters and tries to access the public key ring. It then checks for missing keys, inaccessible keys, expired keys and keys that expire soon (or never).
    Users with keys that expire soon will receive an email, mentioning the problem. Administrators receive an email with an overview of all the problematic keys.
+ * add a standalone 'watchdog' script that ensures that the whole stack is up and running as expected
+
 
 0.1.8 - 2012-08-30
 ------------------

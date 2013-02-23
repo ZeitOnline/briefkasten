@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1.9-dev'
+version = '0.1.9-watchdog'
 
 
 setup(name='briefkasten',
@@ -21,14 +21,23 @@ setup(name='briefkasten',
         'Pyramid',
         'pyramid_deform',
         'deform',
+        'zope.testbrowser',
+        'pyquery',
     ],
     extras_require={
-        "tests": ['wsgi_intercept', 'zope.testbrowser']
+        "tests": ['wsgi_intercept', 'zope.testbrowser'],
+        "watchdog": [
+            'imapclient',
+            'zope.testbrowser',
+            'pyquery',
+            'pyramid_mailer'],
     },
     test_suite="briefkasten",
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main
+        [console_scripts]
+        watchdog = briefkasten.watchdog:main
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),

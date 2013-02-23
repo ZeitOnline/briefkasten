@@ -114,12 +114,13 @@ class Dropbox(object):
         """ overwrite the message text. this also updates the corresponding file. """
         self._write_message(self.fs_path, 'message', newtext)
 
-    def process(self, purge_meta_data=True):
+    def process(self, purge_meta_data=True, testing=False):
         """ Calls the external helper scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
         """
         fs_process = join(self.container.settings['fs_bin_path'], 'process.sh')
-        fs_config = join(self.container.settings['fs_bin_path'], 'briefkasten.conf')
+        fs_config = join(self.container.settings['fs_bin_path'],
+            'briefkasten%s.conf' % ('_test' if testing else ''))
         shellenv = environ.copy()
         shellenv['PATH'] = '%s:%s' % (shellenv['PATH'], self.container.settings['fs_bin_path'])
         return call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
