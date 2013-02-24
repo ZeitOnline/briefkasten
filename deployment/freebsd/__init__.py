@@ -34,24 +34,27 @@ class JailHost(api.JailHost):
         for ip in range(2, 11):
             fab.sudo('ifconfig lo1 alias 127.0.0.%s' % ip)
         for jailhost in ['webserver', 'appserver']:
-            alias = config[jailhost]['ip_addr']
+            try:
+                alias = config[jailhost].get('ip_addr', self.available_blueprints[jailhost].ip_addr)
+            except AttributeError:
+                exit("You must provide an IP Address for the %s jail" % jailhost)
             if alias != self.ip_addr and not alias.startswith('127.0.0.'):
-                fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host']['iface'], alias))
-                fab.sudo("""ifconfig %s alias %s""" % (config['host']['iface'], alias))
+                fab.sudo("""echo 'ifconfig_%s_alias="%s"' >> /etc/rc.conf""" % (config['host'].get('iface', self.iface), alias))
+                fab.sudo("""ifconfig %s alias %s""" % (config['host'].get('iface', self.iface), alias))
 
         # set up NAT for the jails
-        fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host']['iface'], self.ip_addr))
+        fab.sudo("""echo 'nat on %s from 127.0/24 to any -> %s' > /etc/pf.conf""" % (config['host'].get('iface', self.iface), self.ip_addr))
         fab.sudo("""echo 'pf_enable="YES"' >> /etc/rc.conf""")
         fab.sudo("""/etc/rc.d/pf start""")
         # TODO: should deactivate net access for the jails after they've built their packages?
 
         # set the time
-        fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host']['timezone'])
-        fab.sudo("ntpdate %s" % config['host']['timeserver'])
+        fab.sudo("cp /usr/share/zoneinfo/%s /etc/localtime" % config['host'].get('timezone', self.timezone))
+        fab.sudo("ntpdate %s" % config['host'].get('timeserver', self.timeserver))
 
         # configure crypto volume for jails
         label = self.jailzfs.split('/')[0]
-        fab.sudo("""gpart add -t freebsd-zfs -l %s -a8 %s""" % (label, config['host']['root_device']))
+        fab.sudo("""gpart add -t freebsd-zfs -l %s -a8 %s""" % (label, config['host'].get('root_device', self.root_device)))
         fab.puts("You will need to enter the passphrase for the crypto volume THREE times")
         fab.puts("Once to provide it for encrypting, a second time to confirm it and a third time to mount the volume")
         fab.sudo("""geli init gpt/%s""" % label)
