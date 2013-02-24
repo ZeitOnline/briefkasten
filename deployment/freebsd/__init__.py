@@ -3,6 +3,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from OpenSSL import crypto
 from fabric import api as fab
+from fabric.context_managers import prefix
 from fabric.contrib.project import rsync_project
 from fabric.contrib.files import exists as fabexists
 from fabric.contrib.files import upload_template
@@ -22,7 +23,9 @@ class JailHost(api.JailHost):
     def bootstrap(self):
         config = self.config
         # run ezjailremote's basic bootstrap
-        ezjail.bootstrap(primary_ip=self.ip_addr)
+
+        with prefix("export PACKAGESITE=\'ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-stable/Latest/\'"):
+            ezjail.bootstrap(primary_ip=self.ip_addr)
 
         # configure IP addresses for the jails
         fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
