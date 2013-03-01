@@ -26,6 +26,7 @@ class JailHost(api.JailHost):
 
         with prefix("export PACKAGESITE=\'ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-9-stable/Latest/\'"):
             ezjail.bootstrap(primary_ip=self.ip_addr)
+            fab.sudo('pkg_add -r rsync')
 
         # configure IP addresses for the jails
         fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
