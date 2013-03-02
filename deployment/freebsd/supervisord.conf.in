@@ -1,8 +1,7 @@
-[unix_http_server]
-file=/tmp/supervisor.sock
-
 [supervisord]
 pidfile=/var/run/supervisor/supervisord.pid
+user=%(app_user)s
+logfile=%(app_home)s/var/log/supervisord.log
 
 [program:briefkasten]
 command=%(app_home)s/bin/pserve %(app_home)s/briefkasten.ini

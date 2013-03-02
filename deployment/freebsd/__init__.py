@@ -92,6 +92,8 @@ class AppserverJail(api.BaseJail):
             destination='%s/usr/local/etc/supervisord.conf' % self.fs_remote_root,
             backup=False,
             use_sudo=True)
+        logdir = '''mkdir -p %s%s/var/log/''' % (self.fs_remote_root, self.app_home)
+        fab.sudo('''mkdir -p logdir''' % logdir)
 
     def update(self):
         # upload sources
