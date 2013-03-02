@@ -128,11 +128,11 @@ class AppserverJail(api.BaseJail):
         fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
 
         # bootstrap and run buildout
-        if self.preparehasrun or not fabexists('%s%s/bin/buildout' % (self.fs_remote_root, self.app_home)):
-            self.console('sudo -u %s python2.7 %s/bootstrap.py -c %s/buildout.cfg'
+        if not fabexists('%s%s/bin/buildout' % (self.fs_remote_root, self.app_home)):
+            self.console('sudo -u %s python2.7 %s/bootstrap.py  --version=1.6.3 -c %s/buildout.cfg'
                 % (self.app_user, self.app_home, self.app_home))
-            self.console('sudo -u %s %s/bin/buildout -c %s/buildout.cfg'
-                % (self.app_user, self.app_home, self.app_home))
+        self.console('sudo -u %s %s/bin/buildout -c %s/buildout.cfg'
+            % (self.app_user, self.app_home, self.app_home))
         # start supervisor
         with fab.settings(fab.show("output"), warn_only=True):
             if self.preparehasrun:
