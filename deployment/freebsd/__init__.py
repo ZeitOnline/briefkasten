@@ -196,6 +196,7 @@ class WebserverJail(api.BaseJail):
             rmtree(tempdir)
 
     def update(self):
+        self.jailhost._snapshot(name='%s-pre-update' % self.name)  # TODO: should use a decorator
         local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
         # configure nginx (make sure logging is off!)
         appserver = self.jailhost.jails['appserver']
@@ -216,6 +217,7 @@ class WebserverJail(api.BaseJail):
                 reloaded = self.console('/usr/local/etc/rc.d/nginx reload')
                 if 'nginx not running' in reloaded:
                     self.console('/usr/local/etc/rc.d/nginx start')
+        self.jailhost._snapshot(name='%s-post-update' % self.name)  # TODO: should use a decorator
 
 
 class CleanserJail(api.BaseJail):
