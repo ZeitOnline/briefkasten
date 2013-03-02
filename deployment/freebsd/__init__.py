@@ -122,6 +122,7 @@ class AppserverJail(api.BaseJail):
             destination=path.join('%s%s' % (self.fs_remote_root, self.app_home), 'buildout.cfg'),
             backup=False)
 
+        # finally, give ownership of the application directory to the application user
         fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
 
         # bootstrap and run buildout
