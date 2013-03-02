@@ -92,6 +92,8 @@ class AppserverJail(api.BaseJail):
             destination='%s/usr/local/etc/supervisord.conf' % self.fs_remote_root,
             backup=False,
             use_sudo=True)
+        # fix root access (why is this neccessary?)
+        fab.sudo('chmod a+rx %s' % self.fs_remote_root)
 
     def update(self):
         # upload sources
