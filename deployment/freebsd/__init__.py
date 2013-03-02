@@ -157,7 +157,7 @@ class WebserverJail(api.BaseJail):
         tempdir = None
 
         # if no files were given, create an ad-hoc certificate and key
-        if not (path.exists(self.cert_file)
+        if self.cert_file is None or self.key_file is None or not (path.exists(self.cert_file)
             or path.exists(self.key_file)):
 
             tempdir = mkdtemp()
