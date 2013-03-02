@@ -107,6 +107,10 @@ class AppserverJail(api.BaseJail):
         fab.sudo("""mkdir -p %s%s""" % (self.fs_remote_root, self.app_home))
         fab.sudo('chown -R %s %s%s' % (fab.env['user'], self.fs_remote_root, self.app_home))
         rsync_project('%s%s' % (self.fs_remote_root, self.app_home), local_paths, delete=True)
+        # HACK: remove watchdog.py to avoid its dependencies
+        # during pyramid scan (it should really be a separate
+        # package altogether)
+        fab.sudo('rm %s%s/briefkasten/watchdog.py' % (self.fs_remote_root, self.app_home))
 
         # upload theme
         fs_remote_theme = path.join(self.app_home, 'themes')
