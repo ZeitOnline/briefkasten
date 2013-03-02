@@ -84,9 +84,11 @@ class AppserverJail(api.BaseJail):
         with fab.settings(fab.show("output"), warn_only=True):
             self.console("pw user add %s" % self.app_user)
             fab.sudo('mkdir -p %s' % path.join(self.fs_remote_root, self.app_home))
+        # TODO: create ssh key for app user
+
+        # setup and confiure supervisor
         fab.sudo('''echo 'supervisord_enable="YES"' >> %s/etc/rc.conf ''' % self.fs_remote_root)
         local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-        # configure supervisor (make sure logging is off!)
         upload_template(filename=path.join(local_resource_dir, 'supervisord.conf.in'),
             context=dict(app_home=self.app_home, app_user=self.app_user),
             destination='%s/usr/local/etc/supervisord.conf' % self.fs_remote_root,
@@ -96,7 +98,6 @@ class AppserverJail(api.BaseJail):
         fab.sudo('''mkdir -p logdir''' % logdir)
 
     def update(self):
-        # upload sources
         import deployment
         userinfo = fab.sudo('pw usershow -V %s/etc -n %s' % (self.fs_remote_root, self.app_user))
         numeric_app_user = userinfo.split(':')[3]
@@ -116,7 +117,6 @@ class AppserverJail(api.BaseJail):
         fs_remote_theme = path.join(self.app_home, 'themes')
         self.fs_remote_theme = fs_remote_theme = path.join(fs_remote_theme, path.split(self.fs_theme_path)[-1])
         fab.run('mkdir -p %s%s' % (self.fs_remote_root, fs_remote_theme))
-
         rsync_project('%s%s/' % (self.fs_remote_root, fs_remote_theme),
             '%s/' % path.abspath(path.join(self.jailhost.config['_fs_config'], self.fs_theme_path)),
             delete=True)
@@ -190,6 +190,7 @@ class WebserverJail(api.BaseJail):
             open(key_file, "wt").write(
                 crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
 
+        # install the webserver certificate
         fab.put(cert_file, '%s/usr/local/etc/nginx/briefkasten.crt' % self.fs_remote_root, use_sudo=True)
         fab.put(key_file, '%s/usr/local/etc/nginx/briefkasten.key' % self.fs_remote_root, use_sudo=True)
         if tempdir:
@@ -231,3 +232,5 @@ class CleanserJail(api.BaseJail):
         'editors/libreoffice',
         'archivers/zip',
     ]
+
+    # TODO  configure ssh_access for the app user
