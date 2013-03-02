@@ -76,7 +76,8 @@ class AppserverJail(api.BaseJail):
     ports_to_install = ['lang/python27',
         'sysutils/py-supervisor',
         'net/rsync',
-        'textproc/libxslt']
+        'textproc/libxslt',
+        'security/sudo']
 
     def configure(self):
         # create application user
