@@ -95,12 +95,11 @@ class AppserverJail(api.BaseJail):
 
     def update(self):
         # upload sources
-        import briefkasten
-        from deployment import APP_SRC
+        import deployment
         userinfo = fab.sudo('pw usershow -V %s/etc -n %s' % (self.fs_remote_root, self.app_user))
         numeric_app_user = userinfo.split(':')[3]
-        base_path = path.abspath(path.join(path.dirname(briefkasten.__file__), '..'))
-        local_paths = ' '.join([path.join(base_path, app_path) for app_path in APP_SRC])
+        base_path = path.abspath(path.join(path.dirname(deployment.__file__), '..'))
+        local_paths = ' '.join([path.join(base_path, app_path) for app_path in deployment.APP_SRC])
 
         # upload project
         fab.sudo("""mkdir -p %s%s""" % (self.fs_remote_root, self.app_home))
