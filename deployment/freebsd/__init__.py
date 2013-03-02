@@ -73,7 +73,7 @@ class AppserverJail(api.BaseJail):
     app_user = 'pyramid'
     app_home = '/usr/local/briefkasten/'
     root_url = '/'
-    ports_to_install = ['lang/python',
+    ports_to_install = ['lang/python27',
         'sysutils/py-supervisor',
         'net/rsync',
         'textproc/libxslt']
