@@ -73,11 +73,13 @@ class AppserverJail(api.BaseJail):
     app_user = 'pyramid'
     app_home = '/usr/local/briefkasten/'
     root_url = '/'
+    fs_pgp_pubkeys = None
     ports_to_install = ['lang/python27',
         'sysutils/py-supervisor',
         'net/rsync',
         'textproc/libxslt',
-        'security/sudo']
+        'security/sudo',
+        'security/gnupg']
 
     def _debug(self):
         pass
@@ -132,6 +134,21 @@ class AppserverJail(api.BaseJail):
             context=self.__dict__,
             destination=path.join('%s%s' % (self.fs_remote_root, self.app_home), 'buildout.cfg'),
             backup=False)
+
+        # create custom briefkasten.conf
+        upload_template(filename=path.join(local_resource_dir, 'briefkasten.conf.in'),
+            context=self.__dict__,
+            destination='%s%s/middleware_scripts/briefkasten.conf' % (self.fs_remote_root, self.app_home),
+            backup=False)
+
+        # configure GnuPG
+        if not self.fs_pgp_pubkeys:  # default to relative location ``pgp_pubkeys``
+            self.fs_pgp_pubkeys = path.join(self.jailhost.config['_fs_config'], 'pgp_pubkeys')
+        full_pgp_pubkeys = '%s/%s/var/' % (self.fs_remote_root, self.app_home)
+        rsync_project(full_pgp_pubkeys,
+            '%s' % self.fs_pgp_pubkeys,
+            delete=True)
+        self.console('''env GNUPGHOME=%s/pgp_pubkeys gpg --import %s/pgp_pubkeys/*@*''' % (full_pgp_pubkeys, full_pgp_pubkeys))
 
         # finally, give ownership of the application directory to the application user
         fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
