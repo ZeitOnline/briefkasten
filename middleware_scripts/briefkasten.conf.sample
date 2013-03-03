@@ -19,3 +19,12 @@ the_default_message="/usr/local/etc/briefkasten/default_message"
 # The sender
 # Appears as the sender in the emails sent to all participants
 the_sender="noreply@briefkasten.dtfh.de"
+
+# The cleanser
+# If non-empty, process.sh connects to the cleanser host to do the work
+# and expects a process.sh to be in PATH on that host
+# To provide User, Idenity, HostName etc for the cleanser host, put them
+# in the ssh-config file that you pass in the_cleanser_ssh_conf
+
+# the_cleanser=cleanserjail
+# the_cleanser_ssh_conf=/usr/local/etc/briefkasten
