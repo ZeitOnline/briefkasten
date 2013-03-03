@@ -8,3 +8,8 @@ APP_SRC = [
     'setup.cfg',
     'setup.py',
 ]
+
+def deploy_freebsd():
+    from deployment import freebsd
+    from ezjaildeploy.commandline import main
+    main(blueprints=freebsd)

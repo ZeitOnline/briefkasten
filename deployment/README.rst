@@ -119,9 +119,14 @@ Now the deployment scripts are ready to run. However, you still need to configur
     fs_theme_path = ../themes/zeitonline
 
 
-Simply call::
+If starting from scratch with a bare FreeBSD installation, you must bootstrap it first::
 
-    bin/deploy yourconfig.ini
+    bin/deploy -c yourconfig.ini bootstrap
+
+If you already have a pre-configured ZFS setup on the host system you can skip the bootstrap and continue directly with the install command
+
+    bin/deploy -c yourconfig.ini install
+
 
 You can also only perform specific deployment steps, i.e. if you already installed ezjail etc. Run ``bin/deploy`` without arguments to see the list of available steps.
 
