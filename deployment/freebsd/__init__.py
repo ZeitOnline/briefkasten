@@ -79,12 +79,17 @@ class AppserverJail(api.BaseJail):
         'textproc/libxslt',
         'security/sudo']
 
+    def _debug(self):
+        pass
+
     def configure(self):
         # create application user
         with fab.settings(fab.show("output"), warn_only=True):
             self.console("pw user add %s" % self.app_user)
             fab.sudo('mkdir -p %s' % path.join(self.fs_remote_root, self.app_home))
-        # TODO: create ssh key for app user
+        cleanser_access_key = '''%s%s/cleanser_access_key''' % (self.fs_remote_root, self.app_home)
+        fab.sudo('''ssh-keygen -t dsa -q -N '' -f %s''' % cleanser_access_key)
+        fab.sudo(''' chmod 600 %s''' % cleanser_access_key)
 
         # setup and confiure supervisor
         fab.sudo('''echo 'supervisord_enable="YES"' >> %s/etc/rc.conf ''' % self.fs_remote_root)
@@ -233,4 +238,16 @@ class CleanserJail(api.BaseJail):
         'archivers/zip',
     ]
 
-    # TODO  configure ssh_access for the app user
+    def configure(self):
+        appserver = self.jailhost.jails['appserver']
+        # create cleanser user
+        with fab.settings(fab.show("output"), warn_only=True):
+            self.console("pw user add cleanser -d %s/home/cleanser" % self.fs_remote_root)
+            userinfo = fab.sudo('pw usershow -V %s/etc -n cleanser' % self.fs_remote_root)
+            numeric_cleanser_user = userinfo.split(':')[3]
+            cleanser_access_key = '''%s%s/cleanser_access_key.pub''' % (appserver.fs_remote_root, appserver.app_home)
+            fab.sudo('''mkdir -p %s/home/cleanser/.ssh''' % self.fs_remote_root)
+            fab.sudo('''chmod 750 %s/home/cleanser/.ssh''' % self.fs_remote_root)
+            fab.sudo('''cp %s %s/home/cleanser/.ssh/authorized_keys''' % (cleanser_access_key, self.fs_remote_root))
+            fab.sudo('''chmod 700 %s/home/cleanser/.ssh/authorized_keys''' % self.fs_remote_root)
+            fab.sudo('''chown -R %s %s/home/cleanser ''' % (numeric_cleanser_user, self.fs_remote_root))
