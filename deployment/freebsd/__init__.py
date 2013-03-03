@@ -231,6 +231,7 @@ class CleanserJail(api.BaseJail):
     ctype = 'zfs'
     sshd = True
     ip_addr = '127.0.0.3'
+    app_home = '/home/cleanser/'
     ports_to_install = [
         'graphics/netpbm',
         'print/ghostscript9',
@@ -251,3 +252,26 @@ class CleanserJail(api.BaseJail):
             fab.sudo('''cp %s %s/home/cleanser/.ssh/authorized_keys''' % (cleanser_access_key, self.fs_remote_root))
             fab.sudo('''chmod 700 %s/home/cleanser/.ssh/authorized_keys''' % self.fs_remote_root)
             fab.sudo('''chown -R %s %s/home/cleanser ''' % (numeric_cleanser_user, self.fs_remote_root))
+
+    def update(self):
+        import deployment
+        base_path = path.abspath(path.join(path.dirname(deployment.__file__), '..'))
+        local_paths = ' '.join([path.join(base_path, app_path) for app_path in deployment.CLEANSER_SRC])
+
+        userinfo = fab.sudo('pw usershow -V %s/etc -n cleanser' % self.fs_remote_root)
+        numeric_cleanser_user = userinfo.split(':')[3]
+
+        # upload cleanser scripts
+        fab.sudo("""mkdir -p %s%s""" % (self.fs_remote_root, self.app_home))
+        fab.sudo('chown -R %s %s%s' % (fab.env['user'], self.fs_remote_root, self.app_home))
+        rsync_project('%s%s' % (self.fs_remote_root, self.app_home), local_paths, delete=True)
+
+        # create custom cleanser configuration
+        local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+        upload_template(filename=path.join(local_resource_dir, 'buildout.cfg.in'),
+            context=self.__dict__,
+            destination=path.join('%s%s' % (self.fs_remote_root, self.app_home), 'buildout.cfg'),
+            backup=False)
+
+        # finally, give ownership of the application directory to the application user
+        fab.sudo('chown -R %s %s%s' % (numeric_cleanser_user, self.fs_remote_root, self.app_home))

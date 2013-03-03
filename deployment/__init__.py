@@ -9,6 +9,12 @@ APP_SRC = [
     'setup.py',
 ]
 
+# top level listing of what to upload for the application server
+CLEANSER_SRC = [
+    'middleware_scripts',
+]
+
+
 def deploy_freebsd():
     from deployment import freebsd
     from ezjaildeploy.commandline import main
