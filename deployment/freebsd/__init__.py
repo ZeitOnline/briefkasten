@@ -87,7 +87,7 @@ class AppserverJail(api.BaseJail):
         with fab.settings(fab.show("output"), warn_only=True):
             self.console("pw user add %s" % self.app_user)
             fab.sudo('mkdir -p %s' % path.join(self.fs_remote_root, self.app_home))
-        cleanser_access_key = '''%s%s/cleanser_access_key''' % (self.fs_remote_root, self.app_home)
+        cleanser_access_key = '''%s%s/var/cleanser_access_key''' % (self.fs_remote_root, self.app_home)
         fab.sudo('''ssh-keygen -t dsa -q -N '' -f %s''' % cleanser_access_key)
         fab.sudo(''' chmod 600 %s''' % cleanser_access_key)
 
