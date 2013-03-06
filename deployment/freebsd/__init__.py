@@ -29,8 +29,8 @@ class JailHost(api.JailHost):
             fab.sudo('pkg_add -r rsync')
 
         # configure IP addresses for the jails
-        fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc.rc.conf""")
-        fab.sudo("""echo 'ipv4_addrs_lo1="127.0.0.2-10/32"' >> /etc.rc.conf""")
+        fab.sudo("""echo 'cloned_interfaces="lo1"' >> /etc/rc.conf""")
+        fab.sudo("""echo 'ipv4_addrs_lo1="127.0.0.2-10/32"' >> /etc/rc.conf""")
         fab.sudo('ifconfig lo1 create')
         for ip in range(2, 11):
             fab.sudo('ifconfig lo1 alias 127.0.0.%s' % ip)
