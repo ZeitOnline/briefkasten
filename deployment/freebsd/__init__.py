@@ -88,7 +88,7 @@ class AppserverJail(api.BaseJail):
         # create application user
         with fab.settings(fab.show("output"), warn_only=True):
             self.console("pw user add %s" % self.app_user)
-            fab.sudo('mkdir -p %s' % path.join(self.fs_remote_root, self.app_home))
+            fab.sudo('mkdir -p %s%s/var' % (self.fs_remote_root, self.app_home))
         cleanser_access_key = '''%s%s/var/cleanser_access_key''' % (self.fs_remote_root, self.app_home)
         fab.sudo('''ssh-keygen -t dsa -q -N '' -f %s''' % cleanser_access_key)
         fab.sudo(''' chmod 600 %s''' % cleanser_access_key)
@@ -101,8 +101,8 @@ class AppserverJail(api.BaseJail):
             destination='%s/usr/local/etc/supervisord.conf' % self.fs_remote_root,
             backup=False,
             use_sudo=True)
-        logdir = '''mkdir -p %s%s/var/log/''' % (self.fs_remote_root, self.app_home)
-        fab.sudo('''mkdir -p logdir''' % logdir)
+        fab.sudo('''mkdir -p %s%s/log''' % (self.fs_remote_root, self.app_home))
+        fab.sudo('''mkdir -p %s%s/pgp_pubkeys''' % (self.fs_remote_root, self.app_home))
 
     def update(self):
         import deployment
