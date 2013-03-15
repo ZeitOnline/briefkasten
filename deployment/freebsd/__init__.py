@@ -148,7 +148,7 @@ class AppserverJail(api.BaseJail):
         rsync_project(full_pgp_pubkeys,
             '%s' % self.fs_pgp_pubkeys,
             delete=True)
-        self.console('''env GNUPGHOME=%s/pgp_pubkeys gpg --import %s/pgp_pubkeys/*@*''' % (full_pgp_pubkeys, full_pgp_pubkeys))
+        self.console('''sh %s/bin/import-gpg.sh''' % (self.app_home))
 
         # finally, give ownership of the application directory to the application user
         fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
