@@ -260,7 +260,7 @@ class CleanserJail(api.BaseJail):
         appserver = self.jailhost.jails['appserver']
         # create cleanser user
         with fab.settings(fab.show("output"), warn_only=True):
-            self.console("pw user add cleanser -d /home/cleanser" % self.fs_remote_root)
+            self.console("pw user add cleanser -d /home/cleanser")
             userinfo = fab.sudo('pw usershow -V %s/etc -n cleanser' % self.fs_remote_root)
             numeric_cleanser_user = userinfo.split(':')[3]
             cleanser_access_key = '''%s%s/cleanser_access_key.pub''' % (appserver.fs_remote_root, appserver.app_home)
