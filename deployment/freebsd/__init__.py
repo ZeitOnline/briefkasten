@@ -10,6 +10,7 @@ from fabric.contrib.files import upload_template
 from ezjailremote import fabfile as ezjail
 from ezjaildeploy import api
 
+fab.env.use_ssh_config = True
 
 class JailHost(api.JailHost):
 
