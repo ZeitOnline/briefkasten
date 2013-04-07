@@ -264,7 +264,7 @@ class CleanserJail(api.BaseJail):
             self.console("pw user add cleanser -d /home/cleanser")
             userinfo = fab.sudo('pw usershow -V %s/etc -n cleanser' % self.fs_remote_root)
             numeric_cleanser_user = userinfo.split(':')[3]
-            cleanser_access_key = '''%s%s/cleanser_access_key.pub''' % (appserver.fs_remote_root, appserver.app_home)
+            cleanser_access_key = '''%s%s/var/cleanser_access_key.pub''' % (appserver.fs_remote_root, appserver.app_home)
             fab.sudo('''mkdir -p %s/home/cleanser/.ssh''' % self.fs_remote_root)
             fab.sudo('''chmod 750 %s/home/cleanser/.ssh''' % self.fs_remote_root)
             fab.sudo('''cp %s %s/home/cleanser/.ssh/authorized_keys''' % (cleanser_access_key, self.fs_remote_root))
