@@ -122,7 +122,7 @@ class Dropbox(object):
         fs_config = join(self.container.settings['fs_bin_path'],
             'briefkasten%s.conf' % ('_test' if testing else ''))
         shellenv = environ.copy()
-        shellenv['PATH'] = '%s:%s' % (shellenv['PATH'], self.container.settings['fs_bin_path'])
+        shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.container.settings['fs_bin_path'])
         return call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
             env=shellenv)
 
