@@ -1,0 +1,18 @@
+
+# Note that for all email addresses gpg should have
+# a public key in its keyring
+
+# List of administrator email addresses
+the_admins="%(admins)s"
+
+# List of editors email addresses
+the_editors="%(editors)s"
+
+export GNUPGHOME="%(app_home)s/var/pgp_pubkeys"
+
+# The sender
+# Appears as the sender in the emails sent to all participants
+the_sender="%(mail_sender)s"
+
+the_cleanser=cleanserjail
+the_cleanser_ssh_conf=/usr/local/etc/briefkasten_ssh_config
