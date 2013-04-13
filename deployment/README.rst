@@ -94,17 +94,39 @@ note the IP_ADDR received, give root user a password::
 
 ..note: Alternatively, at this point it could be a good idea to replace the DHCP configuration with a permanent, static IP address.
 
-Now we can let the deployment scripts take over. You need a full checkout of the briefkasten repository, i.e.::
+
+Installing the deployment scripts
+=================================
+
+Starting from scratch, this is a three-step process (and kind of 'meta'): 
+
+ * first we install the generic tool ``buildout`` (**bootstrap.py**)
+ * then we use that to install our deployment scripts (**bin/buildout**)
+ * finally, we run those scripts to actually install the briefkasten on the remote host (**bin/deploy**)
+
+You need a full checkout of the briefkasten repository, i.e.::
 
     git clone git://github.com/ZeitOnline/briefkasten.git
     cd briefkasten
-    python bootstrap.py -d
 
-But for deploying the application you only need a very minimal buildout (i.o.w. you won't need to install the whole stack and its dependencies)::
+While that checkout contains the whole briefkasten stack, we you only need a very minimal subset of it to deploy it. To achieve this, create a file named ``buildout.cfg`` in the top-level of the checkout with the following contents::
 
-    bin/buildout -c deployment.cfg
+    [buildout]
+    extends = buildout/deployment.cfg
 
-Now the deployment scripts are ready to run. However, you still need to configure your particular installation. This is done by creating a `.ini` file. Take a look at the following example::
+Before running the buildout process for the first time, you still need to bootstrap it, like so::
+
+    python2.7 bootstrap.py
+
+This installs buildout itself, now you can use it in turn to install the deployment scripts by calling it without any parameters (the ``buildout.cfg`` we just created is used as default)::
+
+    bin/buildout
+
+
+Using the deployment scripts
+============================
+
+Now ``bin/deploy`` is ready to run. However, you still need to configure your particular installation. This is done by creating a `.ini` file. Take a look at the following example::
 
     [host]
     ip_addr = 10.0.10.120

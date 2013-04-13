@@ -12,6 +12,7 @@ from ezjaildeploy import api
 
 fab.env.use_ssh_config = True
 
+
 class JailHost(api.JailHost):
 
     iface = 'em0'
@@ -293,3 +294,55 @@ class CleanserJail(api.BaseJail):
 
         # finally, give ownership of the application directory to the application user
         fab.sudo('chown -R %s %s%s' % (numeric_cleanser_user, self.fs_remote_root, self.app_home))
+
+
+class DeploymentJail(api.BaseJail):
+
+    sshd = True
+    app_user = 'pyramid'
+    app_home = '/usr/local/briefkasten/'
+    ports_to_install = ['lang/python27',
+        'net/rsync',
+        'security/sudo']
+
+    def _debug(self):
+        pass
+
+    def configure(self):
+        # create application user
+        with fab.settings(fab.show("output"), warn_only=True):
+            self.console("pw user add %s" % self.app_user)
+            fab.sudo('mkdir -p %s%s/var' % (self.fs_remote_root, self.app_home))
+
+    def update(self):
+        import deployment
+        userinfo = fab.sudo('pw usershow -V %s/etc -n %s' % (self.fs_remote_root, self.app_user))
+        numeric_app_user = userinfo.split(':')[3]
+        base_path = path.abspath(path.join(path.dirname(deployment.__file__), '..'))
+        local_paths = ' '.join([path.join(base_path, app_path) for app_path in deployment.APP_SRC])
+
+        # upload project
+        fab.sudo("""mkdir -p %s%s""" % (self.fs_remote_root, self.app_home))
+        fab.sudo('chown -R %s %s%s' % (fab.env['user'], self.fs_remote_root, self.app_home))
+        rsync_project('%s%s' % (self.fs_remote_root, self.app_home), local_paths, delete=True)
+        # HACK: remove watchdog.py to avoid its dependencies
+        # during pyramid scan (it should really be a separate
+        # package altogether)
+        fab.sudo('rm %s%s/briefkasten/watchdog.py' % (self.fs_remote_root, self.app_home))
+
+        # create custom buildout.cfg
+        local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
+        upload_template(filename=path.join(local_resource_dir, 'deployment-jail.cfg.in'),
+            context=self.__dict__,
+            destination=path.join('%s%s' % (self.fs_remote_root, self.app_home), 'buildout.cfg'),
+            backup=False)
+
+        # finally, give ownership of the application directory to the application user
+        fab.sudo('chown -R %s %s%s' % (numeric_app_user, self.fs_remote_root, self.app_home))
+
+        # bootstrap and run buildout
+        if not fabexists('%s%s/bin/buildout' % (self.fs_remote_root, self.app_home)):
+            self.console('sudo -u %s python2.7 %s/bootstrap.py -d --version=1.6.3 -c %s/buildout.cfg'
+                % (self.app_user, self.app_home, self.app_home))
+        self.console('sudo -u %s %s/bin/buildout -c %s/buildout.cfg'
+            % (self.app_user, self.app_home, self.app_home))

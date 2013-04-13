@@ -103,7 +103,7 @@ def main():
     try:
         fs_config = sys.argv[1]
     except IndexError:
-        fs_config = path.join(path.dirname(__file__), '..', 'watchdog-development.ini')
+        fs_config = path.join(path.dirname(__file__), '..', 'etc/watchdog.ini')
     fs_config = path.abspath(fs_config)
     parser = ConfigParser(allow_no_value=True)
     parser.read(fs_config)
@@ -111,7 +111,7 @@ def main():
 
     # read history of previous runs
     errors = []
-    fs_history = path.abspath(path.join(path.dirname(__file__), '..',  'var', 'watchdog-history.json'))
+    fs_history = path.abspath(path.join(path.dirname(__file__), '..', 'var', 'watchdog-history.json'))
     if path.exists(fs_history):
         history = json.load(open(fs_history, 'r'))
     else:

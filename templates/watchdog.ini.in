@@ -1,0 +1,13 @@
+[briefkasten]
+app_url = ${watchdog:app_url}
+max_process_secs = ${watchdog:max_process_secs}
+imap_recipient = ${watchdog:imap_recipient}
+imap_host = ${watchdog:imap_host}
+imap_user = ${watchdog:imap_user}
+imap_passwd = ${watchdog:imap_passwd}
+testing_secret = ${watchdog:testing_secret}
+the_sender= ${watchdog:the_sender}
+notify_email = ${watchdog:notify_email}
+# smtp settings for pyramid_mailer, see
+# http://docs.pylonsproject.org/projects/pyramid_mailer/en/latest/
+smtp_host = ${watchdog:smtp_host}
