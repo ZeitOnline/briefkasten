@@ -1,2 +1,2 @@
 #!/bin/sh
-./bin/py.test src/ezjaildeploy -s --cov ezjaildeploy --cov-report=html --cov-config src/ezjaildeploy/.coveragerc
+./bin/py.test src/ezjaildeploy -s --cov ezjaildeploy --cov-report=term --cov-report=html --cov-config src/ezjaildeploy/.coveragerc
