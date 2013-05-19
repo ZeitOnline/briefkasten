@@ -43,7 +43,6 @@ setup(name='briefkasten',
         main = briefkasten:main
         [console_scripts]
         watchdog = briefkasten.watchdog:main
-        deploy = deployment:deploy_freebsd
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),
