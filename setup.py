@@ -30,8 +30,7 @@ setup(name='briefkasten',
             'wsgi_intercept',
             'zope.testbrowser'],
         "freebsd-deployment": [
-            'ezjaildeploy',
-            'pyopenssl'],
+            'ezjaildeploy'],
         "watchdog": [
             'imapclient',
             'zope.testbrowser',
