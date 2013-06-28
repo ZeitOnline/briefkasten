@@ -13,7 +13,7 @@ buildout.cfg:
 	ln -s $(buildoutcfg).cfg buildout.cfg
 
 bin/buildout: buildout.cfg bootstrap.py
-	$(python) bootstrap.py -d
+	$(python) bootstrap.py
 
 clean:
 	rm -rf .installed.cfg bin/buildout buildout.cfg
