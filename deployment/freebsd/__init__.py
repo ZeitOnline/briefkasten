@@ -230,6 +230,7 @@ class WebserverJail(api.BaseJail):
                 fqdn=self.fqdn,
                 app_ip=appserver.ip_addr,
                 app_port=appserver.port,
+                root_url=appserver.root_url,
                 wwwuser=self.wwwuser),
             destination='%s/usr/local/etc/nginx/nginx.conf' % self.fs_remote_root,
             backup=False,
