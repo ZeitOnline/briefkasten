@@ -132,7 +132,7 @@ class AppserverJail(api.BaseJail):
 
         # create custom buildout.cfg
         local_resource_dir = path.join(path.abspath(path.dirname(__file__)))
-        upload_template(filename=path.join(local_resource_dir, 'buildout.cfg.in'),
+        upload_template(filename=path.join(local_resource_dir, 'appserver-jail.cfg.in'),
             context=self.__dict__,
             destination=path.join('%s%s' % (self.fs_remote_root, self.app_home), 'buildout.cfg'),
             backup=False)

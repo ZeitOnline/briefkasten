@@ -2,9 +2,9 @@
 APP_SRC = [
     'briefkasten',
     'middleware_scripts',
-    'appserver.cfg',
+    'buildout/appserver.cfg',
     'bootstrap.py',
-    'briefkasten.ini.in',
+    'templates',
     'setup.cfg',
     'setup.py',
 ]
