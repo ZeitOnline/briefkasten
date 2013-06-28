@@ -1,5 +1,4 @@
 [supervisord]
-pidfile=/var/run/supervisor/supervisord.pid
 user=%(app_user)s
 logfile=%(app_home)s/var/supervisord.log
 
@@ -14,6 +13,9 @@ stderr_logfile=NONE
 
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[unix_http_server]
+file = /tmp/supervisor.sock
 
 [supervisorctl]
 serverurl = unix:///tmp/supervisor.sock

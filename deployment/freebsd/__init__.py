@@ -112,7 +112,6 @@ class AppserverJail(api.BaseJail):
         numeric_app_user = userinfo.split(':')[3]
         base_path = path.abspath(path.join(path.dirname(deployment.__file__), '..'))
         local_paths = ' '.join([path.join(base_path, app_path) for app_path in deployment.APP_SRC])
-
         # upload project
         fab.sudo("""mkdir -p %s%s""" % (self.fs_remote_root, self.app_home))
         fab.sudo('chown -R %s %s%s' % (fab.env['user'], self.fs_remote_root, self.app_home))
