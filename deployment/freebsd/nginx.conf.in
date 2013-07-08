@@ -46,7 +46,7 @@ http {
         proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header        X-Forwarded-Proto $scheme;
     
-        location ^~ %(root_url)s {
+        location ^~ / {
             proxy_pass http://%(app_ip)s:%(app_port)s/;
         }
     }

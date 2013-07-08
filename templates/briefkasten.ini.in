@@ -13,6 +13,7 @@ pyramid.default_locale_name = de
 pyramid.includes = ${config:debug_includes}
 fs_dropbox_root = ${config:fs_dropbox_root}
 fs_bin_path = ${config:fs_bin_path}
+# appserver_root_url *must* end with trailing slash!
 appserver_root_url = ${config:appserver_root_url}
 test_submission_secret = ${config:test_submission_secret}
 
