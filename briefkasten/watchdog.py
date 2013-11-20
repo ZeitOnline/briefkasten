@@ -49,7 +49,7 @@ def perform_submission(app_url, testing_secret):
         submit_form = browser.getForm(id='briefkasten-form')
     except LookupError:
         errors.append(WatchdogError(subject=u"Couldn't find submission form",
-            message=u""""""))
+            message=u"""The contact form was not accessible"""))
         return token
     submit_form.getControl(name='message').value = u'This is an automated test submission from the watchdog instance.'
     submit_form.getControl(name='testing_secret').value = testing_secret

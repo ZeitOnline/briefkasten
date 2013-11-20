@@ -1,4 +1,3 @@
-
 pyversion = 2.7
 python = python$(pyversion)
 buildoutcfg = development
@@ -12,10 +11,13 @@ $(cfgs): %: %.cfg bin/buildout
 buildout.cfg:
 	ln -s $(buildoutcfg).cfg buildout.cfg
 
-bin/buildout: buildout.cfg bootstrap.py
-	$(python) bootstrap.py
+bin/buildout: bin/pip
+	bin/pip install zc.buildout
+
+bin/python bin/pip:
+	virtualenv .
 
 clean:
-	rm -rf .installed.cfg bin/buildout buildout.cfg
+	git clean -fXd
 
 .PHONY: all $(cfgs) clean
