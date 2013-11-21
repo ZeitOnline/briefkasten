@@ -1,0 +1,23 @@
+---
+- name: ensure /etc/rc.conf.d exists
+  file: path=/etc/rc.conf.d/ state=directory owner=root group=wheel mode=0655
+
+- name: ensure helper packages are installed
+  pkgng: name={{ item }} state=present
+  with_items:
+  - ezjail
+  - sudo
+  - screen
+  - bash
+
+- name: ensure ezjail is enabled on startup
+  service: name=ezjail enabled=yes
+
+- name: ensure ZFS partition for jails
+  zfs: name={{ jails_zfs_root }} mountpoint={{ jails_dir }} checksum={{ zfs_checksum }} state=present
+
+- name: Base configuration of ezjail
+  template: src=ezjail.conf.j2 dest=/usr/local/etc/ezjail.conf
+
+- name: ensure the webserver jail exists
+  ezjail: name=webserver ip_addr={{ansible_default_ipv4.address}} disktype=zfs state=present

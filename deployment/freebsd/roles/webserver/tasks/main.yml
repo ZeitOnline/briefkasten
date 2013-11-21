@@ -1,0 +1,4 @@
+---
+- name: install nginx
+  pkgng_chroot: name=pkg chroot="{{ jails_dir }}/webserver" state=present
+  tags: webserver

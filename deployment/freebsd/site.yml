@@ -1,0 +1,5 @@
+- hosts: jails_host
+  user: root
+  roles:
+    - jails_host
+    - webserver

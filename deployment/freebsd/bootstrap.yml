@@ -1,0 +1,14 @@
+---
+# run this with ansible-playbook -i ansible_hosts bootstrap.yml -k -c paramiko -v
+- hosts: jails_host
+  gather_facts: false
+  remote_user: root
+  tasks:
+  - name: install pkgng
+    raw: "pkg_info | grep -v 'pkg-' > /dev/null ; if $? pkg_add -r pkg; rehash ; pkg2ng; echo 'WITH_PKGNG=yes' >> /etc/make.conf; echo 'packagesite: http://pkgbeta.freebsd.org/freebsd%3A9%3Ax86%3A64/latest' >> /usr/local/etc/pkg.conf; pkg update ; pkg upgrade -y"
+  - name: install python27
+    raw: "pkg install -y python27"
+  - name: add ansible ssh-key
+    authorized_key: user=root key="{{ item }}"
+    with_file:
+        - ~/.ssh/identity.pub
