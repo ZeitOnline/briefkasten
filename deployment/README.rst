@@ -56,7 +56,7 @@ Then use ``dd`` to write it to a USB stick (in Mac OS X use Disk Utility's 'Get 
 
     dd if=FreeBSD-9.0-RELEASE-amd64-memstick.img of=/dev/disk3 bs=10240 conv=sync
 
-..note: It is very importan you get the target device right, or else you might end up destroying valuable data!
+..note: It is very important you get the target device right, or else you might end up destroying valuable data!
 
 You can now start the machine and it should boot from the USB stick.
 
