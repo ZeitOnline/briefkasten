@@ -1,6 +1,6 @@
 /bin/
 /briefkasten.ini
-buildout.cfg
+/buildout.cfg
 /docs/html/
 /.coverage
 /htmlcov/
