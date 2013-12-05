@@ -1,5 +1,5 @@
 ---
-# run this with ansible-playbook -i ansible_hosts bootstrap.yml -k -c paramiko
+# run this with ansible-playbook bootstrap.yml -k -c paramiko
 
 - hosts: jails_host
   gather_facts: false

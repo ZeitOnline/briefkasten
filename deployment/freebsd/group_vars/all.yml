@@ -1,4 +1,14 @@
 ---
 # FreeBSD
 ansible_python_interpreter: /usr/local/bin/python2.7
+jails_dir: /usr/jails
+jails_zfs_root: tank/jails
+jails_netmask_lo1: 255.255.255.0
+primary_if: em0
+# add multiple to use a mirror
+root_devices:
+    - ada0
 zfs_checksum: fletcher4
+timeserver: time.euro.apple.com
+# relative path to /usr/share/zoneinfo
+timezone: Europe/Berlin

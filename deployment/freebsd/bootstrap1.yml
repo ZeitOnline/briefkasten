@@ -1,0 +1,45 @@
+---
+# after bootstrap0.yml has run
+# run this with ansible-playbook bootstrap1.yml --extra-vars "geli_passphrase=XXX"
+# this configures the crypto zpool
+
+- hosts: jails_host
+  remote_user: root
+
+  handlers:
+    - name: restart ezjail
+      service: name=ezjail state=restarted
+
+  vars:
+    geli_passphrase_location: /tmp/geli_passphrase
+    zpool_name: tank
+
+  tasks:
+  - name: create tank partitions
+    command: "gpart add -t freebsd-zfs -l {{ zpool_name }}-{{ item }} {{ item }} creates=/dev/gpt/{{ zpool_name }}-{{ item }}"
+    with_items: root_devices 
+
+  - name: create temporary GELI passphrase file
+    copy: content={{ geli_passphrase }} dest={{ geli_passphrase_location }} owner=root mode=600
+    tags: mount_geli
+
+  - name: create GELI providers
+    command: "geli init -s 4096 -l 256 -J {{ geli_passphrase_location}} /dev/gpt/{{ zpool_name }}-{{ item }} creates=/var/backups/gpt_{{ zpool_name }}-{{ item }}.eli"
+    with_items: root_devices
+
+  - name: mount the GELI containers
+    command: "geli attach -j {{ geli_passphrase_location}} /dev/gpt/{{ zpool_name }}-{{ item }} creates=/dev/gpt/{{ zpool_name }}-{{ item }}.eli"
+    with_items: root_devices
+    tags: mount_geli
+    notify:
+      - restart ezjail
+
+  - name: remove passphrase from FS
+    file: path={{ geli_passphrase_location }} state=absent
+    tags: mount_geli
+
+  - name: create tank zpool
+    command: "zpool create -m /{{ zpool_name }} {{ zpool_name }} {% for device in root_devices %} /dev/gpt/{{ zpool_name }}-{{ device }}.eli {% endfor %} creates=/{{ zpool_name }}"
+
+  - name: ensure ZFS partition for jails
+    zfs: name={{ jails_zfs_root }} mountpoint={{ jails_dir }} checksum={{ zfs_checksum }} state=present
