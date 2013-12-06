@@ -1,0 +1,21 @@
+---
+- name: make sure poudriere is installed
+  pkgng: name=poudriere state=present
+
+- name: poudriere configuration
+  template: src=poudriere.conf.j2 dest=/usr/local/etc/poudriere.conf
+
+- name: create ports tree
+  command: poudriere ports -c creates=/usr/local/poudriere/ports/default/www/nginx/distinfo
+
+- name: upload list of packages to build
+  copy: src=pkg_list dest={{ pkg_list }}
+
+- name: create build jail
+  command: poudriere jail -c -j 92amd64 -v 9.2-RELEASE -a amd64
+
+- name: configure build jail
+  copy: src=92amd64-make.conf dest=/usr/local/etc/poudriere.d/92amd64-make.conf
+
+- name: start build run
+  command: poudriere bulk -f {{ pkg_list }} 92amd64
