@@ -15,11 +15,14 @@ bootstrap0:
 bootstrap1:
 	bin/ansible-playbook -i host bootstrap1.yml --extra-vars "geli_passphrase=$(passphrase)"
 
+deploy:
+	bin/ansible-playbook -i host site.yml
+
 mount_geli:
 	bin/ansible-playbook -i host bootstrap1.yml -t mount_geli --extra-vars "geli_passphrase=$(passphrase)"
 
 clean:
 	git clean -fXd
 
-.PHONY: clean bootstrap0 bootstrap1 mount_geli
+.PHONY: clean bootstrap0 bootstrap1 deploy mount_geli
 
