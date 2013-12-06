@@ -72,9 +72,9 @@ import shlex
 import os
 import sys
 
-def query_package(module, pkgin_path, name, chroot):
+def query_package(module, pkgin_path, name, chroot, jail):
 
-    rc, out, err = module.run_command("%s%s info -e %s" % (pkgin_path, chroot, name))
+    rc, out, err = module.run_command("%s%s%s info -e %s" % (pkgin_path, chroot, jail, name))
 
     if rc == 0:
         return True
@@ -82,10 +82,13 @@ def query_package(module, pkgin_path, name, chroot):
     return False
 
 
-def remove_packages(module, pkgin_path, packages, chroot):
+def remove_packages(module, pkgin_path, packages, chroot, jail):
     
     if chroot != "":
         chroot=" -c %s" % (chroot)
+
+    if jail != "":
+        jail=" -j %s" % (jail)
 
     remove_c = 0
     # Using a for loop incase of error, we can report the package that failed
@@ -94,7 +97,7 @@ def remove_packages(module, pkgin_path, packages, chroot):
         if not query_package(module, pkgin_path, package, chroot):
             continue
 
-        rc, out, err = module.run_command("%s%s delete -y %s" % (pkgin_path, chroot, package))
+        rc, out, err = module.run_command("%s%s%s delete -y %s" % (pkgin_path, chroot, jail, package))
 
         if query_package(module, pkgin_path, package, chroot):
             module.fail_json(msg="failed to remove %s: %s" % (package, out))
@@ -108,7 +111,7 @@ def remove_packages(module, pkgin_path, packages, chroot):
     module.exit_json(changed=False, msg="package(s) already absent")
 
 
-def install_packages(module, pkgin_path, packages, cached, pkgsite, chroot):
+def install_packages(module, pkgin_path, packages, cached, pkgsite, chroot, jail):
 
     install_c = 0
 
@@ -118,18 +121,21 @@ def install_packages(module, pkgin_path, packages, cached, pkgsite, chroot):
     if chroot != "":
         chroot=" -c %s" % (chroot)
 
+    if jail != "":
+        jail=" -j %s" % (jail)
+
     if cached == "no":
-        rc, out, err = module.run_command("%s %s%s update" % (pkgsite, pkgin_path, chroot))
-        if rc != 0:
+        rc, out, err = module.run_command("%s %s%s%s update" % (pkgsite, pkgin_path, chroot, jail))
+        if rc not in [0, 70]:
             module.fail_json(msg="Could not update catalogue")
 
     for package in packages:
-        if query_package(module, pkgin_path, package, chroot):
+        if query_package(module, pkgin_path, package, chroot, jail):
             continue
 
-        rc, out, err = module.run_command("%s %s%s install -U -y %s" % (pkgsite, pkgin_path, chroot, package))
+        rc, out, err = module.run_command("%s %s%s%s install -U -y %s" % (pkgsite, pkgin_path, chroot, jail, package))
 
-        if not query_package(module, pkgin_path, package, chroot):
+        if not query_package(module, pkgin_path, package, chroot, jail):
             module.fail_json(msg="failed to install %s: %s" % (package, out))
 
         install_c += 1
@@ -147,6 +153,7 @@ def main():
                 name         = dict(aliases=["pkg"], required=True),
                 cached       = dict(default="no", required=False, choices=["yes","no"]),
                 chroot       = dict(default="", required=False),
+                jail         = dict(default="", required=False),
                 pkgsite      = dict(default="", required=False)))
 
     pkgin_path = module.get_bin_path('pkg', True)
@@ -156,7 +163,7 @@ def main():
     pkgs = p["name"].split(",")
 
     if p["state"] == "present":
-        install_packages(module, pkgin_path, pkgs, p["cached"], p["pkgsite"], p["chroot"])
+        install_packages(module, pkgin_path, pkgs, p["cached"], p["pkgsite"], p["chroot"], p["jail"])
 
     elif p["state"] == "absent":
         remove_packages(module, pkgin_path, pkgs, p["chroot"])
