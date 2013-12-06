@@ -10,10 +10,6 @@
     - name: restart ezjail
       service: name=ezjail state=restarted
 
-  vars:
-    geli_passphrase_location: /tmp/geli_passphrase
-    zpool_name: tank
-
   tasks:
   - name: create tank partitions
     command: "gpart add -t freebsd-zfs -l {{ zpool_name }}-{{ item }} {{ item }} creates=/dev/gpt/{{ zpool_name }}-{{ item }}"
