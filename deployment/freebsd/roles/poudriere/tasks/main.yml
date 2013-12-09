@@ -12,10 +12,13 @@
   copy: src=pkg_list dest={{ pkg_list }}
 
 - name: create build jail
-  command: poudriere jail -c -j 92amd64 -v 9.2-RELEASE -a amd64
+  command: poudriere jail -c -j 92amd64 -v 9.2-RELEASE -a amd64 creates=/usr/local/poudriere/jails/92amd64
 
 - name: configure build jail
   copy: src=92amd64-make.conf dest=/usr/local/etc/poudriere.d/92amd64-make.conf
 
+- name: create distfiles cache directory
+  file: path=/usr/ports/distfiles state=directory
+
 - name: start build run
-  command: poudriere bulk -f {{ pkg_list }} 92amd64
+  command: poudriere bulk -f {{ pkg_list }} -j 92amd64 creates={{ jails_dir }}/basejail/poudriere_data/packages/92amd64-default

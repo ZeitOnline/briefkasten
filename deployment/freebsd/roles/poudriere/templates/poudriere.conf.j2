@@ -5,7 +5,7 @@ BASEFS=/usr/local/poudriere
 USE_PORTLINT=no
 USE_TMPFS=yes
 # point this to basejail?
-POUDRIERE_DATA={{ jails_zfs_root  }}/basejail/poudriere_data
+POUDRIERE_DATA={{ jails_dir  }}/basejail/poudriere_data
 DISTFILES_CACHE=/usr/ports/distfiles
 CHECK_CHANGED_DEPS=yes
 CCACHE_DIR=/var/cache/ccache
