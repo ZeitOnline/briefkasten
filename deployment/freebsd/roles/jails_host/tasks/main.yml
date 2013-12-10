@@ -37,3 +37,12 @@
 - name: pkg.conf for newjail
   copy: src=pkg.conf dest={{ jails_dir }}/newjail/usr/local/etc/pkg.conf
 
+- name: configure lo1
+  lineinfile: dest=/etc/rc.conf state=present line='cloned_interfaces=lo1'
+
+- name: configure lo1 aliases
+  lineinfile: dest=/etc/rc.conf state=present line='ipv4_addrs_lo1=127.0.0.2-10/32'
+
+- name: restart network
+  command: sh -c 'ifconfig lo1 > /dev/null || ( service netif restart; service routing restart ; :); :'
+
