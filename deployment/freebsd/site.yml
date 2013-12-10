@@ -2,4 +2,5 @@
   user: root
   roles:
     - jails_host
+    - poudriere
     - webserver

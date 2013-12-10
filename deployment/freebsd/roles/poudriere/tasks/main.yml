@@ -22,3 +22,9 @@
 
 - name: start build run
   command: poudriere bulk -f {{ pkg_list }} -j 92amd64 creates={{ jails_dir }}/basejail/poudriere_data/packages/92amd64-default
+
+- name: Ensure basejail etc exists
+  file: path={{ jails_dir }}/newjail/etc/pkg state=directory
+
+- name: Ensure pkgng configuration will be present in each jail
+  copy: src=pkg_repo.conf dest={{ jails_dir }}/newjail//etc/pkg/pkg_repo.conf

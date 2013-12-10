@@ -3,6 +3,10 @@
 - name: ensure the webserver jail exists
   ezjail: name=webserver ip_addr={{ansible_default_ipv4.address}} disktype=zfs state=running
 
-- name: install nginx
-  pkgng_chroot: name=pkg chroot="{{ jails_dir }}/webserver" state=present
+
+- name: install packages for webserver
+  pkgng_chroot: name={{ item }} jail="webserver" state=present
+  with_items:
+    - pkg
+    - nginx
   tags: webserver
