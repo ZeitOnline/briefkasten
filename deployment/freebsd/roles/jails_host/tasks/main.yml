@@ -2,6 +2,12 @@
 - name: ensure /etc/rc.conf.d exists
   file: path=/etc/rc.conf.d/ state=directory owner=root group=wheel mode=0655
 
+- name: bind host sshd to primary ip
+  lineinfile: dest=/etc/ssh/sshd_config state=present line='ListenAddress {{ ansible_all_ipv4_addresses[0] }}' create=yes
+  # TODO: sshd is not actually restarted in RL
+  notify:
+    - restart sshd
+
 # (re-)configure pkg properly after initial bootstrap
 - name: pkg conf directory
   file: path=/etc/pkg state=directory
@@ -46,3 +52,25 @@
 - name: restart network
   command: sh -c 'ifconfig lo1 > /dev/null || ( service netif restart; service routing restart ; :); :'
 
+- name: ensure the webserver jail exists
+  ezjail: name=webserver ip_addr=192.168.2.117,127.0.0.2 disktype=zfs state=running
+
+- name: let sshd in jail listen only on private ip
+  lineinfile: dest={{ jails_dir }}/webserver/etc/ssh/sshd_config state=present line='ListenAddress 127.0.0.2'
+
+- name: enable root ssh access in jail
+  lineinfile: dest={{ jails_dir}}/webserver/etc/ssh/sshd_config state=present line='PermitRootLogin without-password' create=yes
+
+- name: copy authorized_keys
+  command: copy /root/.ssh/authorized_keys {{ jails_dir }}/webserver/root/.ssh/ creates={{ jails_dir }}/webserver/root/.ssh/authorized_keys
+
+- name: enable sshd inside jail
+  lineinfile: dest={{ jails_dir }}/webserver/etc/rc.conf state=present line='sshd_enable=YES' create=yes
+  
+- name: install packages for webserver
+  pkgng_chroot: name={{ item }} jail="webserver" state=present
+  with_items:
+    - pkg
+    - python27
+    - nginx
+  tags: webserver

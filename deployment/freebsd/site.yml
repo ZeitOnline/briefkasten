@@ -3,4 +3,8 @@
   roles:
     - jails_host
     - poudriere
+
+- hosts: webserver
+  user: root
+  roles:
     - webserver

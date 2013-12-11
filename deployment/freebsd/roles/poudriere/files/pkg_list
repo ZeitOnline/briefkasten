@@ -1,3 +1,4 @@
 ports-mgmt/pkg
 www/nginx
 net/rsync
+lang/python27
