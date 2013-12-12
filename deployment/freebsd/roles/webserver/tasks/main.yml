@@ -1,4 +1,8 @@
 ---
+
+- name: configure nginx
+  template: src=nginx.conf.in dest=/usr/local/etc/nginx/nginx.conf
+
 - name: make sure nginx is running
   service: name=nginx state=running
 

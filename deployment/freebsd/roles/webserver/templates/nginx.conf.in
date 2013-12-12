@@ -1,4 +1,4 @@
-user  %(wwwuser)s;
+user  {{ wwwuser }};
 worker_processes  1;
 error_log  /dev/null;
 pid        /var/run/nginx.pid;
@@ -28,7 +28,7 @@ http {
 
     server {
         listen       443;
-        server_name  %(fqdn)s;
+        server_name  {{ fqdn }};
     
         client_max_body_size 2048m;
 
@@ -42,12 +42,14 @@ http {
         ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
         ssl_prefer_server_ciphers   on;
 
-        proxy_set_header        Host            $host;
-        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header        X-Forwarded-Proto $scheme;
+        proxy_set_header        Host                $host;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto   $scheme;
     
         location ^~ / {
-            proxy_pass http://%(app_ip)s:%(app_port)s/;
+            {% for host in groups['appserver_jail'] %}
+               proxy_pass http://{{ hostvars[host]['inventory_hostname'] }}:{{ application_port }}
+            {% endfor %}
         }
     }
 }

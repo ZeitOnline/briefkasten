@@ -1,10 +1,11 @@
 - hosts: jails_host
   user: root
+
   roles:
     - jails_host
     - poudriere
 
-- hosts: webserver
+- hosts: webserver_jail
   user: root
   roles:
     - webserver

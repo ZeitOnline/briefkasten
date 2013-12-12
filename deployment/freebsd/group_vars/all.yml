@@ -14,3 +14,4 @@ zfs_checksum: fletcher4
 timeserver: time.euro.apple.com
 # relative path to /usr/share/zoneinfo
 timezone: Europe/Berlin
+application_port: 6543
