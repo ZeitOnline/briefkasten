@@ -8,3 +8,7 @@ Host jails_host
 Host webserver
     User root
     ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.2 22
+
+Host appserver
+    User root
+    ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.3 22
