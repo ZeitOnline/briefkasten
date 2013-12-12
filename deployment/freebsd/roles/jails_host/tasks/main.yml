@@ -48,7 +48,7 @@
   notify: restart network
 
 - name: ensure the webserver jail exists
-  ezjail: name=webserver ip_addr=192.168.2.117,127.0.0.2 disktype=zfs state=running
+  ezjail: name=webserver ip_addr=192.168.2.117,127.0.0.2 disktype=zfs state=present
 
 - name: let sshd in jail listen only on private ip
   lineinfile: dest={{ jails_dir }}/webserver/etc/ssh/sshd_config state=present line='ListenAddress 127.0.0.2'
@@ -61,6 +61,9 @@
 
 - name: enable sshd inside jail
   lineinfile: dest={{ jails_dir }}/webserver/etc/rc.conf state=present line='sshd_enable=YES' create=yes
+
+- name: start the webserver jail
+  command: ezjail-admin start webserver
   
 - name: install packages for webserver
   pkgng_chroot: name={{ item }} jail="webserver" state=present
