@@ -2,3 +2,7 @@ ports-mgmt/pkg
 www/nginx
 net/rsync
 lang/python27
+sysutils/py-supervisor
+textproc/libxslt
+security/sudo
+security/gnupg
