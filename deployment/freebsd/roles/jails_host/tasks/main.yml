@@ -40,14 +40,12 @@
 - name: pkg.conf for newjail
   copy: src=pkg.conf dest={{ jails_dir }}/newjail/usr/local/etc/pkg.conf
 
-- name: configure lo1
-  lineinfile: dest=/etc/rc.conf state=present line='cloned_interfaces=lo1'
+- name: ensure root .ssh for newjail
+  file: path={{ jails_dir }}/newjail/root/.ssh state=directory owner=root group=wheel mode=0700
 
-- name: configure lo1 aliases
-  lineinfile: dest=/etc/rc.conf state=present line='ipv4_addrs_lo1=127.0.0.2-10/32'
-
-- name: restart network
-  command: sh -c 'ifconfig lo1 > /dev/null || ( service netif restart; service routing restart ; :); :'
+- name: Configure network interface for jails
+  template: src=network.j2 dest=/etc/rc.conf.d/network
+  notify: restart network
 
 - name: ensure the webserver jail exists
   ezjail: name=webserver ip_addr=192.168.2.117,127.0.0.2 disktype=zfs state=running
