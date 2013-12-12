@@ -1,0 +1,5 @@
+- hosts: webserver_jail
+  user: root
+  roles:
+    - common
+    - webserver

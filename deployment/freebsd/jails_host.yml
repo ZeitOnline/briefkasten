@@ -1,0 +1,7 @@
+- hosts: jails_host
+  user: root
+
+  roles:
+    - common
+    - jails_host
+
