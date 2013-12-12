@@ -2,10 +2,12 @@
   user: root
 
   roles:
+    - common
     - jails_host
     - poudriere
 
 - hosts: webserver_jail
   user: root
   roles:
+    - common
     - webserver
