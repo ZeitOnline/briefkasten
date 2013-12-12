@@ -47,9 +47,7 @@ http {
         proxy_set_header        X-Forwarded-Proto   $scheme;
     
         location ^~ / {
-            {% for host in groups['appserver_jail'] %}
-               proxy_pass http://{{ hostvars[host]['inventory_hostname'] }}:{{ application_port }}
-            {% endfor %}
+           proxy_pass http://{{ hostvars['appserver']['ip'] }}:{{ hostvars['appserver']['application_port'] }}
         }
     }
 }
