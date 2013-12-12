@@ -18,9 +18,6 @@
 - name: pkg.conf
   copy: src=pkg.conf dest=/usr/local/etc/pkg.conf
 
-- name: remove pkg.conf (contains deprecated value)
-  file: path=/usr/local/etc/pkg.conf state=absent
-
 - name: ensure helper packages are installed
   pkgng: name={{ item }} state=present
   with_items:
