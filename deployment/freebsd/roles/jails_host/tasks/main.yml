@@ -57,7 +57,7 @@
   lineinfile: dest={{ jails_dir}}/webserver/etc/ssh/sshd_config state=present line='PermitRootLogin without-password' create=yes
 
 - name: copy authorized_keys
-  command: copy /root/.ssh/authorized_keys {{ jails_dir }}/webserver/root/.ssh/ creates={{ jails_dir }}/webserver/root/.ssh/authorized_keys
+  command: cp /root/.ssh/authorized_keys {{ jails_dir }}/webserver/root/.ssh/ creates={{ jails_dir }}/webserver/root/.ssh/authorized_keys
 
 - name: enable sshd inside jail
   lineinfile: dest={{ jails_dir }}/webserver/etc/rc.conf state=present line='sshd_enable=YES' create=yes
