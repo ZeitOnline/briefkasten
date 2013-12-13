@@ -10,5 +10,15 @@
 - name: enable supervisord at startup time
   lineinfile: dest=/etc/rc.conf state=present line='supervisord_enable=YES' create=yes
 
+- name: ensure application directory
+  file: path={{apphome}} state=directory owner={{appuser}} mode=770
+
+- name: ensure log directory
+  file: path={{apphome}}/log state=directory owner={{appuser}} mode=770
+
+- name: ensure pgp directory
+  file: path={{apphome}}/pgp_pubkeys state=directory owner={{appuser}} mode=770
+
 - name: make sure supervisord is running
   service: name=supervisord state=running
+
