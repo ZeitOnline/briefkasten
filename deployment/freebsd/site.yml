@@ -1,13 +1,7 @@
-- hosts: jails_host
-  user: root
-
-  roles:
-    - common
-    - jails_host
-    - poudriere
-
-- hosts: webserver_jail
-  user: root
-  roles:
-    - common
-    - webserver
+---
+# toplevel playbook to run all playbooks in order.
+# assumes bootstrap0 and bootstrap1 have run already
+- include:
+  - jails_host.yml
+  - poudriere.yml
+  - webserver.yml
