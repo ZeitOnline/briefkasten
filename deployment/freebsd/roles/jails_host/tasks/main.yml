@@ -47,6 +47,8 @@
   template: src=network.j2 dest=/etc/rc.conf.d/network
   notify: restart network
 
+# create and configure the webserver jail
+
 - name: ensure the webserver jail exists
   ezjail: name=webserver ip_addr=192.168.2.117,127.0.0.2 disktype=zfs state=present
 
@@ -72,3 +74,43 @@
     - python27
     - nginx
   tags: webserver
+
+
+# create and configure the appserver jail
+# TODO: use with_items for the basic, repeatitive setup across jails
+
+- name: ensure the appser jail exists
+  ezjail: name=appserver ip_addr={{ hostvars['appserver']['ip']}} disktype=zfs state=present
+  tags: appserver
+
+- name: let sshd in jail listen only on private ip
+  lineinfile: dest={{ jails_dir }}/appserver/etc/ssh/sshd_config state=present line='ListenAddress {{ hostvars['appserver']['ip']}}'
+  tags: appserver
+
+- name: enable root ssh access in jail
+  lineinfile: dest={{ jails_dir}}/appserver/etc/ssh/sshd_config state=present line='PermitRootLogin without-password' create=yes
+  tags: appserver
+
+- name: copy authorized_keys
+  command: cp /root/.ssh/authorized_keys {{ jails_dir }}/appserver/root/.ssh/ creates={{ jails_dir }}/appserver/root/.ssh/authorized_keys
+  tags: appserver
+
+- name: enable sshd inside jail
+  lineinfile: dest={{ jails_dir }}/appserver/etc/rc.conf state=present line='sshd_enable=YES' create=yes
+  tags: appserver
+
+- name: start the webserver jail
+  command: ezjail-admin start appserver
+  tags: appserver
+  
+- name: install packages for webserver
+  pkgng_chroot: name={{ item }} jail="appserver" state=present
+  with_items:
+    - pkg
+    - python27
+    - py27-supervisor
+    - rsync
+    - libxslt
+    - sudo
+    - gnupg
+  tags: appserver
