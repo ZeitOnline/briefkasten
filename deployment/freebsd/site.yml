@@ -5,3 +5,4 @@
   - jails_host.yml
   - poudriere.yml
   - webserver.yml
+  - appserver.yml

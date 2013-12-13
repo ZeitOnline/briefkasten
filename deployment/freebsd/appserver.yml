@@ -1,0 +1,5 @@
+- hosts: appserver_jail
+  user: root
+  roles:
+    - common
+    - appserver

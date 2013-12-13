@@ -1,10 +1,10 @@
 [supervisord]
-user=%(app_user)s
-logfile=%(app_home)s/var/supervisord.log
+user={{appuser}}
+logfile={{apphome}}/var/supervisord.log
 
 [program:briefkasten]
-command=%(app_home)s/bin/pserve %(app_home)s/briefkasten.ini
-user=%(app_user)s
+command={{apphome}}/bin/pserve {{apphome}}/briefkasten.ini
+user={{appuser}}
 autostart=true
 autorestart=true
 startsecs=5

@@ -1,2 +1,4 @@
 ---
 appuser: pyramid
+apphome: /usr/local/briefkasten
+root_url: /

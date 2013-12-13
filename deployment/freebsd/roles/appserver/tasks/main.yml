@@ -1,9 +1,14 @@
 ---
 
-- name: configure nginx
-  template: src=nginx.conf.in dest=/usr/local/etc/nginx/nginx.conf
+- name: create application user
+  # this creates /home/pyramid/.ssh/id_rsa{.pub}
+  user: name={{appuser}} createhome=yes generate_ssh_key=yes
 
-- name: make sure nginx is running
-  service: name=nginx state=running
+- name: configure supervisord
+  template: src=supervisord.conf.j2 dest=/usr/local/etc/supervisord.conf
 
-# TODO: make sure it's enabled at startup
+- name: enable supervisord at startup time
+  lineinfile: dest=/etc/rc.conf state=present line='supervisord_enable=YES' create=yes
+
+- name: make sure supervisord is running
+  service: name=supervisord state=running
