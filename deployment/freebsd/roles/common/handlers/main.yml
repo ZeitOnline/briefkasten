@@ -3,3 +3,5 @@
   service: name=ezjail state=restarted
 - name: restart sshd
   service: name=sshd state=restarted
+- name: restart pf
+  service: name=pf state=restarted

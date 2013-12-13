@@ -47,6 +47,15 @@
   template: src=network.j2 dest=/etc/rc.conf.d/network
   notify: restart network
 
+# configure NAT for jails
+- name: enable pf at startup
+  lineinfile: dest=/etc/rc.conf state=present line='pf_enable=YES' create=yes
+
+- name: upload pf config
+  template: src=pf.conf.j2 dest=/etc/pf.conf
+  notify: restart pf
+
+
 # create and configure the webserver jail
 
 - name: ensure the webserver jail exists
@@ -75,13 +84,16 @@
     - nginx
   tags: webserver
 
-
 # create and configure the appserver jail
 # TODO: use with_items for the basic, repeatitive setup across jails
 
 - name: ensure the appser jail exists
   ezjail: name=appserver ip_addr={{ hostvars['appserver']['ip']}} disktype=zfs state=present
   tags: appserver
+
+# allow the app server net access
+- name: copy resolv.conf
+  command: cp /etc/resolv.conf {{ jails_dir }}/appserver/etc/resolv.conf creates={{ jails_dir }}/appserver/etc/resolv.conf
 
 - name: let sshd in jail listen only on private ip
   lineinfile: dest={{ jails_dir }}/appserver/etc/ssh/sshd_config state=present line='ListenAddress {{ hostvars['appserver']['ip']}}'
@@ -109,6 +121,8 @@
     - pkg
     - python27
     - py27-supervisor
+    - py27-virtualenv
+    - gmake
     - rsync
     - libxslt
     - sudo

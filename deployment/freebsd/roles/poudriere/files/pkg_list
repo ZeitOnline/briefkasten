@@ -1,8 +1,10 @@
 ports-mgmt/pkg
 www/nginx
+devel/gmake
+devel/py-virtualenv
 net/rsync
 lang/python27
-sysutils/py27-supervisor
+sysutils/py-supervisor
 textproc/libxslt
 security/sudo
 security/gnupg

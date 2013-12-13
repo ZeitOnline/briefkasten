@@ -1,2 +1,2 @@
 [buildout]
-extends = buildout/deployment.cfg
+extends = buildout/appserver.cfg
