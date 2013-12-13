@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 version = '0.1.10-dev'
 
 
-setup(name='briefkasten',
+setup(name='briefkasten-watchdog',
     version=version,
-    description='a reasonably secure web application for submitting content anonymously',
+    description='test if a given briefkasten instance is working properly',
     long_description="",
     classifiers=[
         "Programming Language :: Python",
@@ -14,16 +14,14 @@ setup(name='briefkasten',
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         'License :: OSI Approved :: BSD License',
     ],
-    packages=find_packages(),
+    packages='.',
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Pyramid',
-        'pyramid_deform',
-        'deform',
-        'Paste',
+        'imapclient',
         'zope.testbrowser',
         'pyquery',
+        'pyramid_mailer',
     ],
     extras_require={
         "tests": [
@@ -32,12 +30,7 @@ setup(name='briefkasten',
     },
     test_suite="briefkasten",
     entry_points="""
-        [paste.app_factory]
-        main = briefkasten:main
+        [console_scripts]
+        watchdog = watchdog:main
     """,
-    message_extractors={'briefkasten': [
-        ('**.py', 'lingua_python', None),
-        ('**.zcml', 'lingua_xml', None),
-        ('**.pt', 'lingua_xml', None),
-    ]},
 )
