@@ -1,0 +1,9 @@
+[jails_host]
+jails_host ip=192.168.2.117
+
+[webserver_jail]
+webserver ip=127.0.0.2 fqdn=briefkasten.virtualbox
+
+[appserver_jail]
+appserver ip=127.0.0.3 application_port=6543
+
