@@ -3,7 +3,14 @@
 - name: configure nginx
   template: src=nginx.conf.in dest=/usr/local/etc/nginx/nginx.conf
 
+- name: upload ssl certificate
+  copy: src={{ cert_location }} dest=/usr/local/etc/nginx/briefkasten.crt
+
+- name: upload ssl key
+  copy: src={{ key_location }} dest=/usr/local/etc/nginx/briefkasten.key
+
+- name: enable nginx at startup time
+  lineinfile: dest=/etc/rc.conf state=present line='nginx_enable=YES' create=yes
+
 - name: make sure nginx is running
   service: name=nginx state=running
-
-# TODO: make sure it's enabled at startup
