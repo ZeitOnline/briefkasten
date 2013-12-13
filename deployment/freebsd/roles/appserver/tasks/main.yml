@@ -19,6 +19,23 @@
 - name: ensure pgp directory
   file: path={{apphome}}/pgp_pubkeys state=directory owner={{appuser}} mode=770
 
+- name: find absolute path to our repo
+  connection: local
+  command: git rev-parse --show-toplevel
+  register: git_base
+
+- name: clear work directory
+  connection: local
+  command: rm -rf {{ git_base.stdout }}/deployment/freebsd/workdir/*
+
+- name: check out clean copy of the local git repo
+  connection: local
+  command: git --work-tree={{ git_base.stdout }} checkout-index -a -f --prefix={{ git_base.stdout }}/deployment/freebsd/workdir/ chdir={{ git_base.stdout }}
+
+- name: upload application
+  connection: local
+  command: 'rsync -av  -e "ssh -F ssh_config" workdir/application/ appserver:{{apphome}}/'
+
 - name: make sure supervisord is running
   service: name=supervisord state=running
 
