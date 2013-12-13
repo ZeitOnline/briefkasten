@@ -20,8 +20,9 @@ The web application requires Python 2.7, the sanitizing scripts depend on a numb
 Bootstrapping
 =============
 
-Simply run::
+Change into the application directory and run::
 
+  $ cd application
   $ make
 
 **Note:** you can optionally provide a custom path to your python, i.e. ``make python=/opt/local/bin/python2.7``.
