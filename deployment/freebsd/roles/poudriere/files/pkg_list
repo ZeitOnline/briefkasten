@@ -8,3 +8,7 @@ sysutils/py-supervisor
 textproc/libxslt
 security/sudo
 security/gnupg
+graphics/netpbm
+print/ghostscript9
+editors/libreoffice
+archivers/zip
