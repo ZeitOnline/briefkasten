@@ -30,6 +30,10 @@
     notify:
       - restart ezjail
 
+  - name: force mount all ZFS
+    command: "zfs mount -a"
+    tags: mount_geli
+
   - name: remove passphrase from FS
     file: path={{ geli_passphrase_location }} state=absent
     tags: mount_geli
