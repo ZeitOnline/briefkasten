@@ -39,13 +39,14 @@
 - name: upload theme
   connection: local
   command: "ls -la {{ local_theme_path }}"
-  command: 'rsync -av  -e "ssh -F ssh_config" {{ local_theme_path }} appserver:{{apphome}}/themes/{{ theme_name }}'
+  command: 'rsync -av  -e "ssh -F ssh_config" {{ local_theme_path }}/ appserver:{{apphome}}/themes/{{ theme_name }}'
 
 - name: configure buildout
   template: src=buildout.cfg.j2 dest={{apphome}}/deployment.cfg
 
-- name: run buildout
-  command: gmake deployment chdir={{apphome}}
+- name: set ownership
+  command: "chown -R {{appuser}} {{apphome}}"
 
-- name: make sure supervisord is running
-  service: name=supervisord state=running
+- name: run buildout (this *will* take quite a while... be patient)
+  command: gmake deployment chdir={{apphome}}
+  notify: restart supervisord

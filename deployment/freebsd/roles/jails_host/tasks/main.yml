@@ -94,6 +94,7 @@
 # allow the app server net access
 - name: copy resolv.conf
   command: cp /etc/resolv.conf {{ jails_dir }}/appserver/etc/resolv.conf creates={{ jails_dir }}/appserver/etc/resolv.conf
+  tags: appserver
 
 - name: let sshd in jail listen only on private ip
   lineinfile: dest={{ jails_dir }}/appserver/etc/ssh/sshd_config state=present line='ListenAddress {{ hostvars['appserver']['ip']}}'

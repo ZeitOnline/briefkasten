@@ -5,3 +5,5 @@
   service: name=sshd state=restarted
 - name: restart pf
   service: name=pf state=restarted
+- name: restart supervisord
+  service: name=supervisord state=restarted
