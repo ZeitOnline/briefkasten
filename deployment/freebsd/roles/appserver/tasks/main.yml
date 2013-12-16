@@ -6,6 +6,7 @@
 
 - name: configure supervisord
   template: src=supervisord.conf.j2 dest=/usr/local/etc/supervisord.conf
+  notify: restart supervisord
 
 - name: enable supervisord at startup time
   lineinfile: dest=/etc/rc.conf state=present line='supervisord_enable=YES' create=yes
@@ -15,9 +16,6 @@
 
 - name: ensure log directory
   file: path={{apphome}}/log state=directory owner={{appuser}} mode=770
-
-- name: ensure pgp directory
-  file: path={{apphome}}/pgp_pubkeys state=directory owner={{appuser}} mode=770
 
 - name: find absolute path to our repo
   connection: local
@@ -38,15 +36,29 @@
 
 - name: upload theme
   connection: local
-  command: "ls -la {{ local_theme_path }}"
   command: 'rsync -av  -e "ssh -F ssh_config" {{ local_theme_path }}/ appserver:{{apphome}}/themes/{{ theme_name }}'
 
 - name: configure buildout
   template: src=buildout.cfg.j2 dest={{apphome}}/deployment.cfg
 
+- name: ensure key directory
+  file: path={{apphome}}/var/pgp_pubkeys state=directory owner={{appuser}} mode=700
+
+- name: upload editor's public keys
+  connection: local
+  command: 'rsync -av --delete  -e "ssh -F ssh_config" {{ local_pgpkey_path }}/ appserver:{{apphome}}/var/pgp_pubkeys/'
+
+- name: configure the cleanser script
+  template: src=briefkasten.conf.j2 dest={{apphome}}/middleware_scripts/briefkasten.conf owner={{appuser}} mode=600
+
 - name: set ownership
   command: "chown -R {{appuser}} {{apphome}}"
 
+- name: import pgp keys
+  sudo_user: "{{appuser}}"
+  script: import-gpg.sh
+
 - name: run buildout (this *will* take quite a while... be patient)
   command: gmake deployment chdir={{apphome}}
+  sudo_user: "{{appuser}}"
   notify: restart supervisord
