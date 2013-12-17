@@ -129,3 +129,43 @@
     - sudo
     - gnupg
   tags: appserver
+
+
+# create and configure the cleanser jail
+# TODO: use with_items for the basic, repeatitive setup across jails
+
+- name: ensure the appser jail exists
+  ezjail: name=cleanser ip_addr={{ hostvars['cleanser']['ip']}} disktype=zfs state=present
+  tags: cleanser
+
+# allow the app server net access
+- name: copy resolv.conf
+  command: cp /etc/resolv.conf {{ jails_dir }}/cleanser/etc/resolv.conf creates={{ jails_dir }}/cleanser/etc/resolv.conf
+  tags: cleanser
+
+- name: let sshd in jail listen only on private ip
+  lineinfile: dest={{ jails_dir }}/cleanser/etc/ssh/sshd_config state=present line='ListenAddress {{ hostvars['cleanser']['ip']}}'
+  tags: cleanser
+
+- name: enable root ssh access in jail
+  lineinfile: dest={{ jails_dir}}/cleanser/etc/ssh/sshd_config state=present line='PermitRootLogin without-password' create=yes
+  tags: cleanser
+
+- name: copy authorized_keys
+  command: cp /root/.ssh/authorized_keys {{ jails_dir }}/cleanser/root/.ssh/ creates={{ jails_dir }}/cleanser/root/.ssh/authorized_keys
+  tags: cleanser
+
+- name: enable sshd inside jail
+  lineinfile: dest={{ jails_dir }}/cleanser/etc/rc.conf state=present line='sshd_enable=YES' create=yes
+  tags: cleanser
+
+- name: start the webserver jail
+  command: ezjail-admin start cleanser
+  tags: cleanser
+  
+- name: install packages for webserver
+  pkgng_chroot: name={{ item }} jail="cleanser" state=present
+  with_items:
+    - pkg
+    - python27
+  tags: cleanser
