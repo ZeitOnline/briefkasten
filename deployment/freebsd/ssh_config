@@ -12,3 +12,7 @@ Host webserver
 Host appserver
     User root
     ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.3 22
+
+Host cleanser
+    User root
+    ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.4 22

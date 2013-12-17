@@ -1,0 +1,21 @@
+---
+- hosts: cleanser_jail
+  user: root
+  tasks:
+    - name: create cleanser user
+      user: name=cleanser createhome=yes
+
+    - name: create cleanser .ssh
+      file: path=/usr/home/cleanser/.ssh owner=cleanser mode=770 state=directory
+
+- hosts: jails_host
+  user: root
+  tasks:
+    - name: grant appserver's pyramid user ssh access
+      command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+
+- hosts: cleanser_jail
+  user: root
+  roles:
+    - common
+    - cleanser

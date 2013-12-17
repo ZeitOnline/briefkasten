@@ -159,11 +159,11 @@
   lineinfile: dest={{ jails_dir }}/cleanser/etc/rc.conf state=present line='sshd_enable=YES' create=yes
   tags: cleanser
 
-- name: start the webserver jail
+- name: start the cleanser jail
   command: ezjail-admin start cleanser
   tags: cleanser
   
-- name: install packages for webserver
+- name: install packages for cleanser
   pkgng_chroot: name={{ item }} jail="cleanser" state=present
   with_items:
     - pkg

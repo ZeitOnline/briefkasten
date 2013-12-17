@@ -1,0 +1,4 @@
+---
+- name: ensure ownership of scripts
+  command: chown -R cleanser /usr/home/cleanser
+
