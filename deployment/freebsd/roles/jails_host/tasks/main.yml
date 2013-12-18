@@ -52,6 +52,7 @@
   lineinfile: dest=/etc/rc.conf state=present line='pf_enable=YES' create=yes
 
 - name: upload pf config
+  # TODO: only enable for those jails that actually need it (currently appserver jail)
   template: src=pf.conf.j2 dest=/etc/pf.conf
   notify: restart pf
 
@@ -91,7 +92,7 @@
   ezjail: name=appserver ip_addr={{ hostvars['appserver']['ip']}} disktype=zfs state=present
   tags: appserver
 
-# allow the app server net access
+# allow the app server dns access
 - name: copy resolv.conf
   command: cp /etc/resolv.conf {{ jails_dir }}/appserver/etc/resolv.conf creates={{ jails_dir }}/appserver/etc/resolv.conf
   tags: appserver
@@ -136,11 +137,6 @@
 
 - name: ensure the appser jail exists
   ezjail: name=cleanser ip_addr={{ hostvars['cleanser']['ip']}} disktype=zfs state=present
-  tags: cleanser
-
-# allow the app server net access
-- name: copy resolv.conf
-  command: cp /etc/resolv.conf {{ jails_dir }}/cleanser/etc/resolv.conf creates={{ jails_dir }}/cleanser/etc/resolv.conf
   tags: cleanser
 
 - name: let sshd in jail listen only on private ip
