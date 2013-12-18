@@ -164,4 +164,8 @@
   with_items:
     - pkg
     - python27
+    - ghostscript9-nox11
+    - netpbm
+    - zip
+    - libreoffice
   tags: cleanser
