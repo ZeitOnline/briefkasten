@@ -6,13 +6,16 @@
       user: name=cleanser createhome=yes
 
     - name: create cleanser .ssh
-      file: path=/usr/home/cleanser/.ssh owner=cleanser mode=770 state=directory
+      file: path=/usr/home/cleanser/.ssh owner=cleanser mode=700 state=directory
 
 - hosts: jails_host
   user: root
   tasks:
-    - name: grant appserver's pyramid user ssh access
-      command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+    # grant appserver's pyramid user ssh access
+    - name: copy keyfile
+      command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys creates={{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+    - name: fix permissions on keyfile
+      command: chmod 600 {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
 
 - hosts: cleanser_jail
   user: root
