@@ -135,7 +135,7 @@
 # create and configure the cleanser jail
 # TODO: use with_items for the basic, repeatitive setup across jails
 
-- name: ensure the appser jail exists
+- name: ensure the cleanser jail exists
   ezjail: name=cleanser ip_addr={{ hostvars['cleanser']['ip']}} disktype=zfs state=present
   tags: cleanser
 
