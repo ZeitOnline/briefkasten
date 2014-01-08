@@ -18,7 +18,7 @@
   copy: src=92amd64-make.conf dest=/usr/local/etc/poudriere.d/92amd64-make.conf
 
 - name: create distfiles cache directory
-  file: path=/usr/ports/distfiles state=directory
+  file: path={{ distfiles_cache }} state=directory
 
 - name: upload ports options
   copy: src=92amd64-options dest=/usr/local/etc/poudriere.d/
