@@ -2,17 +2,17 @@ ControlMaster auto
 ControlPath   /tmp/%h_%p_%r
 
 Host jails_host
-  HostName 192.168.2.117
+  HostName 192.168.2.104
   User root
 
 Host webserver
     User root
-    ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.2 22
+    ProxyCommand ssh -q root@192.168.2.104 nc 127.0.0.2 22
 
 Host appserver
     User root
-    ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.3 22
+    ProxyCommand ssh -q root@192.168.2.104 nc 127.0.0.3 22
 
 Host cleanser
     User root
-    ProxyCommand ssh -q root@192.168.2.117 nc 127.0.0.4 22
+    ProxyCommand ssh -q root@192.168.2.104 nc 127.0.0.4 22
