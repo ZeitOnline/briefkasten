@@ -20,9 +20,6 @@
 - name: create distfiles cache directory
   file: path={{ distfiles_cache }} state=directory
 
-- name: upload ports options
-  copy: src=92amd64-options dest=/usr/local/etc/poudriere.d/
-
 - name: start build run
   command: poudriere bulk -f {{ pkg_list }} -j 92amd64 creates={{ jails_dir }}/basejail/poudriere_data/packages/92amd64-default
 
