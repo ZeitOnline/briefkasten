@@ -1,8 +1,0 @@
-[buildout]
-extends = appserver.cfg
-develop = .
-
-[config]
-appserver_root_url = %(root_url)s
-fs_theme_path = %(fs_remote_theme)s
-test_submission_secret = %(test_submission_secret)s
