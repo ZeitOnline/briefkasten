@@ -1,0 +1,4 @@
+jails_dir: /usr/jails
+jails_zfs_root: tank/jails
+zfs_checksum: fletcher4
+pkg_txz_url: http://pkg.freebsd.org/freebsd:9:x86:64/latest/Latest/pkg.txz

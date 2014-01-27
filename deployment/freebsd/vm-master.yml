@@ -1,0 +1,6 @@
+---
+- hosts: vm-master
+  roles:
+    - common
+    - dhcp_host
+    - jails_host

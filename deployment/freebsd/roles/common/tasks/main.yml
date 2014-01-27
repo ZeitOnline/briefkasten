@@ -1,0 +1,7 @@
+---
+- name: Setup pkg.conf
+  copy: src=pkg.conf dest=/usr/local/etc/pkg.conf
+- name: Setup make.conf
+  copy: src=make.conf dest=/etc/make.conf
+- name: Setup FreeBSD.conf
+  copy: src=FreeBSD.conf dest=/usr/local/etc/pkg/repos/FreeBSD.conf
