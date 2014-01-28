@@ -1,4 +1,4 @@
-- hosts: jails_host
+- hosts: vm-master
   user: root
 
   roles:
