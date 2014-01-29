@@ -102,6 +102,11 @@ clean: destroyvm
 dist-clean: clean
 	git clean -dxxf src
 
+cert: setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key
+
+setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key:
+	openssl req -x509 -newkey rsa:2048 -keyout setup/roles/webserver/files/briefkasten.key -out setup/roles/webserver/files/briefkasten.crt -days 365 -nodes
+
 
 
 
@@ -110,11 +115,6 @@ dist-clean: clean
 
 # bootstrap1:
 # 	bin/ansible-playbook -i host bootstrap1.yml --extra-vars "geli_passphrase=$(passphrase)"
-
-# cert: roles/webserver/files/briefkasten.crt, roles/webserver/files/briefkasten.key
-
-# roles/webserver/files/briefkasten.crt, roles/webserver/files/briefkasten.key:
-# 	openssl req -x509 -newkey rsa:2048 -keyout roles/webserver/files/briefkasten.key -out roles/webserver/files/briefkasten.crt -days 365 -nodes
 
 # deploy:
 # 	bin/ansible-playbook -i host site.yml
