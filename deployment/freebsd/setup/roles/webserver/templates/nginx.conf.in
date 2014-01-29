@@ -47,7 +47,7 @@ http {
         proxy_set_header        X-Forwarded-Proto   $scheme;
     
         location ^~ / {
-           proxy_pass http://{{ hostvars['appserver']['ip'] }}:{{ hostvars['appserver']['application_port'] }};
+           proxy_pass http://{{ hostvars['appserver']['awsome_ip'] }}:{{ application_port }};
         }
     }
 }

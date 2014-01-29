@@ -1,5 +1,10 @@
 ---
 
+- name: install packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - nginx
+
 - name: configure nginx
   template: src=nginx.conf.in dest=/usr/local/etc/nginx/nginx.conf
 

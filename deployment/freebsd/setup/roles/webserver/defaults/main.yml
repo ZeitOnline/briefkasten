@@ -2,3 +2,4 @@
 wwwuser: www
 cert_location: briefkasten.crt
 key_location: briefkasten.key
+application_port: 6543
