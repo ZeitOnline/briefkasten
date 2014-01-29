@@ -104,7 +104,7 @@
   file: dest=/usr/jails/flavours/base state=directory owner=root group=wheel
 
 - name: Pkg in base flavour
-  command: "tar -x -C /usr/jails/flavours/base --chroot --exclude '+*' -f /var/cache/pkg/All/pkg.txz creates=/usr/jails/flavours/base"
+  command: "tar -x -C /usr/jails/flavours/base --chroot --exclude '+*' -f /var/cache/pkg/All/pkg.txz creates=/usr/jails/flavours/base/usr/local/sbin/pkg"
 
 - name: The .ssh directory for root in base flavour
   file: dest=/usr/jails/flavours/base/root/.ssh state=directory mode=0600 owner=root group=wheel
