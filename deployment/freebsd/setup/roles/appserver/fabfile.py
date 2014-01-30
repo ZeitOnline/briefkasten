@@ -1,31 +1,37 @@
 from fabric import api as fab
-from fabric.contrib.project import rsync_project
+from fabric.contrib.project import rsync_project as _rsync_project
 
 
 fab.env.shell = "/usr/local/bin/bash -c"
 
 
 def debug():
-    fab.run('pwd')
+    fab.run('ls')
+
+
+def rsync_project(*args, **kwargs):
+    additional_args = []
+    ssh_info = fab.env.server.init_ssh_key()
+    for key in ssh_info:
+        if key[0].isupper():
+            additional_args.append('-o')
+            additional_args.append('%s="%s"' % (key, ssh_info[key].replace('"', '\"')))
+    kwargs['ssh_opts'] = '%s %s' % (kwargs.get('ssh_opts', ''), ' '.join(additional_args))
+    _rsync_project(*args, **kwargs)
 
 
 def upload_application():
     git_base = fab.local('git rev-parse --show-toplevel', capture=True)
-    with fab.cd(git_base):
+    with fab.lcd(git_base):
         # clean the workdir
-        fab.local('rm -rf deployment/freebsd/workdir/*')
+        fab.local('rm -rf workdir/*')
         # check out clean copy of the local git repo
         fab.local('git checkout-index -a -f --prefix=%s/deployment/freebsd/workdir/' % git_base)
         # upload application
-        # We have to force a ssh connection, so the known hosts file is filled
-        # with current data, otherwise the rsync_project call will fail
-        fab.run('pwd')
-        import pdb; pdb.set_trace()
         with fab.settings(fab.hide('running')):
-            rsync_project('/mnt/data/content/',
-                local_dir="deployment/freebsd/workdir/",
-                delete=True,
-                ssh_opts='-o UserKnownHostsFile=%s' % fab.env.known_hosts)
+            rsync_project(remote_dir='/usr/local/briefkasten/',
+                local_dir="%s/deployment/freebsd/workdir/application/" % git_base,
+                delete=False)
 
 
 # - name: upload application
