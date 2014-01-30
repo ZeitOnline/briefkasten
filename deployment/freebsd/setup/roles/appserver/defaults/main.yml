@@ -1,5 +1,5 @@
 ---
 appuser: pyramid
 apphome: /usr/local/briefkasten
-approot_url: /
-theme_name: default
+awsome_approot_url: /
+awsome_theme_name: default

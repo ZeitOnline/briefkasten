@@ -1,4 +1,14 @@
 ---
+- name: install packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - py27-supervisor
+    - py27-virtualenv
+    - gmake
+    - rsync
+    - libxslt
+    - sudo
+    - gnupg
 
 - name: create application user
   # this creates /home/pyramid/.ssh/id_rsa{.pub}
@@ -17,36 +27,14 @@
 - name: ensure log directory
   file: path={{apphome}}/log state=directory owner={{appuser}} mode=770
 
-- name: find absolute path to our repo
-  connection: local
-  command: git rev-parse --show-toplevel
-  register: git_base
-
-- name: clear work directory
-  connection: local
-  command: rm -rf {{ git_base.stdout }}/deployment/freebsd/workdir/*
-
-- name: check out clean copy of the local git repo
-  connection: local
-  command: git --work-tree={{ git_base.stdout }} checkout-index -a -f --prefix={{ git_base.stdout }}/deployment/freebsd/workdir/ chdir={{ git_base.stdout }}
-
-- name: upload application
-  connection: local
-  command: 'rsync -av  -e "ssh -F ssh_config" workdir/application/ appserver:{{apphome}}/'
-
-- name: upload theme
-  connection: local
-  command: 'rsync -av  -e "ssh -F ssh_config" {{ local_theme_path }}/ appserver:{{apphome}}/themes/{{ theme_name }}'
-
 - name: configure buildout
   template: src=buildout.cfg.j2 dest={{apphome}}/deployment.cfg
 
 - name: ensure key directory
   file: path={{apphome}}/var/pgp_pubkeys state=directory owner={{appuser}} mode=700
 
-- name: upload editor's public keys
-  connection: local
-  command: 'rsync -av --delete  -e "ssh -F ssh_config" {{ local_pgpkey_path }}/ appserver:{{apphome}}/var/pgp_pubkeys/'
+- name: ensure application directory
+  file: path={{apphome}}/middleware_scripts state=directory owner={{appuser}} mode=770
 
 - name: configure the cleanser script
   template: src=briefkasten.conf.j2 dest={{apphome}}/middleware_scripts/briefkasten.conf owner={{appuser}} mode=600
@@ -54,11 +42,3 @@
 - name: set ownership
   command: "chown -R {{appuser}} {{apphome}}"
 
-- name: import pgp keys
-  sudo_user: "{{appuser}}"
-  script: import-gpg.sh
-
-- name: run buildout (this *will* take quite a while... be patient)
-  command: gmake deployment chdir={{apphome}}
-  sudo_user: "{{appuser}}"
-  notify: restart supervisord
