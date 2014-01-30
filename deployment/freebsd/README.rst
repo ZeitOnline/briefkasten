@@ -21,4 +21,5 @@ You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools 
 - after reboot run ``/bin/aws playbook vm-master.yml``
 - setup the local package host: ``/bin/aws playbook poudriere.yml`` (this will take a while, it will download a ports tree and compile all packages)
 - ``./bin/aws start webserver``
-- ``/bin/aws playbook webserver.yml``
+- either put a valid cert and key into ``setup/roles/webserver/files/briefkasten.(crt|key)`` or run ``make cert`` to create a self-signed one
+- now you can configure the webserver jail: ``/bin/aws playbook webserver.yml``
