@@ -8,6 +8,10 @@ fab.env.shell = "/usr/local/bin/bash -c"
 def debug():
     fab.run('ls')
 
+def get_play(path):
+    import ansible
+    pb = fab.env.server.get_playbook(path)
+    return ansible.playbook.Play(pb, pb.playbook[0], pb.play_basedirs[0])
 
 def rsync_project(*args, **kwargs):
     additional_args = []
@@ -22,6 +26,8 @@ def rsync_project(*args, **kwargs):
 
 def upload_application():
     git_base = fab.local('git rev-parse --show-toplevel', capture=True)
+    play = get_play('../../appserver.yml')
+    default_vars = play.default_vars
     with fab.lcd(git_base):
         # clean the workdir
         fab.local('rm -rf workdir/*')
@@ -29,7 +35,7 @@ def upload_application():
         fab.local('git checkout-index -a -f --prefix=%s/deployment/freebsd/workdir/' % git_base)
         # upload application
         with fab.settings(fab.hide('running')):
-            rsync_project(remote_dir='/usr/local/briefkasten/',
+            rsync_project(remote_dir=default_vars['apphome'],
                 local_dir="%s/deployment/freebsd/workdir/application/" % git_base,
                 delete=False)
 
