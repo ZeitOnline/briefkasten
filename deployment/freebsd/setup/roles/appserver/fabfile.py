@@ -3,7 +3,7 @@ from fabric import api as fab
 from fabric.contrib.project import rsync_project as rsync_project
 
 
-fab.env.shell = "/usr/local/bin/bash -c"
+fab.env.shell = "/bin/csh -c"
 
 def _git_base():
     return fab.local('git rev-parse --show-toplevel', capture=True)
@@ -71,25 +71,29 @@ def upload_theme():
     _upload_theme()
 
 
-def upload_project():
-    """ upload the entire project, including theme, application, pgg keys etc. with the current git state"""
-    _checkout_git()
-    _upload_application()
-    _upload_theme()
+def upload_editor_keys():
+    """ upload and/or update the PGP keys for editors, import them into PGP"""
+    default_vars = _default_vars()
+    appuser = default_vars['appuser']
+    with fab.settings(fab.hide('running')):
+        local_key_path = path.join(fab.env['config_base'], fab.env.server.config['local_pgpkey_path'])
+        remote_key_path = '%s/var/pgp_pubkeys/' % _default_vars()['apphome']
+        _rsync_project(remote_dir=remote_key_path, local_dir=local_key_path, delete=True)
+        fab.run('chown -R %s %s' % (appuser, remote_key_path))
+        with fab.prefix("setenv GNUPGHOME %s" % remote_key_path):
+            fab.sudo('''gpg --import %s/*.gpg''' % remote_key_path,
+                user=appuser, shell_escape=False)
 
-
-# - name: upload editor's public keys
-#   connection: local
-#   command: 'rsync -av --delete  -e "ssh -F ssh_config" {{ local_pgpkey_path }}/ appserver:{{apphome}}/var/pgp_pubkeys/'
-
-# - name: set ownership
-#   command: "chown -R {{appuser}} {{apphome}}"
-
-# - name: import pgp keys
-#   sudo_user: "{{appuser}}"
-#   script: import-gpg.sh
 
 # - name: run buildout (this *will* take quite a while... be patient)
 #   command: gmake deployment chdir={{apphome}}
 #   sudo_user: "{{appuser}}"
 #   notify: restart supervisord
+
+def upload_project():
+    """ upload the entire project, including theme, application, pgg keys etc. with the current git state"""
+    _checkout_git()
+    _upload_application()
+    _upload_theme()
+    upload_editor_keys()
+
