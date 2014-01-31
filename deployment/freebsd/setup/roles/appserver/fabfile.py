@@ -45,9 +45,10 @@ def _upload_application():
                 delete=False)
 
             # upload the source with deleting
-            _rsync_project(remote_dir='%s/briefkasten' % _default_vars()['apphome'],
-                local_dir="%s/deployment/freebsd/workdir/application/briefkasten" % _git_base(),
+            _rsync_project(remote_dir='%s/briefkasten' % default_vars['apphome'],
+                local_dir="%s/deployment/freebsd/workdir/application/briefkasten/" % _git_base(),
                 delete=True)
+        fab.run('chown -R %s %s' % (default_vars['appuser'], default_vars['apphome']))
 
 def upload_application():
     """upload and/or update the application with the current git state """
