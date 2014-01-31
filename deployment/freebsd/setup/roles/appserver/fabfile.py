@@ -86,15 +86,18 @@ def upload_editor_keys():
                 user=appuser, shell_escape=False)
 
 
-# - name: run buildout (this *will* take quite a while... be patient)
-#   command: gmake deployment chdir={{apphome}}
-#   sudo_user: "{{appuser}}"
+def run_buildout():
+    default_vars = _default_vars()
+    with fab.cd(default_vars['apphome']):
+        fab.sudo('gmake deployment', user=default_vars['appuser'])
 #   notify: restart supervisord
 
+
 def upload_project():
-    """ upload the entire project, including theme, application, pgg keys etc. with the current git state"""
+    """ upload, bootstrap and start the entire project"""
     _checkout_git()
     _upload_application()
     _upload_theme()
     upload_editor_keys()
+    run_buildout()
 
