@@ -4,8 +4,8 @@ Obtaining the sources
 You need to clone the entire project but then work only inside ``deployment/freebsd`` (where this README is located)::
 
     git clone git@github.com:ZeitOnline/briefkasten
+    git checkout -t origin/freebsd-jails-with-mr.awsome
     cd briefkasten/deployment/freebsd
-    git checkout origin/freebsd-jails-with-mr.awsome
 
 
 Installation using Virtualbox
