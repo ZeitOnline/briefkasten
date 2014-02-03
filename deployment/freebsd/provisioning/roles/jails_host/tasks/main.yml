@@ -50,6 +50,7 @@
   - sudo
   - screen
   - bash
+  - rsync
 
 - name: Set default jail interface
   lineinfile: dest=/etc/rc.conf regexp=^jail_interface= line=jail_interface=\"lo1\"

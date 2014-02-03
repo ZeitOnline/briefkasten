@@ -1,9 +1,12 @@
 from fabric import api as fab
 from fabric.contrib.project import rsync_project
+from os import path
 
 def _git_base():
     return fab.local('git rev-parse --show-toplevel', capture=True)
 
+def _local_path(*segments):
+    return path.join(_git_base(), 'deployment', 'freebsd', *segments)
 
 def _default_vars():
     import ansible
