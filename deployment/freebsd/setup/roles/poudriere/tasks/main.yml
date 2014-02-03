@@ -27,4 +27,4 @@
   file: path={{ jails_dir }}/newjail/etc/pkg state=directory
 
 - name: Ensure pkgng configuration will be present in each jail
-  copy: src=pkg_repo.conf dest={{ jails_dir }}/newjail//etc/pkg/pkg_repo.conf
+  copy: src=pkg_repo.conf dest={{ jails_dir }}/newjail/etc/pkg/pkg_repo.conf
