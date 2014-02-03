@@ -18,6 +18,18 @@ You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools 
 - wait till the login prompt
 - Continue with **Bootstrapping the host**
 
+Installation using VMWare
+-------------------------
+
+First get the image::
+
+	make mfsbsd_download
+
+This downloads the ISO image into the ``downloads`` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password ``root/mfsroot``. Use ``ifconfig`` to get the assigned IP address and enter it into ``aws.conf``.
+
+- Continue with **Bootstrapping the host**
+
+
 Installation on physical hardware
 ---------------------------------
 
@@ -32,6 +44,7 @@ Verify the integrity of the downloaded image::
 	shasum mfsbsd-se-9.2-RELEASE-amd64.img
 
 Make sure the output matches the one in the downloaded text. Return into the deployment directory ``cd ..``.
+
 
 Creating a bootable USB medium (Mac OSX)
 ========================================
