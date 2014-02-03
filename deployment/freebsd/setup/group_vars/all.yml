@@ -1,3 +1,6 @@
 ---
 # FreeBSD
 ansible_python_interpreter: /usr/local/bin/python2.7
+jails_dir: /usr/jails
+zpool_name: tank
+jails_zfs_root: tank/jails
