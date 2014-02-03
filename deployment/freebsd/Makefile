@@ -106,19 +106,3 @@ cert: setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/b
 
 setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key:
 	openssl req -x509 -newkey rsa:2048 -keyout setup/roles/webserver/files/briefkasten.key -out setup/roles/webserver/files/briefkasten.crt -days 365 -nodes
-
-
-
-
-# bootstrap0:
-# 	bin/ansible-playbook -i host bootstrap0.yml -k -c paramiko
-
-# bootstrap1:
-# 	bin/ansible-playbook -i host bootstrap1.yml --extra-vars "geli_passphrase=$(passphrase)"
-
-# deploy:
-# 	bin/ansible-playbook -i host site.yml
-
-# mount_geli:
-# 	bin/ansible-playbook -i host bootstrap1.yml -t mount_geli --extra-vars "geli_passphrase=$(passphrase)"
-
