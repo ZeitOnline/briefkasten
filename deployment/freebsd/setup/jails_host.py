@@ -1,14 +1,15 @@
 # coding: utf-8
 from fabric import api as fab
-from fabric.contrib.project import rsync_project
-from mr.awsome.ezjail.fabric import bootstrap
+from mr.awsome.ezjail.fabric import bootstrap as _bootstrap
 from fabric_scripts import _local_path, _rsync_project
 
 fab.env.shell = '/bin/sh -c'
 
 
-# shutup pyflakes
-(bootstrap, )
+def bootstrap(**kwargs):
+    with fab.lcd(_local_path('provisioning/vm-master')):
+        _bootstrap(**kwargs)
+
 
 def download_distfiles():
     _rsync_project(remote_dir='/usr/local/poudriere/distfiles',
