@@ -51,7 +51,7 @@ Run ``gpart list`` and note the device name of the hard drive. Enter these value
 Bootstrapping the host
 ----------------------
 
-- run ``make bootstrapvm``
+- run ``make bootstraphost``
 - answer ``y`` for the questions coming up. the host will reboot automatically after the script has run.
 - after reboot run ``./bin/aws playbook provisioning/vm-master.yml``
 - setup the local package host: ``./bin/aws playbook setup/poudriere.yml`` (this will take a while, it will download a ports tree and compile all packages)
