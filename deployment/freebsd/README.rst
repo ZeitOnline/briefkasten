@@ -66,7 +66,8 @@ Bootstrapping the host
 
 - run ``make bootstraphost``
 - answer ``y`` for the questions coming up. the host will reboot automatically after the script has run.
-- after reboot run ``./bin/aws playbook provisioning/vm-master.yml``
+- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:vm-master]`` section of your ``aws.conf`` as ``fingerprint =``.
+- in the meantime the host has probably finished rebooting. Now run ``./bin/aws playbook provisioning/vm-master.yml``
 - setup the local package host: ``./bin/aws playbook setup/poudriere.yml`` (this will take a while, it will download a ports tree and compile all packages)
 - ``./bin/aws start webserver``
 - either put a valid cert and key into ``setup/roles/webserver/files/briefkasten.(crt|key)`` or run ``make cert`` to create a self-signed one
