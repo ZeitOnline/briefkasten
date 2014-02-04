@@ -23,6 +23,12 @@ def download_packages():
         delete=False, upload=False)
 
 
+def download_ports_tree():
+	""" download poudriere's ports tree """
+	_rsync_project(remote_dir='/usr/local/poudriere/ports/default',
+        local_dir=_local_path('downloads/'),
+        delete=False, upload=False)
+
 
 def upload_distfiles():
     pass
