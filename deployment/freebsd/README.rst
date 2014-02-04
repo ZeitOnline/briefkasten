@@ -14,7 +14,7 @@ Installation using Virtualbox
 You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools available in your path.
 
 - Place your public ssh key in ``roles/common/files/identity.pub``
-- ``make startvm``
+- ``make start-vm``
 - wait till the login prompt
 - Continue with **Bootstrapping the host**
 

@@ -41,7 +41,7 @@ bin/buildout: $(PYTHON_TARGETS) bin/ansible
 	bin/buildout -v
 
 
-check_mfsbsd_download:
+check-mfsbsd-download:
 	@test "`md5 -q $(MFSBSD_PATH)`" = "660d2b65e55a982c071891b7996fe684" || rm -f $(MFSBSD_PATH)
 
 
@@ -54,7 +54,7 @@ $(MFSBSD_PATH): downloads
 	touch $(MFSBSD_PATH)
 
 
-mfsbsd_download: check_mfsbsd_download $(MFSBSD_PATH)
+mfsbsd-download: check-mfsbsd-download $(MFSBSD_PATH)
 
 
 $(VM_PATH):
@@ -73,29 +73,34 @@ $(VM_VBOX): $(VM_BOOT_DISK)
 	VBoxManage storageattach $(VM_NAME) --storagectl "SATA" --type hdd --port 1 --medium $(VM_BOOT_DISK)
 
 
-vm: mfsbsd_download $(VM_VBOX)
+vm: mfsbsd-download $(VM_VBOX)
 
 
-startvm: vm
+start-vm: vm
 	-VBoxManage modifyvm $(VM_NAME) --natpf1 "ssh,tcp,,47022,,22"
 	-VBoxManage modifyvm $(VM_NAME) --natpf2 "https,tcp,,47023,,443"
 	VBoxManage startvm $(VM_NAME)
 
 
-stopvm:
+stop-vm:
 	VBoxManage controlvm $(VM_NAME) acpipowerbutton
 
 
-bootstraphost: .installed.cfg
+bootstrap-host: .installed.cfg
 	./bin/aws do vm-master bootstrap
 
+configure-host: .installed.cfg
+	./bin/aws playbook provisioning/vm-master.yml
 
-destroyvm:
+setup-poudriere: .installed.cfg
+	./bin/aws playbook setup/poudriere.yml
+
+destroy-vm:
 	-VBoxManage controlvm $(VM_NAME) poweroff && sleep 2
 	-VBoxManage unregistervm $(VM_NAME) --delete
 
 
-clean: destroyvm
+clean: destroy-vm
 	rm -rf bin lib include share
 
 
