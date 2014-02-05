@@ -9,3 +9,5 @@ textproc/libxslt
 security/sudo
 security/gnupg
 archivers/zip
+graphics/netpbm
+print/ghostscript9
