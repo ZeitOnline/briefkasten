@@ -1,5 +1,3 @@
-passphrase = 
-
 VIRTUALENV = virtualenv --system-site-packages
 PYTHON_TARGETS = bin/python lib/python* include/python*
 
@@ -13,6 +11,9 @@ VM_NAME = briefkasten
 VM_PATH = $(VM_BASEFOLDER)/$(VM_NAME)
 VM_VBOX = $(VM_PATH)/$(VM_NAME).vbox
 VM_BOOT_DISK = $(VM_PATH)/boot.vdi
+
+
+# setting up the deployment
 
 all: .installed.cfg
 
@@ -41,6 +42,8 @@ bin/buildout: $(PYTHON_TARGETS) bin/ansible
 	bin/buildout -v
 
 
+# download required assets:
+
 check-mfsbsd-download:
 	@test "`md5 -q $(MFSBSD_PATH)`" = "660d2b65e55a982c071891b7996fe684" || rm -f $(MFSBSD_PATH)
 
@@ -57,9 +60,10 @@ $(MFSBSD_PATH): downloads
 mfsbsd-download: check-mfsbsd-download $(MFSBSD_PATH)
 
 
+# setup and manage a virtualbox instance:
+
 $(VM_PATH):
 	mkdir -p $(VM_PATH)
-
 
 %.vdi: $(VM_PATH)
 	VBoxManage createhd --filename $@ --size 102400 --format VDI
@@ -72,19 +76,23 @@ $(VM_VBOX): $(VM_BOOT_DISK)
 	VBoxManage storageattach $(VM_NAME) --storagectl "SATA" --type dvddrive --port 0 --medium $(MFSBSD_PATH)
 	VBoxManage storageattach $(VM_NAME) --storagectl "SATA" --type hdd --port 1 --medium $(VM_BOOT_DISK)
 
-
 vm: mfsbsd-download $(VM_VBOX)
-
 
 start-vm: vm
 	-VBoxManage modifyvm $(VM_NAME) --natpf1 "ssh,tcp,,47022,,22"
 	-VBoxManage modifyvm $(VM_NAME) --natpf2 "https,tcp,,47023,,443"
 	VBoxManage startvm $(VM_NAME)
 
-
 stop-vm:
 	VBoxManage controlvm $(VM_NAME) acpipowerbutton
 
+
+destroy-vm:
+	-VBoxManage controlvm $(VM_NAME) poweroff && sleep 2
+	-VBoxManage unregistervm $(VM_NAME) --delete
+
+
+# Configure an existing host:
 
 bootstrap-host: .installed.cfg
 	./bin/aws do vm-master bootstrap
@@ -95,19 +103,17 @@ configure-host: .installed.cfg
 setup-poudriere: .installed.cfg
 	./bin/aws playbook setup/poudriere.yml
 
-destroy-vm:
-	-VBoxManage controlvm $(VM_NAME) poweroff && sleep 2
-	-VBoxManage unregistervm $(VM_NAME) --delete
-
-
-clean: destroy-vm
-	rm -rf bin lib include share
-
-
-dist-clean: clean
-	git clean -dxxf src
-
 cert: setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key
 
 setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key:
 	openssl req -x509 -newkey rsa:2048 -keyout setup/roles/webserver/files/briefkasten.key -out setup/roles/webserver/files/briefkasten.crt -days 365 -nodes
+
+
+# clean up:
+
+clean: destroy-vm
+	rm -rf bin lib include share
+
+dist-clean: clean
+	git clean -dxxf src
+
