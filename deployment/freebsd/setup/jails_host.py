@@ -21,10 +21,22 @@ def download_distfiles():
         delete=False, upload=False)
 
 
+def upload_distfiles():
+    _rsync_project(remote_dir='/usr/local/poudriere/distfiles/',
+        local_dir=_local_path('downloads/distfiles/'),
+        delete=True, upload=True)
+
+
 def download_packages():
     _rsync_project(remote_dir='/usr/jails/basejail/poudriere_data/packages',
         local_dir=_local_path('downloads/'),
         delete=False, upload=False)
+
+
+def upload_packages():
+    _rsync_project(remote_dir='/usr/jails/basejail/poudriere_data/packages/',
+        local_dir=_local_path('downloads/packages/'),
+        delete=False, upload=True)
 
 
 def download_ports_tree():
@@ -34,6 +46,13 @@ def download_ports_tree():
         delete=False, upload=False)
 
 
+def upload_ports_tree():
+	""" download poudriere's ports tree """
+	_rsync_project(remote_dir='/usr/local/poudriere/ports/default/',
+        local_dir=_local_path('downloads/default/'),
+        delete=False, upload=True)
+
+
 def download_poudriere_assets():
     """ download ports tree, distfiles, and packages from poudriere """
     download_distfiles()
@@ -41,8 +60,11 @@ def download_poudriere_assets():
     download_ports_tree()
 
 
-def upload_distfiles():
-    pass
+def upload_poudriere_assets():
+    """ upload local ports tree, distfiles, and packages from poudriere """
+    upload_distfiles()
+    upload_packages()
+    upload_ports_tree()
 
 
 def build_packages():
