@@ -32,7 +32,7 @@ def _upload_theme():
     with fab.lcd(_git_base()):
         with fab.settings(fab.hide('running')):
             local_theme_path = path.join(fab.env['config_base'], fab.env.server.config['local_theme_path'])
-            remote_theme_path = '%s/themes/%s' % (_default_vars()['apphome'], fab.env.server.config['theme_name'])
+            remote_theme_path = '%s/themes/%s' % (default_vars['apphome'], fab.env.server.config['theme_name'])
             _rsync_project(remote_dir=remote_theme_path,
                 local_dir=local_theme_path,
                 delete=True)
@@ -49,7 +49,7 @@ def upload_editor_keys():
     appuser = default_vars['appuser']
     with fab.settings(fab.hide('running')):
         local_key_path = path.join(fab.env['config_base'], fab.env.server.config['local_pgpkey_path'])
-        remote_key_path = '%s/var/pgp_pubkeys/' % _default_vars()['apphome']
+        remote_key_path = '%s/var/pgp_pubkeys/' % default_vars['apphome']
         _rsync_project(remote_dir=remote_key_path, local_dir=local_key_path, delete=True)
         fab.run('chown -R %s %s' % (appuser, remote_key_path))
         with fab.prefix("setenv GNUPGHOME %s" % remote_key_path):
