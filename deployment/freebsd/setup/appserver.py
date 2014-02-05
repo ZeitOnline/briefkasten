@@ -57,10 +57,14 @@ def upload_editor_keys():
                 user=appuser, shell_escape=False)
 
 
+def restart_application():
+    fab.sudo('supervisorctl restart briefkasten')
+
+
 def run_buildout():
     with fab.cd(default_vars['apphome']):
         fab.sudo('gmake deployment', user=default_vars['appuser'])
-#   notify: restart supervisord
+    restart_application()
 
 
 def upload_project():
