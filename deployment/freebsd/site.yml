@@ -1,8 +1,0 @@
----
-# toplevel playbook to run all playbooks in order.
-# assumes bootstrap0 and bootstrap1 have run already
-- include:
-  - jails_host.yml
-  - poudriere.yml
-  - webserver.yml
-  - appserver.yml
