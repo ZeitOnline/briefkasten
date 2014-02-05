@@ -1,3 +1,0 @@
----
-- name: restart network
-  command: sh -c 'ifconfig lo1 > /dev/null || ( service netif restart; service routing restart ; :); :'
