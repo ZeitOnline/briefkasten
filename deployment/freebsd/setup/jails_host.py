@@ -34,6 +34,13 @@ def download_ports_tree():
         delete=False, upload=False)
 
 
+def download_poudriere_assets():
+    """ download ports tree, distfiles, and packages from poudriere """
+    download_distfiles()
+    download_packages()
+    download_ports_tree()
+
+
 def upload_distfiles():
     pass
 
