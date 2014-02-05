@@ -5,11 +5,8 @@
 - name: poudriere configuration
   template: src=poudriere.conf.j2 dest=/usr/local/etc/poudriere.conf
 
-- name: create ports tree
-  command: poudriere ports -c creates=/usr/local/poudriere/ports/default/www/nginx/distinfo
-
-- name: upload list of packages to build
-  copy: src=pkg_list dest={{ pkg_list }}
+- name: create ports tree directories
+  command: poudriere ports -c -F creates=/usr/local/poudriere/ports/default
 
 - name: create build jail
   command: poudriere jail -c -j 92amd64 -v 9.2-RELEASE -a amd64 creates=/usr/local/poudriere/jails/92amd64
@@ -19,9 +16,6 @@
 
 - name: create distfiles cache directory
   file: path={{ distfiles_cache }} state=directory
-
-- name: start build run
-  command: poudriere bulk -f {{ pkg_list }} -j 92amd64 creates={{ jails_dir }}/basejail/poudriere_data/packages/92amd64-default
 
 - name: Ensure basejail etc exists
   file: path={{ jails_dir }}/newjail/etc/pkg state=directory
