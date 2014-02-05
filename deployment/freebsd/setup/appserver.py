@@ -4,10 +4,11 @@ from fabric_scripts import _git_base, _default_vars, _rsync_project, _checkout_g
 
 
 fab.env.shell = "/bin/csh -c"
+default_vars = _default_vars('appserver.yml')
 
 def _upload_application():
     git_base = _git_base()
-    default_vars = _default_vars()
+    
     with fab.lcd(git_base):
         with fab.settings(fab.hide('running')):
             # upload the whole project w/o deleting
@@ -45,7 +46,6 @@ def upload_theme():
 
 def upload_editor_keys():
     """ upload and/or update the PGP keys for editors, import them into PGP"""
-    default_vars = _default_vars()
     appuser = default_vars['appuser']
     with fab.settings(fab.hide('running')):
         local_key_path = path.join(fab.env['config_base'], fab.env.server.config['local_pgpkey_path'])
@@ -58,7 +58,6 @@ def upload_editor_keys():
 
 
 def run_buildout():
-    default_vars = _default_vars()
     with fab.cd(default_vars['apphome']):
         fab.sudo('gmake deployment', user=default_vars['appuser'])
 #   notify: restart supervisord

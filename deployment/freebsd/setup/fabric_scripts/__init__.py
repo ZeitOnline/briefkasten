@@ -6,11 +6,12 @@ def _git_base():
     return fab.local('git rev-parse --show-toplevel', capture=True)
 
 def _local_path(*segments):
+    """creates an absolute path from the segments relative to the deployment directory (where the Makefile lives etc.)"""
     return path.join(_git_base(), 'deployment', 'freebsd', *segments)
 
-def _default_vars():
+def _default_vars(playbook_path):
     import ansible
-    pb = fab.env.server.get_playbook('../../appserver.yml')
+    pb = fab.env.server.get_playbook(playbook_path)
     play = ansible.playbook.Play(pb, pb.playbook[0], pb.play_basedirs[0])
     return play.default_vars
 
