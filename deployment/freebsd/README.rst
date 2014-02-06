@@ -99,5 +99,7 @@ Installing the jails
 
 First start and create the (empty) jails ``make start-jails``, then configure them: ``make configure-jails``.
 
+.. note:: if you see output about not being able to verify the fingerprint of a jail... that happens sometimes (not sure when and why) on first access. In that case simply repeat the command.
+
 You now should be able to visit the configured https URL in your browser. In the case of virtualbox ``https://localhost:47023/briefkasten/submit``.
 
