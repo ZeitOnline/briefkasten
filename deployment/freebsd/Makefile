@@ -71,7 +71,7 @@ $(VM_PATH):
 
 $(VM_VBOX): $(VM_BOOT_DISK)
 	VBoxManage createvm --name $(VM_NAME) --basefolder $(VM_BASEFOLDER) --ostype FreeBSD_64 --register
-	VBoxManage modifyvm $(VM_NAME) --memory 512 --accelerate3d off --boot1 disk --boot2 dvd --acpi on --rtcuseutc on
+	VBoxManage modifyvm $(VM_NAME) --memory 2048 --accelerate3d off --boot1 disk --boot2 dvd --acpi on --rtcuseutc on
 	VBoxManage storagectl $(VM_NAME) --name "SATA" --add sata
 	VBoxManage storageattach $(VM_NAME) --storagectl "SATA" --type dvddrive --port 0 --medium $(MFSBSD_PATH)
 	VBoxManage storageattach $(VM_NAME) --storagectl "SATA" --type hdd --port 1 --medium $(VM_BOOT_DISK)
