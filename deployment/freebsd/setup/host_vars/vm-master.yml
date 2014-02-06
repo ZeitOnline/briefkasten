@@ -5,5 +5,5 @@ pkg_txz_url: http://pkg.freebsd.org/freebsd:9:x86:64/latest/Latest/pkg.txz
 ipnat_rules:
     - "# https forward for webserver:"
     - "rdr {{ ansible_default_ipv4.interface }} {{ ansible_default_ipv4.address }}/32 port {{ awsome_https_port }} -> {{ hostvars['webserver']['awsome_ip'] }} port 443"
-    - "uncomment for debugging the app directly:"
+    - "# uncomment for debugging the app directly:"
     - "#rdr {{ ansible_default_ipv4.interface }} {{ ansible_default_ipv4.address }}/32 port {{ application_port }} -> {{ hostvars['appserver']['awsome_ip'] }} port {{ application_port }}"
