@@ -9,7 +9,7 @@ default_vars = _default_vars('poudriere.yml')
 
 def bootstrap(**kwargs):
     """call mr.awsome.ezjail's bootstrap """
-    with fab.lcd(_local_path('provisioning/vm-master')):
+    with fab.lcd(_local_path('setup/vm-master')):
         _bootstrap(**kwargs)
 
 

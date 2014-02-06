@@ -98,7 +98,7 @@ bootstrap-host: .installed.cfg
 	./bin/aws do vm-master bootstrap
 
 configure-host: .installed.cfg
-	./bin/aws playbook provisioning/vm-master.yml
+	./bin/aws playbook setup/vm-master.yml
 
 setup-poudriere: .installed.cfg
 	./bin/aws playbook setup/poudriere.yml

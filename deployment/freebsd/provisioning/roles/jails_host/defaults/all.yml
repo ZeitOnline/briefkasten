@@ -1,2 +1,0 @@
----
-jails_pkg_url: "pkg+http://pkg.freeBSD.org/${ABI}/latest"
