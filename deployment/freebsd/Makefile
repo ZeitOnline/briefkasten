@@ -129,6 +129,8 @@ configure-appserver:
 configure-cleanser:
 	bin/aws playbook setup/cleanser.yml
 
+configure-jails: configure-webserver configure-appserver configure-cleanser
+
 # clean up:
 
 clean: destroy-vm

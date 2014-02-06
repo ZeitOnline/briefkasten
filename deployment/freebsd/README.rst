@@ -97,7 +97,7 @@ Now we have all requirements in place to install the jails.
 Installing the jails
 --------------------
 
-- First start and create the (empty) jails ``make start-jails``.
-- Configure the webserver jail: ``make configure-webserver``
-- Configure the appserver jail: ``make configure-appserver``
-- Configure the cleanser jail: ``make configure-cleanser``
+First start and create the (empty) jails ``make start-jails``, then configure them: ``make configure-jails``.
+
+You now should be able to visit the configured https URL in your browser. In the case of virtualbox ``https://localhost:47023/briefkasten/submit``.
+
