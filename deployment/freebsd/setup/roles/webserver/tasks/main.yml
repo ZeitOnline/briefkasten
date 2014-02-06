@@ -6,7 +6,7 @@
     - nginx
 
 - name: configure nginx
-  template: src=nginx.conf.in dest=/usr/local/etc/nginx/nginx.conf
+  template: src=nginx.conf dest=/usr/local/etc/nginx/nginx.conf
 
 - name: upload ssl certificate
   copy: src={{ cert_location }} dest=/usr/local/etc/nginx/briefkasten.crt
