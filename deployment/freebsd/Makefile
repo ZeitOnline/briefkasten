@@ -119,7 +119,7 @@ start-jails: .installed.cfg
 	bin/aws start appserver
 	bin/aws start cleanser
 
-configure-webserver: cert
+configure-webserver:
 	bin/aws playbook setup/webserver.yml
 
 configure-appserver:
