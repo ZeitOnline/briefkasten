@@ -37,7 +37,7 @@ theme_name = zeitonline
 # the remaining values in this file usually don't need to be adjusted
 flavour = base
 user = root
-startup_script = ../provisioning/vm-master/startup-ansible-jail
+startup_script = ../setup/vm-master/startup-ansible-jail
 proxycommand = nohup {path}/../bin/assh vm-master -W {ip}:22
 proxyhost = vm-master
 
