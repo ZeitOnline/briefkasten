@@ -103,11 +103,31 @@ configure-host: .installed.cfg
 setup-poudriere: .installed.cfg
 	./bin/aws playbook setup/poudriere.yml
 
-cert: setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key
+build-packages: .installed.cfg
+	./bin/aws do vm-master build_packages
 
-setup/roles/webserver/files/briefkasten.crt, setup/roles/webserver/files/briefkasten.key:
-	openssl req -x509 -newkey rsa:2048 -keyout setup/roles/webserver/files/briefkasten.key -out setup/roles/webserver/files/briefkasten.crt -days 365 -nodes
+cert: etc/briefkasten.crt, etc/briefkasten.key
 
+etc/briefkasten.crt, etc/briefkasten.key:
+	openssl req -x509 -newkey rsa:2048 -keyout etc/briefkasten.key -out etc/briefkasten.crt -days 365 -nodes
+
+
+# Create and configure the jails
+
+start-jails: .installed.cfg
+	bin/aws start webserver
+	bin/aws start appserver
+	bin/aws start cleanser
+
+configure-webserver: cert
+	bin/aws playbook setup/webserver.yml
+
+configure-appserver:
+	bin/aws playbook setup/appserver.yml
+	bin/aws do appserver upload_project
+
+configure-cleanser:
+	bin/aws playbook setup/cleanser.yml
 
 # clean up:
 

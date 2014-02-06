@@ -1,32 +1,41 @@
-[ansible]
-playbooks-directory = ../provisioning
-
 [ez-master:vm-master]
-# debug-commands = true
-fabfile = ../setup/jails_host.py
-bootstrap-system-pool-size = 4G
-# bootstrap-swap-size = 1G
-#bootstrap-zfsinstall = ../zfsinstall/zfsinstall
-# bootstrap-system-devices = ada0
-bootstrap-geli = yes
+# here you configure access to the jail host
+# the values here are pre-set for when using ``make start-vm``
 host = 127.0.0.1
 port = 47022
 user = root
-# the pkg repository URL that the jails should use
-ansible-jails_pkg_url = file:///basejail/poudriere_data/packages/92amd64-default
-
 # replace the fingerprint with the output from ``make bootstraphost``
 # (or with whatever the SSH fingerprint of your host is, if you did not set it up via the Makefile)
-fingerprint = 06:01:31:85:81:35:61:20:eb:39:33:40:b1:af:02:bf
+fingerprint = 
+
+# the remaining values of this section usually don't need to be adjusted
+# the pkg repository URL that the jails should use
+ansible-jails_pkg_url = file:///basejail/poudriere_data/packages/92amd64-default
+debug-commands = false
+fabfile = ../setup/jails_host.py
+bootstrap-system-pool-size = 4G
+# bootstrap-swap-size = 1G
+# bootstrap-system-devices = ada0
+bootstrap-geli = yes
 password-fallback = true
 
 [macro:ez-base]
+ansible-fqdn=briefkasten.virtualbox
+approot_url=/briefkasten/
+admins=tom@tomster.org erdgeist@erdgeist.org
+editors=tom@tomster.org erdgeist@erdgeist.org
+mail_sender=noreply@zeit.de
+test_submission_secret = changeme
+# needs trailing slash:
+local_theme_path = ../../../../briefkasten-theme/
+theme_name = zeitonline
+
+# the remaining values in this file usually don't need to be adjusted
 flavour = base
 user = root
 startup_script = ../provisioning/vm-master/startup-ansible-jail
 proxycommand = nohup {path}/../bin/assh vm-master -W {ip}:22
 proxyhost = vm-master
-approot_url=/briefkasten/
 
 [ez-zfs:data]
 path = tank/data
@@ -46,27 +55,21 @@ create = true
 [ez-instance:webserver]
 <= macro:ez-base
 ip = 10.0.0.1
-ansible-fqdn=briefkasten.virtualbox
 mounts =
     src={zfs[shared]}/cache/pkg/All dst=/var/cache/pkg/All create=true
-
 
 [ez-instance:appserver]
 <= macro:ez-base
 ip = 10.0.0.2
 fabfile = ../setup/appserver.py
-admins=tom@tomster.org erdgeist@erdgeist.org
-editors=tom@tomster.org erdgeist@erdgeist.org
-mail_sender=noreply@zeit.de
-test_submission_secret = changeme
-# needs trailing slash:
-local_theme_path = ../../../../briefkasten-theme/
-theme_name = zeitonline
 local_pgpkey_path = pgp_pubkeys/
 mounts =
     src={zfs[shared]}/cache/pkg/All dst=/var/cache/pkg/All create=true
 
-
 [ez-instance:cleanser]
 <= macro:ez-base
 ip = 10.0.0.3
+
+[ansible]
+playbooks-directory = ../setup
+
