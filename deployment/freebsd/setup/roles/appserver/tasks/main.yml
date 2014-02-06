@@ -39,6 +39,9 @@
 - name: configure the cleanser script
   template: src=briefkasten.conf.j2 dest={{apphome}}/middleware_scripts/briefkasten.conf owner={{appuser}} mode=600
 
+- name: ssh config for the the cleanser script
+  template: src=briefkasten_ssh_config.j2 dest={{apphome}}/var/briefkasten_ssh_config owner={{appuser}} mode=600
+
 - name: set ownership
   command: "chown -R {{appuser}} {{apphome}}"
 
