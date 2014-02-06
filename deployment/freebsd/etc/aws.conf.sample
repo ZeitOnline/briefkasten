@@ -4,6 +4,10 @@
 host = 127.0.0.1
 port = 47022
 user = root
+# the port at which the webserver listens, set to 47023 for when using ``make start-vm``
+# otherwise set to 443
+https_port = 47023
+#https_port = 443
 # replace the fingerprint with the output from ``make bootstraphost``
 # (or with whatever the SSH fingerprint of your host is, if you did not set it up via the Makefile)
 fingerprint = 
