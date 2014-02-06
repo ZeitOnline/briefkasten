@@ -2,3 +2,6 @@
 - name: ensure ownership of scripts
   command: chown -R cleanser /usr/home/cleanser
 
+- name: Upload cleanser scripts
+  copy: src=../../../../../../application/middleware_scripts/ dest=/usr/local/bin/
+  tags: foo
