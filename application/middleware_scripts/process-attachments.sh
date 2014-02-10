@@ -36,9 +36,9 @@ process_single_file () {
   image/*)             process-image.sh  "${the_file}" "${the_destination}" "${the_type}";;
 
 # archive and compression format
-  application/zip)     process_zip       "${the_file}" "${the_destination}";;
-  application/x-bzip2) process_bzip      "${the_file}" "${the_destination}";;
-  application/x-tar)   process_tar       "${the_file}" "${the_destination}";;
+  application/zip)     process_zip.sh    "${the_file}" "${the_destination}";;
+  application/x-bzip2) process_bzip.sh   "${the_file}" "${the_destination}";;
+  application/x-tar)   process_tar.sh    "${the_file}" "${the_destination}";;
 
 # every unknown format is just copied
 # this means that the server tried its best and is at least not worse
@@ -61,6 +61,31 @@ while getopts :d: arg; do case ${arg} in
 esac; done; shift $(( ${OPTIND} - 1 ))
 
 [ -d "${the_dropdir}" ] || exerr "Can't access drop directory"
+
+# If the passed to us a config file to parse, source it
+[ "${the_config}" && -r "${the_config}" ] && "./${the_config}"
+
+# If we have a remote cleanser host, clean the attachments there
+if [ "${the_cleanser}" ]; then
+  the_ssh_conf="-o PasswordAuthentication=no"
+  [ "${the_cleanser_ssh_conf}" ] && the_ssh_conf="-F the_cleanser_ssh_conf ${the_ssh_conf}"
+  the_remote_dir=`basename "${the_dropdir}"`
+
+  # copy over the attachments
+  scp ${the_cleanser_ssh_conf} -r ${the_dropdir} ${the_cleanser}:${the_remote_dir}
+
+  # execute remote cleanser job
+  ssh ${the_cleanser_ssh_conf} ${the_cleanser} process-attachments.sh -d ${the_remote_dir}
+  the_return_code=$?
+
+  # get back the result
+  scp ${the_cleanser_ssh_conf} -r ${the_cleanser}:${the_remote_dir}/ ${the_dropdir}
+
+  # remove remote dir
+  ssh ${the_cleanser_ssh_conf} ${the_cleanser} rm -r ${the_remote_dir}
+
+  exit ${the_return_code}
+fi
 
 # Check for attachment directory.
 # If it is not there, we got nothing to do

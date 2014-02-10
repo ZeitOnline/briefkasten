@@ -72,6 +72,7 @@ tar cf - ${the_dropdir} | gpg -e ${the_backup_recipients} -o "${the_dropdir}/bac
 [ -r "${the_dropdir}/message" ] || cp ${the_default_message} ${the_dropdir}/message
 
 # Clean all attachments and move cleaned versions to the clean/ directory
+export the_config
 if ! process-attachments.sh -d "${the_dropdir}"; then
   # If this fails, send the report to the editors for later retrieval
   # Also remove all clear text, keeping only the encrypted backup
