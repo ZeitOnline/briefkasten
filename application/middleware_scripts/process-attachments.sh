@@ -63,26 +63,26 @@ esac; done; shift $(( ${OPTIND} - 1 ))
 [ -d "${the_dropdir}" ] || exerr "Can't access drop directory"
 
 # If the passed to us a config file to parse, source it
-[ "${the_config}" && -r "${the_config}" ] && "./${the_config}"
+[ "${the_config}" -a -r "${the_config}" ] && . "${the_config}"
 
 # If we have a remote cleanser host, clean the attachments there
 if [ "${the_cleanser}" ]; then
   the_ssh_conf="-o PasswordAuthentication=no"
-  [ "${the_cleanser_ssh_conf}" ] && the_ssh_conf="-F the_cleanser_ssh_conf ${the_ssh_conf}"
+  [ "${the_cleanser_ssh_conf}" ] && the_ssh_conf="-F ${the_cleanser_ssh_conf} ${the_ssh_conf}"
   the_remote_dir=`basename "${the_dropdir}"`
 
   # copy over the attachments
-  scp ${the_cleanser_ssh_conf} -r ${the_dropdir} ${the_cleanser}:${the_remote_dir}
+  scp ${the_ssh_conf} -r ${the_dropdir} ${the_cleanser}:${the_remote_dir}
 
   # execute remote cleanser job
-  ssh ${the_cleanser_ssh_conf} ${the_cleanser} process-attachments.sh -d ${the_remote_dir}
+  ssh ${the_ssh_conf} ${the_cleanser} process-attachments.sh -d ${the_remote_dir}
   the_return_code=$?
 
   # get back the result
-  scp ${the_cleanser_ssh_conf} -r ${the_cleanser}:${the_remote_dir}/ ${the_dropdir}
+  scp ${the_ssh_conf} -r ${the_cleanser}:${the_remote_dir} `dirname ${the_dropdir}`
 
   # remove remote dir
-  ssh ${the_cleanser_ssh_conf} ${the_cleanser} rm -r ${the_remote_dir}
+  ssh ${the_ssh_conf} ${the_cleanser} rm -r ${the_remote_dir}
 
   exit ${the_return_code}
 fi
