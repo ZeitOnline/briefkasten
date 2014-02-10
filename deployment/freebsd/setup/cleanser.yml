@@ -8,7 +8,7 @@
     - zip
     - netpbm
     - ghostscript9-nox11
-    # - libreoffice
+    - libreoffice
 
   - name: create cleanser user
     user: name=cleanser createhome=yes
