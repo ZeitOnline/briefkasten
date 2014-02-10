@@ -69,6 +69,7 @@ def upload_poudriere_assets():
 
 def build_packages():
     """ uploads the list of packages and tells poudriere to build them"""
+    # TODO: create ZFS snapshot before each build? (use ports version somehow to label it)
     pkg_list = default_vars['pkg_list']
     fab.put(_local_path('setup/roles/poudriere/files/pkg_list'), pkg_list)
     fab.run('poudriere bulk -f %s -j 92amd64' % pkg_list)
