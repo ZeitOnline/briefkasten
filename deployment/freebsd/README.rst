@@ -1,47 +1,65 @@
+Overview
+--------
+
+An instance of the briefkasten is deployed by running scripts on a *control host* (i.e. your local machine) which then configure and install it on a *target host* (i.e. virtual machine for development and testing, on dedicated hardware for production).
+
+During this process the *target host* will boot from a FreeBSD 9.2 installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
+
+
 Obtaining the sources
 ---------------------
 
-You need to clone the entire project but then work only inside ``deployment/freebsd`` (where this README is located)::
+You need to clone the entire project onto the *control host* but will then work only inside ``deployment/freebsd`` (where this README is located)::
 
     git clone git@github.com:ZeitOnline/briefkasten
     cd briefkasten
     git checkout -t origin/freebsd-jails-with-mr.awsome
     cd deployment/freebsd
 
+
 Installing the requirements
 ---------------------------
 
-The system needs **Python 2.7** with ``virtualenv`` and ``make``.
+The *control host* needs **Python 2.7** with ``virtualenv`` and ``make``.
+
+TODO: add specific requirements for common Linux distributions and Mac OSX.
 
 
 Configuring your setup
 ----------------------
 
-Before we can continue, we need to configure your setup. The deployment needs four assets, most of which need to reside inside ``etc``:
+Before we can continue, we need to configure your setup. The deployment scripts require four assets, most of which need to reside inside ``etc``:
 
-- ``etc/aws.conf`` - the **main configuration file** for the jail host and jails. See ``aws.conf.sample`` for details.
-- ``provisioning/vm-master/identity.pub`` – your **SSL public key**. This will be uploaded to the host.
-- One or more **PGP keys** located inside ``etc/pgp_pubkeys/`` – these will be used to encrypt the submissions
-- ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` – the SSL key and certificate of the webserver that will server the app. This is optional during development and testing, if you provide none a self-signed setup will be generated for your convenience
+1. ``etc/aws.conf`` - the **main configuration file** for the jail host and jails. See ``aws.conf.sample`` for details.
+2. ``provisioning/vm-master/identity.pub`` – your **SSL public key**. This will be uploaded to the host.
+3. One or more **PGP keys** located inside ``etc/pgp_pubkeys/`` – these will be used to encrypt the submissions
+4. ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` – the SSL key and certificate of the webserver that will server the app. This is optional during development and testing, if you provide none you can create a self-signed setup by running ``make cert``.
+
+
+Booting the target host into FreeBSD
+------------------------------------
+
+Next we will need to boot the *target host* into the FreeBSD installer. Since an official vanilla installer from freebsd.org would require quite a bit more manual configuration we instead use a slightly modified version of this called `MFSBSD <http://mfsbsd.vx.sk>`_ – it basically attempts to configure the network via DHCP and has SSH enabled for ``root`` with a defined password of ``mfsroot``.
+
 
 Installation using Virtualbox
 -----------------------------
 
-You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools available in your path.
+This is the recommended way for testing and developing, as it allows for 100% automation. You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools available in your path.
 
-- ``make start-vm``
-- wait till the login prompt
+- ``make start-vm`` – this will download the ISO image, create a virtual machine and boot it from the image
+- wait till the login prompt - we're now booted into the MFSBSD installer
 - Continue with **Bootstrapping the host**
 
 
 Installation using VMWare
 -------------------------
 
-First get the image::
+First download the image::
 
 	make mfsbsd_download
 
-This downloads the ISO image into the ``downloads`` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password ``root/mfsroot``. Use ``ifconfig`` to get the assigned IP address and enter it into ``aws.conf``.
+This downloads the ISO image into the ``downloads`` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password ``root/mfsroot``. Use ``ifconfig`` to get the assigned IP address (or assign one manually) and enter it into ``aws.conf``.
 
 - Continue with **Bootstrapping the host**
 
@@ -77,21 +95,25 @@ Boot the machine. Log in as root using the pre-configured password ``mfsroot``. 
 Run ``gpart list`` and note the device name of the hard drive. Enter these values into your ``etc/aws.conf``. Return into the deployment directory ``cd ..``.
 
 
-Bootstrapping the host
-----------------------
+Bootstrapping the target host
+-----------------------------
 
-The functionality of the briefkasten has been split into three jails: a **webserver** jail that only contains the frontend, an **appserver** jail that contains the web application that handles the submissions and a separate **cleanser** jail that only deals with sanitizing and anonymizing any submitted attachments.
+Either way you now should have *target host* booted into MFSBSD with a known IP address which has been entered into ``etc/aws.conf`` and we can continue.
 
-Once we have a running host we can prepare for running these jails like so:
+The functionality of the briefkasten has been split into three jails: a **webserver** jail which only contains the frontend, an **appserver** jail which contains the web application that handles the submissions and a separate **cleanser** jail that only deals with sanitizing and anonymizing any submitted attachments.
 
-- run ``make bootstrap-host``
+Since we have a running host we can prepare for these jails like so:
+
+- run ``make bootstrap-host`` on the *control host*
 - answer ``y`` for the questions coming up. the host will reboot automatically after the script has run.
 - at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:vm-master]`` section of your ``aws.conf`` as ``fingerprint =``.
-- in the meantime the host has probably finished rebooting. Now run ``make configure-host``
+- in the meantime the *targe host* has probably finished rebooting. Now run ``make configure-host``
 - setup the local package host: ``make setup-poudriere``
 - if this is the first time you've setup a system you will need to build the required packages - this will take quiet a while as it will download a ports tree and compile all packages. Run ``make build-packages``.
 
-Now we have all requirements in place to install the jails.
+.. note:: There is a convenience script to download and upload the resulting packages to save time for repeat installations but currently you will need to look into ``setup/jails_host.py`` to figure it out.
+
+Anyway, now we have all requirements in place to install the jails.
 
 
 Installing the jails
