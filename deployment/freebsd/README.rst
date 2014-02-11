@@ -11,7 +11,7 @@ Obtaining the sources
 
 You need to clone the entire project onto the *control host* but will then work only inside ``deployment/freebsd`` (where this README is located)::
 
-    git clone git@github.com:ZeitOnline/briefkasten
+    git clone https://github.com/ZeitOnline/briefkasten.git
     cd briefkasten
     git checkout -t origin/freebsd-jails-with-mr.awsome
     cd deployment/freebsd
