@@ -1,17 +1,24 @@
 [ez-master:vm-master]
 # here you configure access to the jail host
-# the values here are pre-set for when using ``make start-vm``
+# the sample values here are pre-set for when using ``make start-vm``
+# the IP address under which the target host is reachable
 host = 127.0.0.1
+# the SSH port that the target host listens to
 port = 47022
+# the SSH user that is used for connecting to the target host
 user = root
+
+# the SSH fingerprint of the target host
+# replace the value with the output from ``make bootstrap-host``
+# (or with whatever the SSH fingerprint of your host is, if you did not set it up via the Makefile)
+fingerprint = 
+
 # the port at which the webserver listens, set to 47023 for when using ``make start-vm``
 # otherwise set to 443
 https_port = 47023
 #https_port = 443
-# replace the fingerprint with the output from ``make bootstraphost``
-# (or with whatever the SSH fingerprint of your host is, if you did not set it up via the Makefile)
-fingerprint = 
 
+##################################################################
 # the remaining values of this section usually don't need to be adjusted
 # the pkg repository URL that the jails should use
 ansible-jails_pkg_url = file:///basejail/poudriere_data/packages/92amd64-default
@@ -24,16 +31,44 @@ bootstrap-geli = yes
 password-fallback = true
 
 [macro:ez-base]
-ansible-fqdn=briefkasten.virtualbox
+# the FQDN under which the webserver is reached
+# ansible-fqdn=briefkasten.virtualbox
+
+# the URL slug under which the briefkasten should be hosted
 approot_url=/briefkasten/
-admins=tom@tomster.org erdgeist@erdgeist.org
-editors=tom@tomster.org erdgeist@erdgeist.org
-mail_sender=noreply@zeit.de
-test_submission_secret = changeme
-# needs trailing slash:
+
+# list of editorial recipients, space separated
+# cleansed submissions will be encrypted for and sent to
+# each address. This means that for each address there
+# needs to be a corresponding public PGP key in the system
+# (etc/pgp_pubkeys)
+editors=bob@acme.org alice@foo.com
+
+
+# list of admin recipients, space separated
+# admins get notified when a submission failes
+# for each address the corresponding PGP key needs
+# have been uploaded to the app server
+admins=foo@bar.com baz@foo.org
+
+# the return address used when sending out emails to editors and admins
+mail_sender=noreply@briefkasten.virtualbox
+
+# path on the control host to where a valid briefkasten theme is
+# located. needs trailing slash:
 local_theme_path = ../../../../briefkasten-theme/
+# the name of the theme
 theme_name = zeitonline
 
+# a token used to identify submissions posted by the watchdog
+# you must configure the identical value for the watchdog process
+# any submission POST that contains a key named ``testing_secret``
+# and a value matching the value specified here will *not* be
+# sent to the editors but 
+test_submission_secret = changeme
+# TODO: document the watchdog process, expose its configuration here, too.
+
+##################################################################
 # the remaining values in this file usually don't need to be adjusted
 flavour = base
 user = root

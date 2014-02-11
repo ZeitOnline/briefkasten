@@ -38,7 +38,27 @@ Before we can continue, we need to configure your setup on the *control host*. T
 aws.conf – the main configuration file
 ======================================
 
-1. Create a copy from the provided example ``cp etc/aws.conf.sample etc/aws.conf``. Look inside it for details, it should be self explanatory.
+Create a copy from the provided example ``cp etc/aws.conf.sample etc/aws.conf``.
+
+You will (at least) need to provide values in the ``[ez-master:vm-master]`` section for the following keys:
+
+  - host
+  - port
+  - user
+  - fingerprint
+  - https_port
+
+And in the ``[macro:ez-base]`` section for these:
+
+	- ansible-fqdn
+	- approot_url
+	- editors
+	- admins
+	- mail_sender
+	- local_theme_path
+	- theme_name
+
+Look inside the file for details, it should be self explanatory. 
 
 
 SSH public key
@@ -125,7 +145,9 @@ For the time being we only provide instructions for Mac OS X, sorry! If you run 
 
 Insert the USB stick into the *target host* and boot from it. Log in as ``root`` using the pre-configured password ``mfsroot``. Either note the name of the ethernet interface and the IP address it has been given by running ``ifconfig`` or set them to the desired values in ``/etc/rc.conf`` if you do not have a DHCP environment.
 
-Run ``gpart list`` and note the device name of the hard drive. Enter these values into your ``etc/aws.conf``. Return into the deployment directory ``cd ..``.
+Run ``gpart list`` and note the device name of the hard drive(s). Enter this values into your ``etc/aws.conf``.
+
+Return into the deployment directory ``cd ..``.
 
 
 
