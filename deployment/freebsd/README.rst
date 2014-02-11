@@ -17,8 +17,8 @@ You need to clone the entire project onto the *control host* but will then work 
     cd deployment/freebsd
 
 
-Installing the requirements
----------------------------
+Installing the requirements on the control host
+-----------------------------------------------
 
 The *control host* needs **Python 2.7** with ``virtualenv`` and ``make``.
 
@@ -32,12 +32,37 @@ Under FreeBSD install ``devel/py-virtualenv``.
 Configuring your setup
 ----------------------
 
-Before we can continue, we need to configure your setup. The deployment scripts require four assets, most of which need to reside inside ``etc``:
+Before we can continue, we need to configure your setup on the *control host*. The deployment scripts require four assets, most of which need to reside inside ``etc``.
 
-1. ``etc/aws.conf`` - the **main configuration file** for the jail host and jails. See ``aws.conf.sample`` for details.
-2. ``provisioning/vm-master/identity.pub`` – your **SSL public key**. This will be uploaded to the host.
-3. One or more **PGP keys** located inside ``etc/pgp_pubkeys/`` – these will be used to encrypt the submissions
-4. ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` – the SSL key and certificate of the webserver that will server the app. This is optional during development and testing, if you provide none you can create a self-signed setup by running ``make cert``.
+
+aws.conf – the main configuration file
+======================================
+
+1. Create a copy from the provided example ``cp etc/aws.conf.sample etc/aws.conf``. Look inside it for details, it should be self explanatory.
+
+
+SSH public key
+==============
+
+This key (usually ``~/.ssh/idenity.pub``) will be installed on the *target host* during bootstrapping and will enable access to it.
+
+You need to place it inside ``provisioning/vm-master/identity.pub`` – even if your key is named differently (i.e. ``id_dsa.pub``) you will need to rename it.
+
+
+Editorial PGP keys
+==================
+
+For each email address configured as recipient of the submissions in ``aws.conf`` you must provide a matching public PGP key which will be used to encrypt the submissions.
+
+These need to reside inside ``etc/pgp_pubkeys/`` and are expected to end in ``*.gpg``. You can use one key per editor or any public keyring format that is understood by ``gnupg``.
+
+
+SSL certificate for the webserver
+=================================
+
+The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It expected in ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` respectively.
+
+This is optional during development and testing – if you provide none you can create a self-signed setup by running ``make cert``.
 
 
 Booting the target host into FreeBSD
@@ -47,7 +72,7 @@ Next we will need to boot the *target host* into the FreeBSD installer. Since an
 
 
 Installation using Virtualbox
------------------------------
+=============================
 
 This is the recommended way for testing and developing, as it allows for 100% automation. You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools available in your path.
 
@@ -57,7 +82,7 @@ This is the recommended way for testing and developing, as it allows for 100% au
 
 
 Installation using VMWare
--------------------------
+=========================
 
 First download the image::
 
@@ -69,7 +94,9 @@ This downloads the ISO image into the ``downloads`` folder. In VMWare create a v
 
 
 Installation on physical hardware
----------------------------------
+=================================
+
+This is the recommended setup for production. The machine doesn't need to be particularly powerful, but it will require at least 2Gb RAM and 10Gb disk space to compile the packages.
 
 Download the MFSBSD ISO image and checksum::
 
@@ -81,11 +108,13 @@ Verify the integrity of the downloaded image::
 
 	shasum mfsbsd-se-9.2-RELEASE-amd64.img
 
-Make sure the output matches the one in the downloaded text.
+Make sure the output matches the one in the downloaded text. Next you will need to create a bootable medium from that image.
 
 
 Creating a bootable USB medium (Mac OSX)
-========================================
+****************************************
+
+For the time being we only provide instructions for Mac OS X, sorry! If you run Linux you probably already know how to do this, anyway :-)
 
 - Run ``diskutil list`` to see which drives are currently in your system.
 - insert your medium
@@ -94,9 +123,10 @@ Creating a bootable USB medium (Mac OSX)
 - run ```sudo dd if=mfsbsd-se-9.2-RELEASE-amd64.img of=/dev/diskN bs=1m``
 - run ``diskutil unmountDisk /dev/diskN``
 
-Boot the machine. Log in as root using the pre-configured password ``mfsroot``. Note the name of the ethernet interface and the IP address it has been given by running ``ifconfig``.
+Insert the USB stick into the *target host* and boot from it. Log in as ``root`` using the pre-configured password ``mfsroot``. Either note the name of the ethernet interface and the IP address it has been given by running ``ifconfig`` or set them to the desired values in ``/etc/rc.conf`` if you do not have a DHCP environment.
 
 Run ``gpart list`` and note the device name of the hard drive. Enter these values into your ``etc/aws.conf``. Return into the deployment directory ``cd ..``.
+
 
 
 Bootstrapping the target host
