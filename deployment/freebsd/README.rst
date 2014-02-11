@@ -45,8 +45,9 @@ You will (at least) need to provide values in the ``[ez-master:vm-master]`` sect
   - host
   - port
   - user
-  - fingerprint
   - https_port
+
+Note that you cannot specify the SSH fingerprint at this time yet, you need to wait until after ``bootstrap-host`` has run (see below)
 
 And in the ``[macro:ez-base]`` section for these:
 
@@ -66,7 +67,7 @@ SSH public key
 
 This key (usually ``~/.ssh/idenity.pub``) will be installed on the *target host* during bootstrapping and will enable access to it.
 
-You need to place it inside ``provisioning/vm-master/identity.pub`` – even if your key is named differently (i.e. ``id_dsa.pub``) you will need to rename it.
+You need to place it inside ``setup/vm-master/identity.pub`` – even if your key is named differently (i.e. ``id_dsa.pub``) you will need to rename it.
 
 
 Editorial PGP keys
