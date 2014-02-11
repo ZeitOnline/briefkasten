@@ -22,7 +22,11 @@ Installing the requirements
 
 The *control host* needs **Python 2.7** with ``virtualenv`` and ``make``.
 
-TODO: add specific requirements for common Linux distributions and Mac OSX.
+On most Linux distributions you should get all of the above by installing ``python-virtualenv`` (i.e. ``aptitude install python-virtualenv``).
+
+Under Mac OS X using `homebrew <http://brew.sh>`_ is the recommended way (``brew install python`` should do the trick.) (The Python installation that's part of Mac OS X ships without ``virtualenv`` and is out-dated. It's best not to touch it at all.)
+
+Under FreeBSD install ``devel/py-virtualenv``.
 
 
 Configuring your setup
