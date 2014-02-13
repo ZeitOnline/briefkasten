@@ -181,3 +181,16 @@ First start and create the (empty) jails ``make start-jails``, then configure th
 
 You now should be able to visit the configured https URL in your browser. In the case of virtualbox ``https://localhost:47023/briefkasten/submit``.
 
+
+Testing the installation
+------------------------
+
+Once all steps have been completed successfully you should be able to visit the briefkasten in a webbrowser.
+
+in the case of testing via virtualbox the url would be `https://localhost:47023/briefkasten/submit <https://localhost:47023/briefkasten/submit>`_.
+
+When visiting the page, enter some text into the form and add one or more attachments, then submit the form.
+
+You should then see a success message along with a link to the feedback page for this submission.
+
+In addition each editor email configured in ``aws.conf`` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
