@@ -38,7 +38,7 @@ bin/buildout: $(PYTHON_TARGETS) bin/ansible
 	-./clear-setuptools-dependency-links
 
 
-.installed.cfg: bin/buildout buildout.cfg src/*/setup.py
+.installed.cfg: bin/buildout buildout.cfg
 	bin/buildout -v
 
 
