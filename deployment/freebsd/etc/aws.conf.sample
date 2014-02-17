@@ -3,7 +3,10 @@
 # the sample values here are pre-set for when using ``make start-vm``
 # the IP address under which the target host is reachable
 host = 127.0.0.1
-# the SSH port that the target host listens to
+# the SSH port that the target host can be reached at.
+# this may differ from the port number it is *listening* to in case of the local
+# port forwarding of the virtualbox instance or any other firewall settings
+# for most other situations you will set this to 22
 port = 47022
 # the SSH user that is used for connecting to the target host
 user = root
@@ -13,7 +16,7 @@ user = root
 # (or with whatever the SSH fingerprint of your host is, if you did not set it up via the Makefile)
 fingerprint = 
 
-# the port at which the webserver listens, set to 47023 for when using ``make start-vm``
+# the port at which the webserver listens, set to 47023 for the virtualbox when using ``make start-vm``
 # otherwise set to 443
 https_port = 47023
 #https_port = 443
