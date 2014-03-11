@@ -6,7 +6,7 @@
   template: src=poudriere.conf.j2 dest=/usr/local/etc/poudriere.conf
 
 - name: create ports tree directories
-  command: poudriere ports -c -F creates=/usr/local/poudriere/ports/default
+  command: poudriere ports -c creates=/usr/local/poudriere/ports/default
 
 - name: create build jail
   command: poudriere jail -c -j 92amd64 -v 9.2-RELEASE -a amd64 creates=/usr/local/poudriere/jails/92amd64
