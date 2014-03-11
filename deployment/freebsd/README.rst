@@ -59,7 +59,9 @@ And in the ``[macro:ez-base]`` section for these:
 	- local_theme_path
 	- theme_name
 
-Look inside the file for details, it should be self explanatory. 
+Look inside the file for details, it should be self explanatory.
+
+TODO: make network device, default router and nameserver (/etc/resolv.conf) instead of requiring a hand-made, custom rc.conf in setup/vm-master
 
 
 SSH public key
