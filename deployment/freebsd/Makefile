@@ -32,6 +32,11 @@ bin/ansible: $(PYTHON_TARGETS)
 	touch bin/ansible
 
 
+bin/ploy: bin/ansible
+	bin/pip install --upgrade --force-reinstall bsdploy
+	touch bin/ploy
+
+
 bin/buildout: $(PYTHON_TARGETS) bin/ansible
 	bin/pip install --upgrade --force-reinstall zc.buildout
 	touch bin/buildout

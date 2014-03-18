@@ -35,10 +35,10 @@ Configuring your setup
 Before we can continue, we need to configure your setup on the *control host*. The deployment scripts require four assets, most of which need to reside inside ``etc``.
 
 
-aws.conf – the main configuration file
-======================================
+ploy.conf – the main configuration file
+=======================================
 
-Create a copy from the provided example ``cp etc/aws.conf.sample etc/aws.conf``.
+Create a copy from the provided example ``cp etc/ploy.conf.sample etc/ploy.conf``.
 
 You will (at least) need to provide values in the ``[ez-master:vm-master]`` section for the following keys:
 
@@ -75,7 +75,7 @@ You need to place it inside ``setup/vm-master/identity.pub`` – even if your ke
 Editorial PGP keys
 ==================
 
-For each email address configured as recipient of the submissions in ``aws.conf`` you must provide a matching public PGP key which will be used to encrypt the submissions.
+For each email address configured as recipient of the submissions in ``ploy.conf`` you must provide a matching public PGP key which will be used to encrypt the submissions.
 
 These need to reside inside ``etc/pgp_pubkeys/`` and are expected to end in ``*.gpg``. You can use one key per editor or any public keyring format that is understood by ``gnupg``.
 
@@ -111,7 +111,7 @@ First download the image::
 
 	make mfsbsd_download
 
-This downloads the ISO image into the ``downloads`` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password ``root/mfsroot``. Use ``ifconfig`` to get the assigned IP address (or assign one manually) and enter it into ``aws.conf``.
+This downloads the ISO image into the ``downloads`` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password ``root/mfsroot``. Use ``ifconfig`` to get the assigned IP address (or assign one manually) and enter it into ``ploy.conf``.
 
 - Continue with **Bootstrapping the host**
 
@@ -148,7 +148,7 @@ For the time being we only provide instructions for Mac OS X, sorry! If you run 
 
 Insert the USB stick into the *target host* and boot from it. Log in as ``root`` using the pre-configured password ``mfsroot``. Either note the name of the ethernet interface and the IP address it has been given by running ``ifconfig`` or set them to the desired values in ``/etc/rc.conf`` if you do not have a DHCP environment.
 
-Run ``gpart list`` and note the device name of the hard drive(s). Enter this values into your ``etc/aws.conf``.
+Run ``gpart list`` and note the device name of the hard drive(s). Enter this values into your ``etc/ploy.conf``.
 
 Return into the deployment directory ``cd ..``.
 
@@ -157,7 +157,7 @@ Return into the deployment directory ``cd ..``.
 Bootstrapping the target host
 -----------------------------
 
-Either way you now should have *target host* booted into MFSBSD with a known IP address which has been entered into ``etc/aws.conf`` and we can continue.
+Either way you now should have *target host* booted into MFSBSD with a known IP address which has been entered into ``etc/ploy.conf`` and we can continue.
 
 The functionality of the briefkasten has been split into three jails: a **webserver** jail which only contains the frontend, an **appserver** jail which contains the web application that handles the submissions and a separate **cleanser** jail that only deals with sanitizing and anonymizing any submitted attachments.
 
@@ -165,7 +165,7 @@ Since we have a running host we can prepare for these jails like so:
 
 - run ``make bootstrap-host`` on the *control host*
 - answer ``y`` for the questions coming up. the host will reboot automatically after the script has run.
-- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:vm-master]`` section of your ``aws.conf`` as ``fingerprint =``.
+- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:vm-master]`` section of your ``ploy.conf`` as ``fingerprint =``.
 - in the meantime the *targe host* has probably finished rebooting. Now run ``make configure-host``
 - setup the local package host: ``make setup-poudriere``
 - if this is the first time you've setup a system you will need to build the required packages - this will take quiet a while as it will download a ports tree and compile all packages. Run ``make build-packages``.
@@ -196,4 +196,4 @@ When visiting the page, enter some text into the form and add one or more attach
 
 You should then see a success message along with a link to the feedback page for this submission.
 
-In addition each editor email configured in ``aws.conf`` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
+In addition each editor email configured in ``ploy.conf`` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
