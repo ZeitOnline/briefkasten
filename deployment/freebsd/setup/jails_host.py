@@ -4,7 +4,6 @@ from mr.awsome.ezjail.fabric import bootstrap as _bootstrap
 from fabric_scripts import _local_path, _rsync_project, _default_vars
 
 fab.env.shell = '/bin/sh -c'
-default_vars = _default_vars('poudriere.yml')
 
 
 def bootstrap(**kwargs):
@@ -70,6 +69,7 @@ def upload_poudriere_assets():
 def build_packages():
     """ uploads the list of packages and tells poudriere to build them"""
     # TODO: create ZFS snapshot before each build? (use ports version somehow to label it)
+    default_vars = _default_vars('poudriere.yml')
     pkg_list = default_vars['pkg_list']
     fab.put(_local_path('setup/roles/poudriere/files/pkg_list'), pkg_list)
     fab.run('poudriere bulk -f %s -j 92amd64' % pkg_list)
