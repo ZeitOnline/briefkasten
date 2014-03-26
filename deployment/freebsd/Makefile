@@ -4,7 +4,7 @@ PYTHON_TARGETS = bin/python lib/python* include/python*
 MFSBSD_URL = http://mfsbsd.vx.sk/files/iso/9/amd64/mfsbsd-se-9.2-RELEASE-amd64.iso
 MFSBSD_FILENAME = $(lastword $(subst /, ,$(MFSBSD_URL)))
 MFSBSD_PATH = downloads/$(MFSBSD_FILENAME)
-MFSBSD_MD5 = 660d2b65e55a982c071891b7996fe684
+MFSBSD_SHA = 4ef70dfd7b5255e36f2f7e1a5292c7a05019c8ce
 
 VM_BASEFOLDER = $(abspath vm)
 VM_NAME = briefkasten
@@ -50,8 +50,7 @@ bin/buildout: $(PYTHON_TARGETS) bin/ansible
 # download required assets:
 
 check-mfsbsd-download:
-	@test "`md5 -q $(MFSBSD_PATH)`" = "660d2b65e55a982c071891b7996fe684" || rm -f $(MFSBSD_PATH)
-
+	echo "$(MFSBSD_SHA)  $(MFSBSD_PATH)" | shasum -c || rm -f $(MFSBSD_PATH)
 
 downloads:
 	mkdir -p downloads
