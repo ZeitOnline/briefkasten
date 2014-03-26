@@ -84,13 +84,11 @@ $(VM_VBOX): $(VM_BOOT_DISK)
 vm: mfsbsd-download $(VM_VBOX)
 
 start-vm: vm
-	-VBoxManage modifyvm $(VM_NAME) --natpf1 "ssh,tcp,,47022,,22"
-	-VBoxManage modifyvm $(VM_NAME) --natpf2 "https,tcp,,47023,,443"
+	-VBoxManage modifyvm $(VM_NAME) --natpf1 "ssh,tcp,,47022,,22" --natpf2 "https,tcp,,47023,,443"
 	VBoxManage startvm $(VM_NAME)
 
 stop-vm:
 	VBoxManage controlvm $(VM_NAME) acpipowerbutton
-
 
 destroy-vm:
 	-VBoxManage controlvm $(VM_NAME) poweroff && sleep 2
