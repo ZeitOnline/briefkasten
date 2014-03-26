@@ -3,10 +3,8 @@
 /include/
 /lib/
 /src/
-/library/ezjail
 /share
 /host
 /vm
 /downloads
 /etc/known_hosts
-/provisioning

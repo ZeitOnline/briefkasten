@@ -1,5 +1,6 @@
-VIRTUALENV = virtualenv --system-site-packages
+PYTHON = python2.7
 PYTHON_TARGETS = bin/python lib/python* include/python*
+VIRTUALENV = virtualenv
 
 MFSBSD_URL = http://mfsbsd.vx.sk/files/iso/9/amd64/mfsbsd-se-9.2-RELEASE-amd64.iso
 MFSBSD_FILENAME = $(lastword $(subst /, ,$(MFSBSD_URL)))
@@ -12,39 +13,18 @@ VM_PATH = $(VM_BASEFOLDER)/$(VM_NAME)
 VM_VBOX = $(VM_PATH)/$(VM_NAME).vbox
 VM_BOOT_DISK = $(VM_PATH)/boot.vdi
 
-
 # setting up the deployment
 
-all: .installed.cfg
-
-$(PYTHON_TARGETS):
+all: python bin/ploy
 
 $(PYTHON_TARGETS): python
 
-.SECONDARY: python
 python:
 	$(VIRTUALENV) --clear .
-	-./clear-setuptools-dependency-links
 
-
-bin/ansible: $(PYTHON_TARGETS)
-	bin/pip install --upgrade --force-reinstall ansible
-	touch bin/ansible
-
-
-bin/ploy: bin/ansible
-	bin/pip install --upgrade --force-reinstall bsdploy
+bin/ploy: 
+	bin/pip install --upgrade --force-reinstall -r requirements.txt
 	touch bin/ploy
-
-
-bin/buildout: $(PYTHON_TARGETS) bin/ansible
-	bin/pip install --upgrade --force-reinstall zc.buildout
-	touch bin/buildout
-	-./clear-setuptools-dependency-links
-
-
-.installed.cfg: bin/buildout buildout.cfg
-	bin/buildout -v
 
 
 # download required assets:
@@ -55,11 +35,9 @@ check-mfsbsd-download:
 downloads:
 	mkdir -p downloads
 
-
 $(MFSBSD_PATH): downloads
 	wget -c "$(MFSBSD_URL)" -O $(MFSBSD_PATH)
 	touch $(MFSBSD_PATH)
-
 
 mfsbsd-download: check-mfsbsd-download $(MFSBSD_PATH)
 
@@ -96,17 +74,17 @@ destroy-vm:
 
 # Configure an existing host:
 
-bootstrap-host: .installed.cfg
-	./bin/aws do vm-master bootstrap
+bootstrap-host: bin/ploy
+	./bin/ploy do vm-master bootstrap
 
-configure-host: .installed.cfg
-	./bin/aws playbook setup/vm-master.yml
+configure-host: bin/ploy
+	./bin/ploy playbook setup/vm-master.yml
 
-setup-poudriere: .installed.cfg
-	./bin/aws playbook setup/poudriere.yml
+setup-poudriere:  bin/ploy
+	./bin/ploy playbook setup/poudriere.yml
 
-build-packages: .installed.cfg
-	./bin/aws do vm-master build_packages
+build-packages:  bin/ploy
+	./bin/ploy do vm-master build_packages
 
 cert: etc/briefkasten.crt, etc/briefkasten.key
 
@@ -116,22 +94,23 @@ etc/briefkasten.crt, etc/briefkasten.key:
 
 # Create and configure the jails
 
-start-jails: .installed.cfg
-	bin/aws start webserver
-	bin/aws start appserver
-	bin/aws start cleanser
+start-jails:  bin/ploy
+	bin/ploy start webserver
+	bin/ploy start appserver
+	bin/ploy start cleanser
 
 configure-webserver:
-	bin/aws playbook setup/webserver.yml
+	bin/ploy playbook setup/webserver.yml
 
 configure-appserver:
-	bin/aws playbook setup/appserver.yml
-	bin/aws do appserver upload_project
+	bin/ploy playbook setup/appserver.yml
+	bin/ploy do appserver upload_project
 
 configure-cleanser:
-	bin/aws playbook setup/cleanser.yml
+	bin/ploy playbook setup/cleanser.yml
 
 configure-jails: configure-webserver configure-appserver configure-cleanser
+
 
 # clean up:
 
