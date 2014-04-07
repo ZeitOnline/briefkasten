@@ -1,6 +1,7 @@
 PYTHON = python2.7
 PYTHON_TARGETS = bin/python lib/python* include/python*
 VIRTUALENV = virtualenv
+develop = false
 
 MFSBSD_URL = http://mfsbsd.vx.sk/files/iso/9/amd64/mfsbsd-se-9.2-RELEASE-amd64.iso
 MFSBSD_FILENAME = $(lastword $(subst /, ,$(MFSBSD_URL)))
@@ -22,9 +23,20 @@ $(PYTHON_TARGETS): python
 python:
 	$(VIRTUALENV) --clear .
 
-bin/ploy: 
+bin/buildout: bin/pip
+	bin/pip install --upgrade --force-reinstall zc.buildout
+	touch bin/buildout
+
+
+ifeq ($(develop), false)
+bin/ploy: python
 	bin/pip install --upgrade --force-reinstall -r requirements.txt
-	touch bin/ploy
+else
+bin/ploy: bin/buildout
+	bin/pip install --upgrade --force-reinstall ansible
+	touch bin/ansible
+	bin/buildout
+endif
 
 
 # download required assets:
