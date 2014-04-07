@@ -1,4 +1,7 @@
 ---
+- name: upload poudriere package
+  copy: src=poudriere-3.0.15.txz dest=/var/cache/pkg/All/poudriere-3.0.15.txz
+
 - name: make sure poudriere is installed
   pkgng: name=poudriere state=present
 
