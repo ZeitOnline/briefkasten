@@ -2,7 +2,7 @@ Fabric==1.8.2
 Jinja2==2.7.2
 MarkupSafe==0.19
 PyYAML==3.10
-ansible==1.5.3
+ansible==1.5.4
 bsdploy==0.1alpha1
 ecdsa==0.11
 lazy==1.1
