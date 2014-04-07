@@ -12,4 +12,5 @@ mr.awsome.ezjail==1.0b1
 mr.awsome.fabric==1.0b1
 paramiko==1.13.0
 pycrypto==2.6.1
+pyliblzma==0.5.3
 wsgiref==0.1.2

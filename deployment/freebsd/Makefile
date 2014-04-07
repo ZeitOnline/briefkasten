@@ -34,13 +34,13 @@ bin/ploy: python
 else
 bin/ploy: bin/buildout
 	bin/pip install --upgrade --force-reinstall ansible
+	bin/pip install --upgrade --force-reinstall pyliblzma
 	touch bin/ansible
 	bin/buildout
 endif
 
 
 # download required assets:
-
 check-mfsbsd-download:
 	echo "$(MFSBSD_SHA)  $(MFSBSD_PATH)" | shasum -c || rm -f $(MFSBSD_PATH)
 

@@ -69,7 +69,7 @@ SSH public key
 
 This key (usually ``~/.ssh/idenity.pub``) will be installed on the *target host* during bootstrapping and will enable access to it.
 
-You need to place it inside ``setup/vm-master/identity.pub`` – even if your key is named differently (i.e. ``id_dsa.pub``) you will need to rename it.
+You need to place it inside ``etc/authorized_keys``.
 
 
 Editorial PGP keys

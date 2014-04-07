@@ -1,0 +1,15 @@
+---
+'base.txz':
+    url: 'ftp://ftp.freebsd.org//pub/FreeBSD/releases/amd64/amd64/9.2-RELEASE/base.txz'
+    directory: '/mnt/var/cache/ezjail'
+    remote: '/mnt/var/cache/ezjail/base.txz'
+'lib32.txz':
+    url: 'ftp://ftp.freebsd.org//pub/FreeBSD/releases/amd64/amd64/9.2-RELEASE/lib32.txz'
+    directory: '/mnt/var/cache/ezjail'
+    remote: '/mnt/var/cache/ezjail/lib32.txz'
+'digests.txz':
+    url: 'http://pkg.freebsd.org/freebsd:9:x86:64/latest/digests.txz'
+    remote: '/mnt/var/cache/pkg/digests.txz'
+'packagesite.txz':
+    url: 'http://pkg.freebsd.org/freebsd:9:x86:64/latest/packagesite.txz'
+    remote: '/mnt/var/cache/pkg/packagesite.txz'

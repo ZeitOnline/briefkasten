@@ -30,8 +30,12 @@ fabfile = ../setup/jails_host.py
 bootstrap-system-pool-size = 4G
 # bootstrap-swap-size = 1G
 # bootstrap-system-devices = ada0
+bootstrap-files = ../bootstrap-files
 bootstrap-geli = yes
 password-fallback = true
+ezjail-install-host = file:///var/cache/ezjail
+bootstrap-packages =
+    ezjail sudo screen bash rsync zfstools python
 
 [macro:ez-base]
 # the FQDN under which the webserver is reached

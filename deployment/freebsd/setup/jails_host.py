@@ -1,6 +1,7 @@
 # coding: utf-8
 from fabric import api as fab
-from mr.awsome.ezjail.fabric import bootstrap as _bootstrap
+from bsdploy.fabric import bootstrap as _bootstrap
+from bsdploy.fabric import fetch_assets
 from fabric_scripts import _local_path, _rsync_project, _default_vars
 
 fab.env.shell = '/bin/sh -c'
