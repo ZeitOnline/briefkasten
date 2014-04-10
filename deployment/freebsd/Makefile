@@ -98,6 +98,9 @@ setup-poudriere:  bin/ploy
 build-packages:  bin/ploy
 	./bin/ploy do vm-master build_packages
 
+upload-packages: bin/ploy
+	./bin/ploy do vm-master upload_packages
+
 cert: etc/briefkasten.crt, etc/briefkasten.key
 
 etc/briefkasten.crt, etc/briefkasten.key:
