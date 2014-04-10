@@ -38,11 +38,12 @@ Configuring your setup
 
 Before we can continue, we need to configure your setup on the *control host*. The deployment scripts require four assets, most of which need to reside inside ``etc``.
 
+In practice it is advisable to keep the entire ``etc`` under separate version control – it contains everything that distinguishes your particular setup from a generic one. A good start is to copy ``etc.sample`` to ``etc`` and perform a ``git init`` inside it. YMMV.
 
 ploy.conf – the main configuration file
 =======================================
 
-Create a copy from the provided example ``cp etc/ploy.conf.sample etc/ploy.conf``.
+Create a copy from the provided example ``cp etc.sample etc``.
 
 You will (at least) need to provide values in the ``[ez-master:vm-master]`` section for the following keys:
 
