@@ -1,7 +1,7 @@
 PYTHON = python2.7
 PYTHON_TARGETS = bin/python lib/python* include/python*
 VIRTUALENV = virtualenv
-develop = false
+develop = true
 
 MFSBSD_URL = http://mfsbsd.vx.sk/files/iso/9/amd64/mfsbsd-se-9.2-RELEASE-amd64.iso
 MFSBSD_FILENAME = $(lastword $(subst /, ,$(MFSBSD_URL)))
