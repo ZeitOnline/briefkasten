@@ -1,6 +1,10 @@
 Overview
 --------
 
+While we could simply provide pre-built installation images, this would defeat the whole idea of running a trustworthy, open source dropbox in the first place, because then you and your submitters would have to blindly trust these binaries without being able to verify their integrity.
+
+Instead the idea is to use as little pre-built ingredients as possible and aquire them from trusted sources (i.e. from the official FreeBSD repositories). In essence we provide you with a grocery list of ingredients along with a recipe and let you do all the shopping and cooking yourself instead of serving a pre-cooked meal!
+
 An instance of the briefkasten is deployed by running scripts on a *control host* (i.e. your local machine) which then configure and install it on a *target host* (i.e. virtual machine for development and testing, on dedicated hardware for production).
 
 During this process the *target host* will boot from a FreeBSD 9.2 installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
