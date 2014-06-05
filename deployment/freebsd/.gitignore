@@ -1,5 +1,6 @@
 /bin/
 /etc/
+/etc.*
 /include/
 /lib/
 /src/
