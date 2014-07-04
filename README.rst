@@ -17,6 +17,11 @@ Requirements
 
 The web application requires Python 2.7, the sanitizing scripts depend on a number of helper packages (such as GnuPG etc.) which are currently not yet documented.
 
+* netpbm
+* libreoffice
+* secure-delete
+* gnupg
+
 Bootstrapping
 =============
 
