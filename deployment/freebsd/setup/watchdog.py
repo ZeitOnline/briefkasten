@@ -53,4 +53,4 @@ def install_watchdog(build=True):
             local_dir='requirements.txt')
         with fab.cd(app_dir):
             fab.sudo('bin/pip install -r upload/requirements.txt', user=app_user)
-            fab.sudo('bin/pip install --force-reinstall upload/briefkasten_watchdog*.zip', user=app_user)
+            fab.sudo('bin/pip install --force-reinstall --upgrade upload/briefkasten_watchdog*.zip', user=app_user)
