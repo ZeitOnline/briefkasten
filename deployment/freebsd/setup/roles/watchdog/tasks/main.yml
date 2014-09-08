@@ -14,7 +14,7 @@
   file: path={{watchdog_app_dir}} state=directory owner={{watchdog_app_user}} mode=770
 
 - name: ensure log directory
-  file: path={{watchdog_app_dir}}/log state=directory owner={{watchdog_app_user}} mode=770
+  file: path={{watchdog_app_dir}}/var state=directory owner={{watchdog_app_user}} mode=770
 
 - name: ensure upload directory
   file: path={{watchdog_app_dir}}/upload state=directory owner={{watchdog_app_user}} mode=770
