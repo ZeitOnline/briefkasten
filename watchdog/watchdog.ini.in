@@ -11,3 +11,6 @@ notify_email = {{watchdog_notify_email}}
 # smtp settings for pyramid_mailer, see
 # http://docs.pylonsproject.org/projects/pyramid_mailer/en/latest/
 smtp_host = {{watchdog_smtp_host}}
+smtp_port = {{watchdog_smtp_port}}
+smtp_username = {{watchdog_smtp_username}}
+smtp_password = {{watchdog_smtp_password}}
