@@ -44,6 +44,7 @@ def perform_submission(app_url, testing_secret):
     token = None
     errors = []
     browser = Browser()
+    browser.mech_browser.set_handle_robots(False)
     browser.open(app_url)
     try:
         submit_form = browser.getForm(id='briefkasten-form')
