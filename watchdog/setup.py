@@ -3,7 +3,7 @@ from setuptools import setup
 version = '0.1.10-dev'
 
 
-setup(name='briefkasten-watchdog',
+setup(name='briefkasten_watchdog',
     version=version,
     description='test if a given briefkasten instance is working properly',
     long_description="",
@@ -14,7 +14,7 @@ setup(name='briefkasten-watchdog',
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         'License :: OSI Approved :: BSD License',
     ],
-    packages='.',
+    packages=['briefkasten_watchdog'],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
@@ -31,6 +31,6 @@ setup(name='briefkasten-watchdog',
     test_suite="briefkasten",
     entry_points="""
         [console_scripts]
-        watchdog = watchdog:main
+        watchdog = briefkasten_watchdog:main
     """,
 )
