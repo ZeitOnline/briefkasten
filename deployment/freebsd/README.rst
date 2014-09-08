@@ -202,3 +202,12 @@ When visiting the page, enter some text into the form and add one or more attach
 You should then see a success message along with a link to the feedback page for this submission.
 
 In addition each editor email configured in ``ploy.conf`` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
+
+
+Installing the watchdog
+-----------------------
+
+The watchdog should be installed on a third host (IOW neither on the target host, nor the control host).
+
+In your ``ploy.conf`` you need to define its IP address and port and assign it the ``watchdog`` role.
+

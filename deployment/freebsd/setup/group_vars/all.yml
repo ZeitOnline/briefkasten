@@ -15,3 +15,8 @@ timeserver: time.euro.apple.com
 # relative path to /usr/share/zoneinfo
 timezone: Europe/Berlin
 application_port: 6543
+
+# watchdog
+watchdog_app_dir: /usr/local/watchdog
+watchdog_app_user: pyramid
+

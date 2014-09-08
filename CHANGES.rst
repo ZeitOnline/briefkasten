@@ -1,6 +1,7 @@
 0.1.10 - Unreleased
 -------------------
 
+ * improved watchdog deployment
 
 
 0.1.9 - 2013-02-23

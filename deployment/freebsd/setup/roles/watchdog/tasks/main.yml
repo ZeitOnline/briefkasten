@@ -1,0 +1,26 @@
+---
+- name: install packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - py27-virtualenv
+    - rsync
+    - sudo
+    - libxslt
+
+- name: create application user
+  user: name={{watchdog_app_user}}
+
+- name: ensure application directory
+  file: path={{watchdog_app_dir}} state=directory owner={{watchdog_app_user}} mode=770
+
+- name: ensure log directory
+  file: path={{watchdog_app_dir}}/log state=directory owner={{watchdog_app_user}} mode=770
+
+- name: ensure upload directory
+  file: path={{watchdog_app_dir}}/upload state=directory owner={{watchdog_app_user}} mode=770
+
+- name: init virtualenv in application directory
+  sudo: yes
+  sudo_user: "{{watchdog_app_user}}"
+  command: virtualenv --system-site-packages . chdir={{watchdog_app_dir}} creates={{watchdog_app_dir}}/bin/python
+
