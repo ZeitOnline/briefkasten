@@ -112,7 +112,7 @@ def main():
 
     # read history of previous runs
     errors = []
-    fs_history = path.abspath(path.join(path.dirname(__file__), '..', 'var', 'watchdog-history.json'))
+    fs_history = path.abspath(path.join(path.dirname(fs_config), 'var', 'watchdog-history.json'))
     if path.exists(fs_history):
         history = json.load(open(fs_history, 'r'))
     else:
