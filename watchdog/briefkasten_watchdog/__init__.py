@@ -103,7 +103,7 @@ def main():
     try:
         fs_config = sys.argv[1]
     except IndexError:
-        fs_config = path.join(path.dirname(__file__), '..', 'etc/watchdog.ini')
+        fs_config = path.join(path.dirname(__file__), '..', 'watchdog.ini')
     fs_config = path.abspath(fs_config)
     parser = ConfigParser(allow_no_value=True)
     parser.read(fs_config)
