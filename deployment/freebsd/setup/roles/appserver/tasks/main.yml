@@ -36,11 +36,11 @@
 - name: ensure application directory
   file: path={{apphome}}/middleware_scripts state=directory owner={{appuser}} mode=770
 
-- name: configure the cleanser script
-  template: src=briefkasten.conf.j2 dest={{apphome}}/middleware_scripts/briefkasten.conf owner={{appuser}} mode=600
-
-- name: configure the cleanser script for watchdog
-  template: src=briefkasten_test.conf.j2 dest={{apphome}}/middleware_scripts/briefkasten_test.conf owner={{appuser}} mode=600
+- name: configure the cleanser script (testing and production)
+  template: src=briefkasten.conf.j2 dest="{{apphome}}/middleware_scripts/{{item.dest}}" owner={{appuser}} mode=600
+  with_items:
+    - { the_editors: "{{awsome_editors}}", the_admins: "{{awsome_admins}}", dest: briefkasten.conf }
+    - { the_editors: "{{watchdog_imap_recipient}}", the_admins: "{{watchdog_imap_recipient}}", dest: briefkasten_test.conf }
 
 - name: ssh config for the the cleanser script
   template: src=briefkasten_ssh_config.j2 dest={{apphome}}/var/briefkasten_ssh_config owner={{appuser}} mode=600
