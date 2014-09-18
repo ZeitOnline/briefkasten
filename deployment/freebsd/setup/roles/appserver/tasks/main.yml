@@ -48,3 +48,5 @@
 - name: set ownership
   command: "chown -R {{appuser}} {{apphome}}"
 
+- name: disable periodic emails
+  copy: src=periodic.conf dest=/etc/periodic.conf owner=root mode=600
