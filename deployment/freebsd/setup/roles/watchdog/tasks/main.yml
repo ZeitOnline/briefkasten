@@ -24,3 +24,5 @@
   sudo_user: "{{watchdog_app_user}}"
   command: virtualenv --system-site-packages . chdir={{watchdog_app_dir}} creates={{watchdog_app_dir}}/bin/python
 
+- name: install cronjob to run watchdog automatically
+  cron: name="briefkasten watchdog" special_time=hourly user={{watchdog_app_user}} job="{{watchdog_app_dir}}/bin/watchdog {{watchdog_app_dir}}/watchdog.ini"
