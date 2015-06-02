@@ -1,7 +1,7 @@
 from os import path
 from fabric import api as fab
 # from fabric_scripts import _git_base, _checkout_git
-from bsdploy.fabutils import rsync_project
+from bsdploy.fabutils import rsync_project, rsync
 
 
 fab.env.shell = "/bin/csh -c"
@@ -54,7 +54,7 @@ def upload_editor_keys():
     with fab.settings(fab.hide('running')):
         local_key_path = path.join(fab.env['config_base'], fab.env.instance.config['local_pgpkey_path'])
         remote_key_path = '%s/var/pgp_pubkeys/' % apphome
-        rsync_project(remote_dir=remote_key_path, local_dir=local_key_path, delete=True)
+        rsync(remote_dir=remote_key_path, local_dir=local_key_path, delete=True)
         fab.run('chown -R %s %s' % (appuser, remote_key_path))
         with fab.prefix("setenv GNUPGHOME %s" % remote_key_path):
             fab.sudo('''gpg --import %s/*.gpg''' % remote_key_path,
