@@ -3,4 +3,5 @@
   user: root
   roles:
     - dhcp_host
-    - jails_host
+    - { role: jails_host, tags: ['configure'] }
+    - { role: jailhost, tags: ['configure', 'hostports'] }

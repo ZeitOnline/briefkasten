@@ -1,0 +1,16 @@
+- name: custom portsnap configuration
+  lineinfile:
+    dest: /etc/portsnap.conf
+    line: REFUSE accessibility afterstep arabic archivers astro audio benchmarks biology cad chinese comms converters databases deskutils dns docs editors elisp emulators enlightenment finance french ftp games geography german gnome gnustep graphics hamradio haskell hebrew hungarian ipv6 irc japanese java kde kld korean linux lisp mail mate math misc multimedia news palm parallel pear perl5 plan9 polish portuguese print python ruby rubygems russian scheme science shells spanish tcl textproc tk ukrainian vietnamese windowmaker x11 x11-clocks x11-drivers x11-fm x11-fonts x11-servers x11-themes x11-toolkits x11-wm xfce zope
+
+- name: replace portsnap with patched version to allow non-interactive usage
+  copy:
+    src: portsnap
+    dest: /usr/sbin/portsnap
+    mode: "0555"
+
+- name: fetch ports
+  command: portsnap fetch
+
+- name: install ports for ezjail
+  command: portsnap -p /usr/jails/basejail/usr/ports extract

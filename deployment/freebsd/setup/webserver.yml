@@ -2,4 +2,5 @@
   user: root
   roles:
     - common
+    - custom_nginx
     - webserver
