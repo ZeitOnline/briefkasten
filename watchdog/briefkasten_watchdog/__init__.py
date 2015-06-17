@@ -58,9 +58,10 @@ def perform_submission(app_url, testing_secret):
     submit_form.submit()
     response = PyQuery(browser.contents)
     token_element = response("#feedback-token")
+    token = None
     if token_element is not None:
         token = token_element.text()
-    else:
+    if not bool(token):
         errors.append(WatchdogError(subject="Couldn't get feedback token",
             message=u"The form submission was successful, but no feedback-token was given at %s" % browser.url))
     return token, errors
