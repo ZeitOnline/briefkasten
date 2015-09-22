@@ -16,6 +16,7 @@ bin/buildout: bin/pip
 
 bin/python bin/pip:
 	virtualenv .
+	bin/pip install -U pip setuptools
 
 clean:
 	git clean -fXd
