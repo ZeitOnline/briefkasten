@@ -1,3 +1,9 @@
+0.2.0  - Unreleased
+-------------------
+
+- major refactoring
+
+
 0.1.10 - Unreleased
 -------------------
 
