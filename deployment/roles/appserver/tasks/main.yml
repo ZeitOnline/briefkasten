@@ -6,7 +6,6 @@
   with_items:
     - py27-supervisor
     - py27-virtualenv
-    - gmake
     - rsync
     - libxslt
     - sudo
