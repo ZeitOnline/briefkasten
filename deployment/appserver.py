@@ -8,29 +8,6 @@ fab.env.shell = "/bin/csh -c"
 # default_vars = _default_vars('appserver.yml')
 
 
-def _upload_application():
-    git_base = _git_base()
-    
-    with fab.lcd(git_base):
-        with fab.settings(fab.hide('running')):
-            # upload the whole project w/o deleting
-            rsync_project(remote_dir=default_vars['apphome'],
-                local_dir="%s/deployment/freebsd/workdir/application/" % git_base,
-                delete=False)
-
-            # upload the source with deleting
-            rsync_project(remote_dir='%s/briefkasten' % default_vars['apphome'],
-                local_dir="%s/deployment/freebsd/workdir/application/briefkasten/" % _git_base(),
-                delete=True)
-        fab.run('chown -R %s %s' % (default_vars['appuser'], default_vars['apphome']))
-
-
-def upload_application():
-    """upload and/or update the application with the current git state """
-    _checkout_git()
-    _upload_application()
-
-
 def _upload_theme():
     with fab.lcd(_git_base()):
         with fab.settings(fab.hide('running')):
@@ -61,20 +38,3 @@ def upload_editor_keys():
                 user=appuser, shell_escape=False)
 
 
-def restart_application():
-    fab.sudo('supervisorctl restart briefkasten')
-
-
-def run_buildout():
-    with fab.cd(default_vars['apphome']):
-        fab.sudo('gmake deployment', user=default_vars['appuser'])
-    restart_application()
-
-
-def upload_project():
-    """ upload, bootstrap and start the entire project"""
-    _checkout_git()
-    _upload_application()
-    _upload_theme()
-    upload_editor_keys()
-    run_buildout()
