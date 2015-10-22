@@ -1,4 +1,4 @@
 ---
 wwwuser: www
-cert_location: ../../../../etc/briefkasten.crt
-key_location: ../../../../etc/briefkasten.key
+cert_location: ../../../etc/briefkasten.crt
+key_location: ../../../etc/briefkasten.key
