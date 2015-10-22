@@ -23,17 +23,18 @@
     path: "{{apphome}}"
     state: directory
     owner: "{{appuser}}"
-    mode: "770"
+    mode: "775"
 
 - name: ensure log & var directory
   file:
     path: "{{apphome}}/{{item}}"
     state: directory
     owner: "{{appuser}}"
-    mode: "770"
+    mode: "775"
   with_items:
     - log
     - var
+    - themes
 
 - name: ensure key directory
   file:
@@ -98,7 +99,7 @@
   template:
     src: briefkasten.ini.j2
     dest: "{{apphome}}/briefkasten.ini"
-  notify: restart supervisord
+  notify: restart application
   tags: app-config
 
 - name: disable periodic emails
@@ -112,11 +113,10 @@
   template:
     src: supervisord.conf.j2
     dest: /usr/local/etc/supervisord.conf
-  notify: restart application
+  notify: restart supervisord
 
 - name: enable supervisord at startup time
   service:
     name: supervisord
-    state: started
     enabled: true 
 

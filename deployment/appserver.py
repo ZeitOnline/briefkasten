@@ -1,27 +1,38 @@
+# coding: utf-8
 from os import path
 from fabric import api as fab
-# from fabric_scripts import _git_base, _checkout_git
-from bsdploy.fabutils import rsync_project, rsync
+from fabric.api import env, task
+from bsdploy.fabutils import rsync
+
+AV = None
+
+# hide stdout by default
+# from fabric.state import output
+# output['stdout'] = False
 
 
-fab.env.shell = "/bin/csh -c"
-# default_vars = _default_vars('appserver.yml')
+def get_vars():
+    global AV
+    if AV is None:
+        hostname = env.host_string.split('@')[-1]
+        AV = dict(hostname=hostname,
+            **env.instances[hostname].get_ansible_variables())
+    return AV
 
 
-def _upload_theme():
-    with fab.lcd(_git_base()):
-        with fab.settings(fab.hide('running')):
-            local_theme_path = path.join(fab.env['config_base'], fab.env.instance.config['local_theme_path'])
-            remote_theme_path = '%s/themes/%s' % (default_vars['apphome'], fab.env.instance.config['theme_name'])
-            rsync_project(remote_dir=remote_theme_path,
-                local_dir=local_theme_path,
-                delete=True)
+@task
+def application(action="restart"):
+    get_vars()
+    fab.run("supervisorctl %s" % action)
 
 
+@task
 def upload_theme():
     """ upload and/or update the theme with the current git state"""
-    _checkout_git()
-    _upload_theme()
+    get_vars()
+    with fab.settings(fab.hide('running')):
+        local_theme_path = path.abspath(path.join(fab.env['config_base'], fab.env.instance.config['local_theme_path']))
+        rsync('-av', '--delete', local_theme_path, '{host_string}:%s/' % AV['themes_dir'])
 
 
 def upload_editor_keys():

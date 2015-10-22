@@ -1,5 +1,4 @@
 ---
 appuser: pyramid
-apphome: /usr/local/briefkasten
 ploy_approot_url: /
 ploy_theme_name: default
