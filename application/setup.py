@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1.10dev0'
+version = '0.1.10.dev0'
 
 
 setup(name='briefkasten',
