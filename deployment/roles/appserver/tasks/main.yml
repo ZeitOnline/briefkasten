@@ -1,6 +1,8 @@
 ---
 - name: install packages
-  pkgng: name={{ item }} state=present
+  pkgng:
+    name: "{{ item }}"
+    state: present
   with_items:
     - py27-supervisor
     - py27-virtualenv
@@ -12,41 +14,103 @@
 
 - name: create application user
   # this creates /home/pyramid/.ssh/id_rsa{.pub}
-  user: name={{appuser}} createhome=yes generate_ssh_key=yes
-
-- name: configure supervisord
-  template: src=supervisord.conf.j2 dest=/usr/local/etc/supervisord.conf
-  notify: restart supervisord
-
-- name: enable supervisord at startup time
-  lineinfile: dest=/etc/rc.conf state=present line='supervisord_enable=YES' create=yes
+  user:
+    name: "{{appuser}}"
+    createhome: yes
+    generate_ssh_key: yes
 
 - name: ensure application directory
-  file: path={{apphome}} state=directory owner={{appuser}} mode=770
+  file:
+    path: "{{apphome}}"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "770"
 
-- name: ensure log directory
-  file: path={{apphome}}/log state=directory owner={{appuser}} mode=770
-
-- name: configure buildout
-  template: src=buildout.cfg.j2 dest={{apphome}}/deployment.cfg
+- name: ensure log & var directory
+  file:
+    path: "{{apphome}}/{{item}}"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "770"
+  with_items:
+    - log
+    - var
 
 - name: ensure key directory
-  file: path={{apphome}}/var/pgp_pubkeys state=directory owner={{appuser}} mode=700
+  file:
+    path: "{{apphome}}/var/pgp_pubkeys"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "700"
 
-- name: ensure application directory
-  file: path={{apphome}}/middleware_scripts state=directory owner={{appuser}} mode=770
+- name: ensure middleware directory
+  file:
+    path: "{{apphome}}/middleware_scripts"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "770"
 
 - name: configure the cleanser script (testing and production)
-  template: src=briefkasten.conf.j2 dest="{{apphome}}/middleware_scripts/{{item.dest}}" owner={{appuser}} mode=600
+  template:
+    src: briefkasten.conf.j2
+    dest: "{{apphome}}/middleware_scripts/{{item.dest}}"
+    owner: "{{appuser}}"
+    mode: "600"
   with_items:
-    - { the_editors: "{{awsome_editors}}", the_admins: "{{awsome_admins}}", dest: briefkasten.conf }
+    - { the_editors: "{{ploy_editors}}", the_admins: "{{ploy_admins}}", dest: briefkasten.conf }
     - { the_editors: "{{watchdog_imap_recipient}}", the_admins: "{{watchdog_imap_recipient}}", dest: briefkasten_test.conf }
 
 - name: ssh config for the the cleanser script
-  template: src=briefkasten_ssh_config.j2 dest={{apphome}}/var/briefkasten_ssh_config owner={{appuser}} mode=600
+  template:
+    src: briefkasten_ssh_config.j2
+    dest: "{{apphome}}/var/briefkasten_ssh_config"
+    owner: "{{appuser}}"
+    mode: "600"
 
-- name: set ownership
-  command: "chown -R {{appuser}} {{apphome}}"
+- name: init virtualenv in application directory
+  command: virtualenv .
+  args:
+    chdir: "{{apphome}}"
+    creates: "{{apphome}}/bin/python"
+
+- name: upload requirements
+  copy:
+    src: requirements.txt
+    dest: "{{apphome}}/"
+    owner: "{{appuser}}"
+    mode: "600"
+
+- name: update pip & co
+  pip:
+    name: "{{item}}"
+    virtualenv: "{{apphome}}"
+    extra_args: "--upgrade"
+  with_items:
+    - pip
+    - setuptools
+
+- name: install python eggs
+  pip:
+    virtualenv: "{{apphome}}"
+    requirements: "{{apphome}}/requirements.txt"
+  tags: update_app
 
 - name: disable periodic emails
-  copy: src=periodic.conf dest=/etc/periodic.conf owner=root mode=600
+  copy:
+    src: periodic.conf
+    dest: /etc/periodic.conf
+    owner: root
+    mode: "600"
+
+- name: configure supervisord
+  template:
+    src: supervisord.conf.j2
+    dest: /usr/local/etc/supervisord.conf
+  notify: restart supervisord
+
+- name: enable supervisord at startup time
+  service:
+    name: supervisord
+    state: started
+    enabled: true 
+
