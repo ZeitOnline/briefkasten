@@ -3,7 +3,7 @@ user={{appuser}}
 logfile={{apphome}}/var/supervisord.log
 
 [program:briefkasten]
-command={{apphome}}/bin/pserve {{apphome}}/etc/briefkasten.ini
+command={{apphome}}/bin/pserve {{apphome}}/briefkasten.ini
 user={{appuser}}
 autostart=true
 autorestart=true

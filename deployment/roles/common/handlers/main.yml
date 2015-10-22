@@ -7,3 +7,7 @@
   service: name=pf state=restarted
 - name: restart supervisord
   service: name=supervisord state=restarted
+- name: restart application
+  supervisorctl:
+    name: briefkasten
+    state: restarted

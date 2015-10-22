@@ -95,6 +95,13 @@
     requirements: "{{apphome}}/requirements.txt"
   tags: update_app
 
+- name: configure appserver
+  template:
+    src: briefkasten.ini.j2
+    dest: "{{apphome}}/briefkasten.ini"
+  notify: restart supervisord
+  tags: app-config
+
 - name: disable periodic emails
   copy:
     src: periodic.conf
@@ -106,7 +113,7 @@
   template:
     src: supervisord.conf.j2
     dest: /usr/local/etc/supervisord.conf
-  notify: restart supervisord
+  notify: restart application
 
 - name: enable supervisord at startup time
   service:
