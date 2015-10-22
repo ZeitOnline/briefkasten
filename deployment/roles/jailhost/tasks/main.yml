@@ -1,4 +1,11 @@
 ---
+- name: create root data filesystem
+  zfs:
+    name: tank/data
+    state: present
+  tags:
+    - zfs-layout
+
 - name: create data filesystem
   zfs:
     name: tank/data/{{item}}
