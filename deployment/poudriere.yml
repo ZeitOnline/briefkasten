@@ -1,6 +1,0 @@
-- hosts: vm-master
-  user: root
-
-  roles:
-    - common
-    - poudriere

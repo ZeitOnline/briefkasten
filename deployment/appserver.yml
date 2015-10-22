@@ -1,5 +1,0 @@
-- hosts: appserver
-  user: root
-  roles:
-    - common
-    - appserver
