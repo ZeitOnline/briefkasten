@@ -16,3 +16,6 @@
   tags:
     - zfs-layout
 
+- name: upgrade ZFS version
+  command: zpool tank upgrade
+  tags: zfs-layout 
