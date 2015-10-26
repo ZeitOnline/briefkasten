@@ -1,19 +1,9 @@
 # coding: utf-8
 from fabric import api as fab
-from bsdploy.fabric import bootstrap as _bootstrap
-from bsdploy.fabric import fetch_assets
-from fabric_scripts import _local_path, _rsync_project, _default_vars
+from bsdploy.fabutils import rsync
 
 fab.env.shell = '/bin/sh -c'
 
-
-def bootstrap(**kwargs):
-    """call mr.awsome.ezjail's bootstrap """
-    with fab.lcd(_local_path('setup/vm-master')):
-        _bootstrap(**kwargs)
-
-
-# poudriere tasks:
 
 def download_distfiles():
     _rsync_project(remote_dir='/usr/local/poudriere/distfiles',
@@ -67,10 +57,11 @@ def upload_poudriere_assets():
     upload_ports_tree()
 
 
+@fab.task
+def download_options():
+    rsync('-av', '{host_string}:/usr/local/etc/poudriere.d/102amd64-briefkasten-options', 'roles/poudriere/files/')
+
+
+@fab.task
 def build_packages():
-    """ uploads the list of packages and tells poudriere to build them"""
-    # TODO: create ZFS snapshot before each build? (use ports version somehow to label it)
-    default_vars = _default_vars('poudriere.yml')
-    pkg_list = default_vars['pkg_list']
-    fab.put(_local_path('setup/roles/poudriere/files/pkg_list'), pkg_list)
-    fab.run('poudriere bulk -f %s -j 92amd64' % pkg_list)
+    fab.run('poudriere bulk -f /usr/local/etc/poudriere.d/briefkasten-pkglist -p briefkasten -z briefkasten -j 102amd64')
