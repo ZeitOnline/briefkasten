@@ -1,27 +1,50 @@
 ---
-- name: upload poudriere package
-  copy: src=poudriere-3.0.15.txz dest=/var/cache/pkg/All/poudriere-3.0.15.txz
-
 - name: make sure poudriere is installed
-  pkgng: name=poudriere state=present
+  pkgng:
+    name: poudriere
+    state: present
+  tags: poudriere
 
 - name: poudriere configuration
-  template: src=poudriere.conf.j2 dest=/usr/local/etc/poudriere.conf
+  template:
+    src: poudriere.conf.j2
+    dest: /usr/local/etc/poudriere.conf
+  tags: poudriere
 
 - name: create ports tree directories
-  command: poudriere ports -c creates=/usr/local/poudriere/ports/default
+  command: poudriere ports -c -p briefkasten creates=/usr/local/poudriere/ports/briefkasten
+  tags: poudriere
 
 - name: create build jail
-  command: poudriere jail -c -j 92amd64 -v 9.2-RELEASE -a amd64 creates=/usr/local/poudriere/jails/92amd64
+  command: poudriere jail -c -j 102amd64 -v 10.2-RELEASE -a amd64 creates=/usr/local/poudriere/jails/102amd64
+  tags: poudriere
 
 - name: configure build jail
-  copy: src=92amd64-make.conf dest=/usr/local/etc/poudriere.d/92amd64-make.conf
+  copy:
+    src: 102amd64-make.conf
+    dest: /usr/local/etc/poudriere.d/102amd64-make.conf
+  tags: poudriere
+
+- name: upload package list
+  copy:
+    src: pkg_list
+    dest: /usr/local/etc/poudriere.d/briefkasten-pkglist
+  tags: poudriere
 
 - name: create distfiles cache directory
-  file: path={{ distfiles_cache }} state=directory
+  file:
+    path: "{{ distfiles_cache }}"
+    state: directory
+  tags: poudriere
 
 - name: Ensure basejail etc exists
-  file: path={{ jails_dir }}/newjail/etc/pkg state=directory
+  file:
+    path: "{{ jails_dir }}/newjail/etc/pkg"
+    state: directory
+  tags: poudriere
 
 - name: Ensure pkgng configuration will be present in each jail
-  copy: src=pkg_repo.conf dest={{ jails_dir }}/newjail/etc/pkg/pkg_repo.conf
+  copy:
+    src: pkg_repo.conf
+    dest: "{{ jails_dir }}/newjail/etc/pkg/FreeBSD.conf"
+  tags: poudriere
