@@ -13,12 +13,10 @@ During this process the *target host* will boot from a FreeBSD 9.2 installer med
 Obtaining the sources
 ---------------------
 
-You need to clone the entire project onto the *control host* but will then work only inside ``deployment/freebsd`` (where this README is located)::
+You need to clone the entire project onto the *control host* but will then work only inside ``deployment`` (where this README is located)::
 
-    git clone https://github.com/ZeitOnline/briefkasten.git
-    cd briefkasten
-    git checkout -t origin/freebsd-jails-with-mr.awsome
-    cd deployment/freebsd
+    git clone https://github.com/tomster/briefkasten.git
+    cd briefkasten/deployment
 
 
 Installing the requirements on the control host
@@ -40,12 +38,13 @@ Before we can continue, we need to configure your setup on the *control host*. T
 
 In practice it is advisable to keep the entire ``etc`` under separate version control – it contains everything that distinguishes your particular setup from a generic one. A good start is to copy ``etc.sample`` to ``etc`` and perform a ``git init`` inside it. YMMV.
 
+
 ploy.conf – the main configuration file
 =======================================
 
 Create a copy from the provided example ``cp etc.sample etc``.
 
-You will (at least) need to provide values in the ``[ez-master:vm-master]`` section for the following keys:
+You will (at least) need to provide values in the ``[ez-master:briefkasten]`` section for the following keys:
 
   - host
   - port
@@ -65,8 +64,6 @@ And in the ``[macro:ez-base]`` section for these:
 	- theme_name
 
 Look inside the file for details, it should be self explanatory.
-
-TODO: make network device, default router and nameserver (/etc/resolv.conf) instead of requiring a hand-made, custom rc.conf in setup/vm-master
 
 
 SSH public key
@@ -88,9 +85,7 @@ These need to reside inside ``etc/pgp_pubkeys/`` and are expected to end in ``*.
 SSL certificate for the webserver
 =================================
 
-The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It expected in ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` respectively.
-
-This is optional during development and testing – if you provide none you can create a self-signed setup by running ``make cert``.
+The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It expected in ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` respectively, ``etc.sample`` contains a self-signed pair for development and testing purposes.
 
 
 Booting the target host into FreeBSD
@@ -104,7 +99,7 @@ Installation using Virtualbox
 
 This is the recommended way for testing and developing, as it allows for 100% automation. You need `VirtualBox <https://www.virtualbox.org>`_ with the command line tools available in your path.
 
-- ``make start-vm`` – this will download the ISO image, create a virtual machine and boot it from the image
+- ``bin/ploy start briefkasten-vbox`` – this will download the ISO image, create a virtual machine and boot it from the image
 - wait till the login prompt - we're now booted into the MFSBSD installer
 - Continue with **Bootstrapping the host**
 
@@ -114,7 +109,8 @@ Installation using VMWare
 
 First download the image::
 
-	make mfsbsd_download
+    mkdir downloads
+    bin/ploy-download  http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img 72664ced483bc69ae27bb1467bca0e678e1d6440 downloads/
 
 This downloads the ISO image into the ``downloads`` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password ``root/mfsroot``. Use ``ifconfig`` to get the assigned IP address (or assign one manually) and enter it into ``ploy.conf``.
 
@@ -129,12 +125,12 @@ This is the recommended setup for production. The machine doesn't need to be par
 Download the MFSBSD ISO image and checksum::
 
 	cd downloads
-	wget http://mfsbsd.vx.sk/files/images/9/amd64/mfsbsd-se-9.2-RELEASE-amd64.img
-	wget http://mfsbsd.vx.sk/files/images/9/amd64/mfsbsd-se-9.2-RELEASE-amd64.img.sums.txt
+	wget http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img
+	wget http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img.sums.txt
 
 Verify the integrity of the downloaded image::
 
-	shasum mfsbsd-se-9.2-RELEASE-amd64.img
+	shasum mfsbsd-se-10.2-RELEASE-amd64.img
 
 Make sure the output matches the one in the downloaded text. Next you will need to create a bootable medium from that image.
 
@@ -148,7 +144,7 @@ For the time being we only provide instructions for Mac OS X, sorry! If you run 
 - insert your medium
 - re-run ``diskutil list`` and notice which number it has been assigned (N)
 - run ``diskutil unmountDisk /dev/diskN``
-- run ```sudo dd if=mfsbsd-se-9.2-RELEASE-amd64.img of=/dev/diskN bs=1m``
+- run ```sudo dd if=mfsbsd-se-10.2-RELEASE-amd64.img of=/dev/diskN bs=1m``
 - run ``diskutil unmountDisk /dev/diskN``
 
 Insert the USB stick into the *target host* and boot from it. Log in as ``root`` using the pre-configured password ``mfsroot``. Either note the name of the ethernet interface and the IP address it has been given by running ``ifconfig`` or set them to the desired values in ``/etc/rc.conf`` if you do not have a DHCP environment.
@@ -168,14 +164,10 @@ The functionality of the briefkasten has been split into three jails: a **webser
 
 Since we have a running host we can prepare for these jails like so:
 
-- run ``make bootstrap-host`` on the *control host*
+- run ``bin/ploy bootstrap briefkasten`` on the *control host*
 - answer ``y`` for the questions coming up. the host will reboot automatically after the script has run.
-- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:vm-master]`` section of your ``ploy.conf`` as ``fingerprint =``.
+- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:briefkasten]`` section of your ``ploy.conf`` as ``fingerprint =``.
 - in the meantime the *targe host* has probably finished rebooting. Now run ``make configure-host``
-- setup the local package host: ``make setup-poudriere``
-- if this is the first time you've setup a system you will need to build the required packages - this will take quiet a while as it will download a ports tree and compile all packages. Run ``make build-packages``.
-
-.. note:: There is a convenience script to download and upload the resulting packages to save time for repeat installations but currently you will need to look into ``setup/jails_host.py`` to figure it out.
 
 Anyway, now we have all requirements in place to install the jails.
 
