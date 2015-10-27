@@ -1,8 +1,11 @@
 ---
 - name: make sure poudriere is installed
   pkgng:
-    name: poudriere
+    name: "{{item}}"
     state: present
+  with_items:
+    - poudriere
+    - rsync
   tags: poudriere
 
 - name: poudriere configuration
@@ -37,14 +40,4 @@
     state: directory
   tags: poudriere
 
-- name: Ensure basejail etc exists
-  file:
-    path: "{{ jails_dir }}/newjail/etc/pkg"
-    state: directory
-  tags: poudriere
 
-- name: Ensure pkgng configuration will be present in each jail
-  copy:
-    src: pkg_repo.conf
-    dest: "{{ jails_dir }}/newjail/etc/pkg/FreeBSD.conf"
-  tags: poudriere
