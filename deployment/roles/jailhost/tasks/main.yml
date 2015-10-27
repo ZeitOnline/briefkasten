@@ -32,6 +32,12 @@
     state: directory
   tags: poudriere
 
+- name: Ensure our self-signed cert will be accepted
+  copy:
+    src: cert.pem
+    dest: "{{ jails_dir }}/newjail/etc/ssl/cert.pem"
+  tags: poudriere
+
 - name: Ensure pkgng configuration will be present in each jail
   copy:
     src: pkg_repo.conf
