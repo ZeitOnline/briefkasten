@@ -28,6 +28,13 @@
     dest: /usr/local/etc/poudriere.d/102amd64-make.conf
   tags: poudriere
 
+- name: upload package options
+  copy:
+    src: 102amd64-briefkasten-options/
+    dest: /usr/local/etc/poudriere.d/102amd64-briefkasten-options/
+    directory_mode: yes
+  tags: poudriere
+
 - name: upload package list
   copy:
     src: pkg_list
