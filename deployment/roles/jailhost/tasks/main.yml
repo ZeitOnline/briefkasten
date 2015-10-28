@@ -38,6 +38,12 @@
     dest: "{{ jails_dir }}/newjail/etc/ssl/cert.pem"
   tags: poudriere
 
+- name: Ensure our self-signed poudriere packages will be accepted
+  copy:
+    src: poudriere.cert
+    dest: "{{ jails_dir }}/newjail/etc/ssl/poudriere.cert"
+  tags: poudriere
+
 - name: Ensure pkgng configuration will be present in each jail
   copy:
     src: pkg_repo.conf

@@ -12,7 +12,9 @@
   template:
     src: poudriere.conf.j2
     dest: /usr/local/etc/poudriere.conf
-  tags: poudriere
+  tags: 
+    - poudriere
+    - poudriere-conf
 
 - name: create ports tree directories
   command: poudriere ports -c -p briefkasten creates=/usr/local/poudriere/ports/briefkasten
@@ -33,7 +35,8 @@
     src: 102amd64-briefkasten-options/
     dest: /usr/local/etc/poudriere.d/102amd64-briefkasten-options/
     directory_mode: yes
-  tags: poudriere
+  tags:
+    - poudriere
 
 - name: upload package list
   copy:
