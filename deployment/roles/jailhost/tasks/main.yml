@@ -17,7 +17,7 @@
     - zfs-layout
 
 - name: upgrade ZFS version
-  command: zpool tank upgrade
+  command: zpool upgrade tank 
   tags: zfs-layout 
 
 - name: Ensure basejail will trust our pkg
