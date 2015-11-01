@@ -17,11 +17,15 @@
     - poudriere-conf
 
 - name: create ports tree directories
-  command: poudriere ports -c -p briefkasten creates=/usr/local/poudriere/ports/briefkasten
+  command: poudriere ports -c -p briefkasten
+  args:
+    creates: /usr/local/poudriere/ports/briefkasten
   tags: poudriere
 
 - name: create build jail
-  command: poudriere jail -c -j 102amd64 -v 10.2-RELEASE -a amd64 creates=/usr/local/poudriere/jails/102amd64
+  command: poudriere jail -c -j 102amd64 -v 10.2-RELEASE -a amd64
+  args:
+    creates: /usr/local/poudriere/jails/102amd64
   tags: poudriere
 
 - name: configure build jail
