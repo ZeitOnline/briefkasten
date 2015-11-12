@@ -20,12 +20,6 @@
   command: zpool upgrade tank 
   tags: zfs-layout 
 
-- name: Ensure basejail will trust our pkg
-  copy:
-    src: "trusted/"
-    dest: "{{ jails_dir }}/basejail/usr/share/keys/pkg/trusted/"
-  tags: poudriere
-
 - name: Ensure basejail etc exists
   file:
     path: "{{ jails_dir }}/newjail/etc/pkg/repos"
@@ -50,7 +44,7 @@
     dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg.conf"
 
 - name: Ensure pkg repo configuration will be present in each jail
-  copy:
+  template:
     src: pkg_repo.conf
     dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg/repos/FreeBSD.conf"
   tags: poudriere
