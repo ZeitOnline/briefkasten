@@ -102,7 +102,13 @@
       args:
         creates: "/usr/local/etc/ezjail/cleanser_{{item}}"
       with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
-      tags: cleanser_clonesx
+      tags: cleanser_clones
+    - name: create rollback snapshot from each clone (jdispatch_rollback)
+      command: "zfs snapshot tank/jails/cleanser_{{item}}@jdispatch_rollback"
+      args:
+        creates: "/usr/jails/cleanser_{{item}}/.zfs/snapshot/jdispatch_rollback"
+      with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
+      tags: cleanser_clones
     - name: install jdispatch tool
       copy:
         src: files/jdispatch.sh
@@ -110,6 +116,7 @@
         owner: root
         group: wheel
         mode: "0755"
+      tags: cleanser_clones
     - name: configure jdispatch tool
       template:
         src: templates/jdispatch.conf
@@ -118,5 +125,5 @@
         group: wheel
         mode: "0644"
       with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
-      tags: debugx
+      tags: cleanser_clones
 
