@@ -3,19 +3,16 @@
 # For ezjail's zfs
 . /usr/local/etc/ezjail.conf
 : ${ezjail_jaildir="/usr/jails"}
+# source our config
+. /usr/local/etc/jdispatch.conf
 
-the_dispatch_script="/usr/home/erdgeist/jdispatch.sh"
-
-# TODO: source our own config
-# debug: set variables
-the_worker_jails="cleanser1 cleanser2 cleanser3 cleanser4"
-the_master_jail="appserver"
-the_dispatchdir_prefix="${ezjail_jaildir}/${the_master_jail}"
-the_dispatchdir_suffix="/var/run/jdispatch"
+: ${the_dispatch_script="/usr/home/erdgeist/jdispatch.sh"}
+: ${the_dispatchdir_prefix="${ezjail_jaildir}/${the_master_jail}"}
+: ${the_dispatchdir_suffix="/var/run/jdispatch"}
+: ${the_dispatch_lock="/var/lock/jdispatch.lock"}
+: ${the_worker_snapshot=jdispatch_rollback}
+: ${the_worker_timeout=180}
 the_dispatchdir="${the_dispatchdir_prefix%/}/${the_dispatchdir_suffix#/}"
-the_dispatch_lock="/var/lock/jdispatch.lock"
-the_worker_snapshot=jdispatch_rollback
-the_worker_timeout=180
 the_proctitle="jdispatch_$( printf ${the_dispatchdir_prefix} | /sbin/sha512 | /usr/bin/head -c 16 )"
 
 

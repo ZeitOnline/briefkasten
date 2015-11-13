@@ -103,4 +103,20 @@
         creates: "/usr/local/etc/ezjail/cleanser_{{item}}"
       with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
       tags: cleanser_clonesx
+    - name: install jdispatch tool
+      copy:
+        src: files/jdispatch.sh
+        dest: /usr/local/bin/
+        owner: root
+        group: wheel
+        mode: "0755"
+    - name: configure jdispatch tool
+      template:
+        src: templates/jdispatch.conf
+        dest: /usr/local/etc/
+        owner: root
+        group: wheel
+        mode: "0644"
+      with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
+      tags: debugx
 
