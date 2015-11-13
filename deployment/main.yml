@@ -96,5 +96,11 @@
         mode: "0600"
         dest: "/usr/jails/cleanser_{{item}}/etc/ssh/sshd_config"
       with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
+      tags: cleanser_clones
+    - name: configure clones for ezjail
+      command: "ezjail-admin create -x cleanser_{{item}} {{hostvars['briefkasten-cleanser']['ploy_ip']}}"
+      args:
+        creates: "/usr/local/etc/ezjail/cleanser_{{item}}"
+      with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
       tags: cleanser_clonesx
 
