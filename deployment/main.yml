@@ -47,6 +47,10 @@
 - hosts: briefkasten
   user: root
   tasks:
+    - name: install jaildaemon
+      pkgng:
+        name: jaildaemon
+        state: present
     # grant appserver's pyramid user ssh access
     - name: copy keyfile
       command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys

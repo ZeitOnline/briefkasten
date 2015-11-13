@@ -9,6 +9,7 @@ devel/py-virtualenv
 net/rsync
 lang/python27
 sysutils/py-supervisor
+sysutils/jaildaemon
 textproc/libxslt
 security/libressl
 security/sudo
