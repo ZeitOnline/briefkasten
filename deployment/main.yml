@@ -47,7 +47,9 @@
   tasks:
     # grant appserver's pyramid user ssh access
     - name: copy keyfile
-      command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys creates={{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      args:
+        creates: "{{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys"
     - name: copy ssh pub host key
       shell: sed -E -e 's:^:{{hostvars['briefkasten-cleanser']['ploy_ip']}} :' -e 's:[^ ]+$::' {{ jails_dir }}/cleanser/etc/ssh/ssh_host_rsa_key.pub > {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/known_hosts creates={{ jails_dir }}/appserver/usr/home/pyramid/.ssh/known_hosts
     - name: fix permissions on keyfile
