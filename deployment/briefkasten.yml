@@ -1,0 +1,19 @@
+---
+- hosts: briefkasten
+  user: root
+  roles:
+    - { role: jails_host, tags: ['configure'] }
+    - { role: jailhost, tags: ['jailhost', 'zfs'] }
+  tasks:
+  - name: create jails
+    command: "ezjail-admin start {{item}}"
+    args:
+      creates: "/usr/jails/{{item}}"
+    with_items:
+    - webserver
+    - appserver
+    - cleanser
+    tags: jails
+
+
+
