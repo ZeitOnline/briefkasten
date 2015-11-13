@@ -7,7 +7,7 @@ Instead the idea is to use as little pre-built ingredients as possible and aquir
 
 An instance of the briefkasten is deployed by running scripts on a *control host* (i.e. your local machine) which then configure and install it on a *target host* (i.e. virtual machine for development and testing, on dedicated hardware for production).
 
-During this process the *target host* will boot from a FreeBSD 9.2 installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
+During this process the *target host* will boot from a FreeBSD installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
 
 
 Obtaining the sources
@@ -26,7 +26,7 @@ The *control host* needs **Python 2.7** with ``virtualenv`` and ``make``.
 
 On most Linux distributions you should get all of the above by installing ``python-virtualenv`` (i.e. ``aptitude install python-virtualenv``).
 
-Under Mac OS X using `homebrew <http://brew.sh>`_ is the recommended way (``brew install python`` should do the trick.) (The Python installation that's part of Mac OS X ships without ``virtualenv`` and is out-dated. It's best not to touch it at all.)
+Under Mac OS X using `homebrew <http://brew.sh>`_ is the recommended way (``brew install python`` should do the trick.) (The Python installation that's part of Mac OS X ships without ``virtualenv`` and is out-dated. It's best to ignore it entirely.
 
 Under FreeBSD install ``devel/py-virtualenv``.
 
