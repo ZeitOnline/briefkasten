@@ -25,8 +25,6 @@
 
 - hosts: briefkasten-cleanser
   user: root
-  roles:
-    - { role: common, tags: ['common', 'cleanser'] }
   tasks:
     - name: install packages
       pkgng: name={{ item }} state=present
@@ -35,12 +33,16 @@
       - netpbm
       - ghostscript9-base
       - libreoffice
-
     - name: create cleanser user
-      user: name=cleanser createhome=yes
-
+      user:
+        name: cleanser
+        createhome: yes
     - name: create cleanser .ssh
-      file: path=/usr/home/cleanser/.ssh owner=cleanser mode=700 state=directory
+      file:
+        path: /usr/home/cleanser/.ssh
+        owner: cleanser
+        mode: "700"
+        state: directory
 
 - hosts: briefkasten
   user: root
@@ -68,7 +70,6 @@
   tasks:
     - name: ensure ownership of scripts
       command: chown -R cleanser /usr/home/cleanser
-
     - name: Upload cleanser scripts
       copy: src=../application/middleware_scripts/ dest=/usr/local/bin/
 
