@@ -70,3 +70,18 @@
     - name: Upload cleanser scripts
       copy: src=../application/middleware_scripts/ dest=/usr/local/bin/
 
+# the cleanser jail is now ready to be snapshotted and cloned
+- hosts: briefkasten
+  user: root
+  tasks:
+    - name: create cleanser snapshot
+      command: "zfs snapshot tank/jails/cleanser@clonesource"
+      args:
+        creates: "/usr/jails/cleanser/.zfs/snapshot/clonesource"
+      tags: cleanser_clones
+    - name: create cleanser clones (from snapshot)
+      command: "zfs clone tank/jails/cleanser@clonesource tank/jails/cleanser_{{item}}"
+      args:
+        creates: "/usr/jails/cleanser_{{item}}"
+      with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
+      tags: cleanser_clones
