@@ -20,7 +20,7 @@ the_proctitle="jdispatch_$( printf ${the_dispatchdir_prefix} | /sbin/sha512 | /u
 exerr () { printf "Error: %s\n" "$*" >&2 ; /bin/rm -f "${the_dispatch_lock}"; exit 1; }
 
 # Implementation
-main() {
+main () {
   now=$( date +%s )
   timeout=$(( now - the_worker_timeout ))
 
