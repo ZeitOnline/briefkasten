@@ -1,20 +1,46 @@
 ---
-- hosts: briefkasten-cleanser
+- hosts: briefkasten
   user: root
   tasks:
-  - name: install packages
-    pkgng: name={{ item }} state=present
-    with_items:
-    - zip
-    - netpbm
-    - ghostscript9-base
-    - libreoffice
+    - name: create jails
+      command: "ezjail-admin start {{item}}"
+      args:
+        creates: "/usr/jails/{{item}}"
+      with_items:
+      - webserver
+      - appserver
+      - cleanser
+      tags: jails
 
-  - name: create cleanser user
-    user: name=cleanser createhome=yes
+- hosts: briefkasten-webserver
+  user: root
+  roles:
+    - { role: common, tags: ['common', 'webserver'] }
+    - { role: webserver, tags: ['webserver'] }
+- hosts: briefkasten-appserver
+  user: root
+  roles:
+    - { role: common, tags: ['common', 'appserver'] }
+    - { role: appserver, tags: ['appserver'] }
 
-  - name: create cleanser .ssh
-    file: path=/usr/home/cleanser/.ssh owner=cleanser mode=700 state=directory
+- hosts: briefkasten-cleanser
+  user: root
+  roles:
+    - { role: common, tags: ['common', 'cleanser'] }
+  tasks:
+    - name: install packages
+      pkgng: name={{ item }} state=present
+      with_items:
+      - zip
+      - netpbm
+      - ghostscript9-base
+      - libreoffice
+
+    - name: create cleanser user
+      user: name=cleanser createhome=yes
+
+    - name: create cleanser .ssh
+      file: path=/usr/home/cleanser/.ssh owner=cleanser mode=700 state=directory
 
 - hosts: briefkasten
   user: root
@@ -43,3 +69,4 @@
 
     - name: Upload cleanser scripts
       copy: src=../application/middleware_scripts/ dest=/usr/local/bin/
+
