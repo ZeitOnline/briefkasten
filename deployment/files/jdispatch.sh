@@ -76,7 +76,7 @@ EOF
     worker_suffix="${the_dispatchdir_suffix}"/"${worker}"
     worker_snap="${ezjail_jailzfs}/${worker}@${the_worker_snapshot}"
 
-    # For us to work on a worker jail, it needs to exit (ezjail needs to know about it) and
+    # For us to work on a worker jail, it needs to exist (ezjail needs to know about it) and
     # its zfs must have a snapshot
     if ! does_ezjail_exist ${worker}; then
       printf "Warning: Skipping jail %s. It does not exist.\n" "${worker}"
@@ -84,7 +84,7 @@ EOF
     fi
 
     if ! does_snapshot_exist ${worker_snap}; then
-      printf "Warning: Skipping jail %s. Can not rollback, because No snapshot %s found on the zfs '%s/%s'.\n" "${worker}" "${the_worker_snapshot}" "${ezjail_jailzfs}" "${worker}"
+      printf "Warning: Skipping jail %s. Cannot rollback, because no snapshot %s found on the ZFS '%s/%s'.\n" "${worker}" "${the_worker_snapshot}" "${ezjail_jailzfs}" "${worker}"
       continue
     fi
 
