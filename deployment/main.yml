@@ -122,11 +122,13 @@
     - name: install jdispatch tool
       copy:
         src: files/jdispatch.sh
-        dest: /usr/local/bin/
+        dest: /usr/local/bin/jdispatch
         owner: root
         group: wheel
         mode: "0755"
-      tags: cleanser_clones
+      tags: 
+      - cleanser_clones
+      - jdispatch
     - name: configure jdispatch tool
       template:
         src: templates/jdispatch.conf
