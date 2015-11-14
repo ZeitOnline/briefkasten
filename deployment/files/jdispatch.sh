@@ -113,7 +113,7 @@ EOF
     /bin/mkdir -p "${worker_dir}" || continue
 
     # Copy claim and release scripts into worker dir
-    printf "#!/bin/sh\n\n/usr/bin/touch %s/done\n/usr/bin/pkill -HUP -f %s\n" ${worker_suffix} ${the_proctitle} > "${worker_dir}/release"
+    printf "#!/bin/sh\n\n/usr/bin/touch %s/done\n/bin/pkill -HUP -f %s\n" ${worker_suffix} ${the_proctitle} > "${worker_dir}/release"
     printf "#!/bin/sh\n\n/usr/bin/mktemp %s 2> /dev/null >/dev/null\nexit \$?\n" "${worker_suffix}/taken" > "${worker_dir}/claim"
     /bin/chmod 0755 "${worker_dir}/claim" "${worker_dir}/release"
 
@@ -130,7 +130,7 @@ EOF
   is_ezjail_alive "${the_master_jail}" || exerr "Warning: master jail is not running. No jaildaemon probe launched."
 
   jail_name=$( printf ${the_master_jail} | /usr/bin/tr -c '[:alnum:]' _ )
-  /usr/bin/pgrep -f ${the_proctitle} > /dev/null 2>/dev/null
+  /bin/pgrep -f ${the_proctitle} > /dev/null 2>/dev/null
   [ $? -eq 1 ] && /usr/local/bin/jaildaemon -c "${the_dispatch_script}" -j ${jail_name} -r -t ${the_proctitle}
 
   /bin/rm -r "${the_dispatch_lock}"
