@@ -35,7 +35,7 @@ main () {
 
   # Try to acquire lock (we might have been called from cron and jaildaemon simultaneously)
   unset retries
-  while /bin/true; do
+  while true; do
     [ ${#retries} -gt 3 ] && exerr "Can't acquire lock."
     if ! /usr/bin/mktemp "${the_dispatch_lock}" > /dev/null 2> /dev/null ; then
       retries=X${retries}
