@@ -51,6 +51,12 @@
       pkgng:
         name: jaildaemon
         state: present
+    - name: enable jaildaemon
+      service:
+        name: jaildaemon
+        enabled: true
+        state: started
+      tags: cleanser_clones
     # grant appserver's pyramid user ssh access
     - name: copy keyfile
       command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
