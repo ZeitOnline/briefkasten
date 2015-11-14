@@ -37,11 +37,13 @@ main () {
   unset retries
   while true; do
     [ ${#retries} -gt 3 ] && exerr "Can't acquire lock."
+    /bin/mkdir -p $( /usr/bin/dirname "${the_dispatch_lock}" ) || exerr "Error: Can't create lock directory"
     if ! /usr/bin/mktemp "${the_dispatch_lock}" > /dev/null 2> /dev/null ; then
       retries=X${retries}
       sleep 5
       continue
     fi
+    break
   done
 
   # Check if our working environment exists
