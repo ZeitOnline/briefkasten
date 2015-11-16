@@ -120,3 +120,12 @@
     name: supervisord
     enabled: true 
 
+- name: upload frontend theme
+  synchronize:
+    src: "{{ploy_local_theme_path}}"
+    dest: "{{themes_dir}}/{{ploy_theme_name}}"
+    rsync_opts:
+      - "-e ploy-ssh"
+  tags:
+    - update-theme
+    
