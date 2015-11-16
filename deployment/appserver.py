@@ -35,16 +35,17 @@ def upload_theme():
         rsync('-av', '--delete', local_theme_path, '{host_string}:%s/' % AV['themes_dir'])
 
 
-def upload_editor_keys():
+@task
+def upload_pgp_keys():
     """ upload and/or update the PGP keys for editors, import them into PGP"""
     appuser = 'pyramid'
     apphome = '/usr/local/briefkasten'
     with fab.settings(fab.hide('running')):
         local_key_path = path.join(fab.env['config_base'], fab.env.instance.config['local_pgpkey_path'])
         remote_key_path = '%s/var/pgp_pubkeys/' % apphome
-        rsync(remote_dir=remote_key_path, local_dir=local_key_path, delete=True)
+        rsync('-av', local_key_path, '{host_string}:%s' % remote_key_path)
         fab.run('chown -R %s %s' % (appuser, remote_key_path))
-        with fab.prefix("setenv GNUPGHOME %s" % remote_key_path):
+        with fab.shell_env(GNUPGHOME=remote_key_path):
             fab.sudo('''gpg --import %s/*.gpg''' % remote_key_path,
                 user=appuser, shell_escape=False)
 

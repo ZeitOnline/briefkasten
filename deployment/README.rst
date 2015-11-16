@@ -42,14 +42,20 @@ In practice it is advisable to keep the entire ``etc`` under separate version co
 ploy.conf – the main configuration file
 =======================================
 
-Create a copy from the provided example ``cp etc.sample etc``.
+Create your own configuration directory inside::
+
+  $ mkdir etc
+
+Create a copy from the provided example::
+
+  $ cp etc.sample/ploy.conf etc/
+
+If you want to use VirtualBox to try out the installation on a local virtual machine, you can copy ``etc.sample/vbox.conf`` instead, which contains a ready-to-use setup. 
 
 You will (at least) need to provide values in the ``[ez-master:briefkasten]`` section for the following keys:
 
   - host
   - port
-  - user
-  - https_port
 
 Note that you cannot specify the SSH fingerprint at this time yet, you need to wait until after ``bootstrap-host`` has run (see below)
 
@@ -85,7 +91,7 @@ These need to reside inside ``etc/pgp_pubkeys/`` and are expected to end in ``*.
 SSL certificate for the webserver
 =================================
 
-The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It expected in ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` respectively, ``etc.sample`` contains a self-signed pair for development and testing purposes.
+The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It is expected in ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` respectively, ``etc.sample`` contains a self-signed pair for development and testing purposes.
 
 
 Booting the target host into FreeBSD
@@ -164,10 +170,10 @@ The functionality of the briefkasten has been split into three jails: a **webser
 
 Since we have a running host we can prepare for these jails like so:
 
-- run ``bin/ploy bootstrap briefkasten`` on the *control host*
+- run ``make bootstrap`` on the *control host*
 - answer ``y`` for the questions coming up. the host will reboot automatically after the script has run.
 - at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the ``[ez-master:briefkasten]`` section of your ``ploy.conf`` as ``fingerprint =``.
-- in the meantime the *targe host* has probably finished rebooting. Now run ``make configure-host``
+- in the meantime the *target host* has probably finished rebooting. Now run ``make configure-host``
 
 Anyway, now we have all requirements in place to install the jails.
 
@@ -177,7 +183,7 @@ Installing the jails
 
 First start and create the (empty) jails ``make start-jails``, then configure them: ``make configure-jails``.
 
-.. note:: if you see output about not being able to verify the fingerprint of a jail... that happens sometimes (not sure when and why) on first access. In that case simply repeat the command.
+Finally, you need to upload and install the PGG keys of the editors and admins: ``make upload-pgp-keys``.
 
 You now should be able to visit the configured https URL in your browser. In the case of virtualbox ``https://localhost:47023/briefkasten/submit``.
 
