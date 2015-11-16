@@ -35,10 +35,13 @@
   tags: poudriere
 
 - name: upload package options
-  copy:
+  synchronize:
     src: 102amd64-briefkasten-options/
     dest: /usr/local/etc/poudriere.d/102amd64-briefkasten-options/
-    directory_mode: yes
+    rsync_opts:
+      - "-e ploy-ssh"
+      - "--delete"
+      - "-av"
   tags:
     - poudriere
 
