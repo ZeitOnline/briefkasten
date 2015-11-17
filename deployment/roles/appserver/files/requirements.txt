@@ -1,61 +1,23 @@
-lxml==3.4.4
-Chameleon==2.11
-Mako==0.8.0
-MarkupSafe==0.15
-Paste==1.7.5.1
-PasteScript==1.7.5
-WebOb==1.2.3
-colander==1.0a2
-deform==0.9.7
-diazo==1.0.3
-mechanize==0.2.5
-paramiko==1.10.1
-peppercorn==0.4
-# pyOpenSSL==0.13
-pycrypto==2.6
-pyquery==1.2.4
-pyramid-deform==0.2a5
-pyramid-mailer==0.11
+Chameleon==2.24
+colander==1.0
+cssselect==0.9.1
+deform==2.0a2
+diazo==1.2.2
+future==0.15.2
+iso8601==0.1.11
+lxml==3.5.0
+Paste==2.0.2
+PasteDeploy==1.5.2
+peppercorn==0.5
+pyramid==1.5.7
+pyramid-chameleon==0.3
+pyramid-deform==0.2
 repoze.lru==0.6
-repoze.sendmail==3.2
-repoze.xmliter==0.5
-translationstring==1.1
-venusian==1.0a8
-
-# Required by:
-# PasteScript==1.7.5
-PasteDeploy==1.5.0
-
-# Required by:
-# pyquery==1.2.4
-cssselect==0.8
-
-# Required by:
-# diazo==1.0.3
-experimental.cssselect==0.3
-
-# Required by:
-# pyramid-mailer==0.11
-pyramid==1.4
-
-# Required by:
-# repoze.sendmail==3.2
-transaction==1.4.1
-
-# Required by:
-# deform==0.9.7
-zope.deprecation==4.0.2
-
-# Required by:
-# zope.schema==4.3.2
-zope.event==4.0.2
-
-# Required by:
-# zope.testbrowser==4.0.2
-zope.interface==4.0.5
-
-# Required by:
-# zope.testbrowser==4.0.2
-zope.schema==4.3.2
-
-briefkasten==0.1.10.dev0
+repoze.xmliter==0.6
+six==1.10.0
+translationstring==1.3
+venusian==1.0
+WebOb==1.5.1
+zope.deprecation==4.1.2
+zope.interface==4.1.3
+briefkasten
