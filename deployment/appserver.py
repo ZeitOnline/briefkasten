@@ -23,7 +23,7 @@ def get_vars():
 @task
 def application(action="restart"):
     get_vars()
-    fab.run("supervisorctl %s" % action)
+    fab.run("supervisorctl %s briefkasten" % action)
 
 
 @task
