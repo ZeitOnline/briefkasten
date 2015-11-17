@@ -38,6 +38,7 @@ def upload_theme():
 @task
 def upload_pgp_keys():
     """ upload and/or update the PGP keys for editors, import them into PGP"""
+    # TODO: use env vars instead:
     appuser = 'pyramid'
     apphome = '/usr/local/briefkasten'
     with fab.settings(fab.hide('running')):
