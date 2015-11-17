@@ -14,22 +14,22 @@ def test_correct_token(browser):
     assert response.status == '200 OK'
 
 
-def test_editor_posts_reply(zbrowser):
+def test_editor_posts_reply(browser):
     dropbox = dropbox_container.add_dropbox(message=u'Hello')
     reply = u'How do you do?'
     author = u'John Doe'
-    zbrowser.open('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token))
-    zbrowser.getControl(name='reply').value = reply
-    zbrowser.getControl(name='author').value = author
-    zbrowser.getForm().submit()
+    page = browser.get('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token))
+    form = page.forms['deform']
+    form['reply'] = reply
+    form['author'] = author
+    form.submit()
     refetched_dropbox = dropbox_container.get_dropbox(dropbox.drop_id)
     assert refetched_dropbox != dropbox
     assert refetched_dropbox.replies[0]['reply'] == reply
     assert refetched_dropbox.replies[0]['author'] == author
 
 
-def test_editor_posts_empty_reply(zbrowser):
+def test_editor_posts_empty_reply(browser):
     dropbox = dropbox_container.add_dropbox(message=u'Hello')
-    zbrowser.open('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token))
-    zbrowser.getForm().submit()
+    browser.get('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token)).forms[0].submit()
     assert dropbox.replies == []

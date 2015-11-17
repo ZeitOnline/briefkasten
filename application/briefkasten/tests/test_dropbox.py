@@ -1,35 +1,26 @@
 # -*- coding: utf-8 -*-
+import hashlib
 import os
 import stat
 from os.path import dirname, exists, join
 from tempfile import mkdtemp
 
-from pytest import raises
+from pytest import fixture, raises
 
 
 #
 # tempfile store tests
 #
-def setup_dropbox_container():
+
+
+@fixture(scope='function')
+def dropbox_container(request):
     from briefkasten.dropbox import DropboxContainer
-    return DropboxContainer(dict(fs_dropbox_root=mkdtemp(),
+    dropbox_container = DropboxContainer(dict(fs_dropbox_root=mkdtemp(),
         fs_bin_path=join(dirname(__file__), 'bin')
     ))
-
-
-def teardown_dropbox_container(dropbox_container):
-    try:
-        dropbox_container.destroy()
-    except OSError:
-        pass
-
-
-def pytest_funcarg__dropbox_container(request):
-    return request.cached_setup(
-        setup=setup_dropbox_container,
-        teardown=teardown_dropbox_container,
-        scope="function"
-    )
+    request.addfinalizer(dropbox_container.destroy)
+    return dropbox_container
 
 
 def test_dropbox_is_created_if_it_does_not_exist():
@@ -109,7 +100,7 @@ def test_attachment_creation_outside_container(dropbox_container):
     dropbox_container.add_dropbox(message=u'Überraschung!', attachments=[attachment])
     assert not exists(join(dropbox_container.fs_path, 'authorized_keys'))
 
-import hashlib
+
 md5 = hashlib.md5()
 
 

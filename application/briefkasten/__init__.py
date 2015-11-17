@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound
-
-from dropbox import DropboxContainer
-dropbox_container = DropboxContainer()
-
 from pyramid.i18n import TranslationStringFactory
+from dropbox import DropboxContainer
+
+dropbox_container = DropboxContainer()
 _ = TranslationStringFactory('briefkasten')
 
 
@@ -49,6 +48,7 @@ def main(global_config, **settings):
     app_route = settings.get('appserver_root_url', '/')
     config.add_static_view('%sstatic/deform' % app_route, 'deform:static')
     config.add_static_view('%sstatic' % app_route, 'briefkasten:static')
+    config.add_renderer('.pt', 'pyramid_chameleon.zpt.renderer_factory')
     config.include('pyramid_deform')
     config.add_route('fingerprint', '%sfingerprint' % app_route)
     config.add_route('dropbox_form', '%ssubmit' % app_route)
