@@ -20,17 +20,31 @@ setup(name='briefkasten',
     install_requires=[
         'Pyramid',
         'pyramid_deform',
+        'pyramid_chameleon',
         'deform',
         'Paste',
-        'zope.testbrowser',
-        'pyquery',
     ],
     extras_require={
-        "tests": [
-            'wsgi_intercept',
-            'zope.testbrowser'],
+        'development': [
+            'webtest',
+            'flake8',
+            'mock',
+            'pep8 < 1.6',
+            'pyramid_debugtoolbar',
+            'pytest <2.8',
+            'py >= 1.4.17',
+            'pyflakes < 0.9',
+            'pytest-flakes',
+            'pytest-pep8',
+            'pytest-cov',
+            'pytest-capturelog',
+            'tox',
+            'pyquery',
+            'mr.hermes',
+            'setuptools-git',
+            'devpi-client',
+        ],
     },
-    test_suite="briefkasten",
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main
