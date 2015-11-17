@@ -6,7 +6,11 @@ all: bin/pserve
 tests: bin/py.test
 	@bin/py.test
 
-bin/pserve bin/py.test bin/devpi: bin/python bin/pip setup.py
+bin/pserve: requirements.txt bin/pip
+	bin/pip install -r requirements.txt
+	@touch $@
+
+bin/py.test: bin/python bin/pip setup.py requirements
 	bin/python setup.py dev
 	@touch $@
 
