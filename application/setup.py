@@ -18,10 +18,12 @@ setup(name='briefkasten',
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Pyramid',
+        'Pyramid<1.6',
         'pyramid_deform',
         'pyramid_chameleon',
         'deform',
+        'diazo',
+        'repoze.xmliter',
         'Paste',
     ],
     extras_require={
