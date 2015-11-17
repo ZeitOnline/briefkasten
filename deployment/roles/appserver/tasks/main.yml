@@ -77,8 +77,11 @@
   copy:
     src: requirements.txt
     dest: "{{apphome}}/"
-    owner: "{{appuser}}"
-    mode: "600"
+    owner: "root"
+    mode: "644"
+  tags:
+    - app-config
+    - update-app
 
 - name: update pip & co
   pip:
@@ -89,18 +92,21 @@
     - pip
     - setuptools
 
-- name: install python eggs
-  pip:
-    virtualenv: "{{apphome}}"
-    requirements: "{{apphome}}/requirements.txt"
-  tags: update_app
-
 - name: configure appserver
   template:
     src: briefkasten.ini.j2
     dest: "{{apphome}}/briefkasten.ini"
   notify: restart application
-  tags: app-config
+  tags:
+    - app-config
+    - update-app
+
+- name: install python eggs
+  pip:
+    virtualenv: "{{apphome}}"
+    requirements: "{{apphome}}/requirements.txt"
+  notify: restart application
+  tags: update-app
 
 - name: disable periodic emails
   copy:
