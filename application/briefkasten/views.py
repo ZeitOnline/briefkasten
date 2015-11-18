@@ -46,7 +46,7 @@ def defaults():
 @view_config(route_name='dropbox_form',
     request_method='GET',
     renderer='briefkasten:templates/dropbox_submission.pt')
-def dropbox_submit(request):
+def dropbox_form(request):
     form = deform.Form(dropbox_schema,
         buttons=[deform.Button('submit', _('Submit'))],
         action=request.url,
@@ -65,7 +65,7 @@ def dropbox_submit(request):
 @view_config(route_name='dropbox_form',
     request_method='POST',
     renderer='briefkasten:templates/dropbox_submission.pt')
-def dropbox_submitted(request):
+def dropbox_submission(request):
     appstruct = defaults()
     try:
         data = deform.Form(dropbox_schema,
@@ -98,7 +98,7 @@ def dropbox_submitted(request):
 
 @view_config(route_name="dropbox_view",
     renderer='briefkasten:templates/feedback.pt')
-def dropbox_view(dropbox, request):
+def dropbox_submitted(dropbox, request):
     appstruct = defaults()
     appstruct.update(title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
