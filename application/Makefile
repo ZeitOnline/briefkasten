@@ -10,7 +10,7 @@ bin/pserve: requirements.txt bin/pip
 	bin/pip install -r requirements.txt
 	@touch $@
 
-bin/py.test: bin/python bin/pip setup.py requirements
+bin/tox bin/py.test: bin/python bin/pip setup.py bin/pserve
 	bin/python setup.py dev
 	@touch $@
 
