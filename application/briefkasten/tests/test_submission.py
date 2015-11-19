@@ -12,7 +12,9 @@ def test_visit_fingerprint(browser):
 
 def test_successful_submission(browser):
     response = browser.post('/briefkasten/submit', params=dict(message=u'hey'))
-    response.status == '200 OK'
+    assert response.status == '302 Found'
+    redirected = browser.get(response.location)
+    assert u'No reply has been posted so far' in redirected.text
 
 
 def test_submission_validation_failure(browser):

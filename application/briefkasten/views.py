@@ -2,6 +2,7 @@
 import pkg_resources
 import colander
 import deform
+from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render
 from pyramid.view import view_config
@@ -73,28 +74,39 @@ def dropbox_submission(request):
             formid='briefkasten-form',
             action=request.url,
             buttons=('submit',)).validate(request.POST.items())
-        testing_secret = request.registry.settings.get('test_submission_secret', '')
-        is_test_submission = is_equal(testing_secret,
-            data.pop('testing_secret', ''))
-        drop_box = dropbox_container.add_dropbox(**data)
-        text = render('briefkasten:templates/editor_email.pt', dict(
-            reply_url=request.route_url('dropbox_editor', drop_id=drop_box.drop_id, editor_token=drop_box.editor_token),
-            message=drop_box.message,
-            num_attachments=drop_box.num_attachments), request)
-        drop_box.update_message(text)
-        process_status = drop_box.process(testing=is_test_submission)
-        try:
-            del tempstore[data['attachment']['uid']]
-        except (KeyError, TypeError):
-            pass
+    except deform.ValidationFailure, exception:
+        appstruct.update(form_submitted=False,
+            form=exception.render())
+        return appstruct
+    # recognize submissions from the watchdog:
+    is_test_submission = is_equal(request.registry.settings.get('test_submission_secret', ''),
+        data.pop('testing_secret', ''))
+    # populate the dropbox on filesystem with the submitted data:
+    drop_box = dropbox_container.add_dropbox(**data)
+    try:
+        del tempstore[data['attachment']['uid']]
+    except (KeyError, TypeError):
+        pass
+    drop_url = request.route_url('dropbox_view', drop_id=drop_box.drop_id)
+    editor_url = request.route_url('dropbox_editor',
+        drop_id=drop_box.drop_id,
+        editor_token=drop_box.editor_token)
+    # prepare the notification email text (we render it for process.sh, because... Python :-)
+    notification_text = render('briefkasten:templates/editor_email.pt', dict(
+        reply_url=editor_url,
+        message=drop_box.message,
+        num_attachments=drop_box.num_attachments), request)
+    drop_box.update_message(notification_text)
+    # now we can call the process method
+    process_status = drop_box.process(testing=is_test_submission)
+    if process_status == 0:
+        return HTTPFound(location=drop_url)
+    else:
         appstruct.update(form=None,
             form_submitted=True,
             drop_id=drop_box.drop_id,
             process_status=process_status)
-    except deform.ValidationFailure, exception:
-        appstruct.update(form_submitted=False,
-            form=exception.render())
-    return appstruct
+        return appstruct
 
 
 @view_config(route_name="dropbox_view",
