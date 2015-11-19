@@ -12,6 +12,7 @@ version = pkg_resources.get_distribution("briefkasten").version
 
 
 class FileUploadTempStore(dict):
+    """ a memory based temporary storage for uploaded files"""
     def preview_url(self, name):
         return ""
 
