@@ -1,7 +1,7 @@
 pyversion = 2.7
 python = python$(pyversion)
 
-all: bin/pserve
+all: bin/tox
 
 tests: bin/py.test
 	@bin/py.test
