@@ -74,6 +74,7 @@ class Dropbox(object):
             mkdir(fs_dropbox_path)
             chmod(fs_dropbox_path, 0770)
             self.paths_created.append(fs_dropbox_path)
+            self.status = u'created'
 
             # write the message into a file
             self._write_message(fs_dropbox_path, 'message', message)
@@ -118,6 +119,7 @@ class Dropbox(object):
         """ Calls the external helper scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
         """
+        self.status = u'submitted'
         fs_process = join(self.container.settings['fs_bin_path'], 'process.sh')
         fs_config = join(self.container.settings['fs_bin_path'],
             'briefkasten%s.conf' % ('_test' if testing else ''))
@@ -139,9 +141,8 @@ class Dropbox(object):
             mkdir(fs_container)
             chmod(fs_container, 0770)
         fs_reply_path = join(fs_container, fs_name)
-        fs_reply = open(fs_reply_path, 'w')
-        fs_reply.write(message.encode('utf-8'))
-        fs_reply.close()
+        with open(fs_reply_path, 'w') as fs_reply:
+            fs_reply.write(message.encode('utf-8'))
         chmod(fs_reply_path, 0660)
         self.paths_created.append(fs_reply_path)
 
@@ -158,4 +159,10 @@ class Dropbox(object):
     def status(self):
         """ returns either 'created', 'quarantined', 'success' or 'failure'
         """
-        return u'created'
+        with open(join(self.fs_path, u'status')) as status_file:
+            return u' '.join(status_file.readline().split()[1:])
+
+    @status.setter
+    def status(self, state):
+        with open(join(self.fs_path, u'status'), 'w') as status_file:
+            status_file.write('0 %s' % state)

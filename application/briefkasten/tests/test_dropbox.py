@@ -46,6 +46,12 @@ def dropbox(dropbox_container):
     return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
 
 
+def test_dropbox_status_manual(dropbox):
+    with open(join(dropbox.fs_path, 'status'), 'w') as status_file:
+            status_file.write(u'23 in limbo'.encode('utf-8'))
+    assert dropbox.status == u'in limbo'
+
+
 def test_dropbox_status_initial(dropbox):
     """ the initial status of a dropbox is 'created'"""
     assert dropbox.status == u'created'
