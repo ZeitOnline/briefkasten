@@ -83,10 +83,12 @@ def dropbox_submission(request):
         data.pop('testing_secret', ''))
     # populate the dropbox on filesystem with the submitted data:
     drop_box = dropbox_container.add_dropbox(**data)
-    try:
-        del tempstore[data['attachment']['uid']]
-    except (KeyError, TypeError):
-        pass
+    # delete attachments from temporary storage
+    for attachment in data['attachments']:
+        # un-used file upload widgets produce `None` values in the struct
+        # which we must ignore
+        if attachment is not None:
+            del tempstore[attachment['uid']]
     drop_url = request.route_url('dropbox_view', drop_id=drop_box.drop_id)
     editor_url = request.route_url('dropbox_editor',
         drop_id=drop_box.drop_id,
