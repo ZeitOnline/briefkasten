@@ -41,6 +41,22 @@ def test_dropbox_is_created_if_it_does_not_exist():
     rmtree(dropbox_root)
 
 
+@fixture
+def dropbox(dropbox_container):
+    return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
+
+
+def test_dropbox_status_initial(dropbox):
+    """ the initial status of a dropbox is 'created'"""
+    assert dropbox.status == u'created'
+
+
+def test_dropbox_status_submitted(dropbox):
+    """once a dropbox has initiated its processing, its status changes to 'quarantined'"""
+    dropbox.process()
+    assert dropbox.status == u'submitted'
+
+
 def test_dropbox_retrieval(dropbox_container):
     dropbox = dropbox_container.add_dropbox(message=u'Schönen guten Tag!',
         attachments=[dict(fp=open(join(dirname(__file__), 'attachment.txt'), 'r'),

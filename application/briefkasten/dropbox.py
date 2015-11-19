@@ -156,8 +156,6 @@ class Dropbox(object):
 
     @property
     def status(self):
-        """ returns either 'new', 'submitted', 'processed'
-            if the status is new or submitted and the message is deleted, we assume it has been processed.
-            (also: the scripts could simply leave a file named 'status' and fill it with information.)
+        """ returns either 'created', 'quarantined', 'success' or 'failure'
         """
-        return "submitted"
+        return u'created'
