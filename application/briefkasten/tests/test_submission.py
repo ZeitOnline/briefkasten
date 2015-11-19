@@ -19,7 +19,8 @@ def test_successful_submission(browser):
 
 def test_submission_validation_failure(browser):
     response = browser.post('/briefkasten/submit', params=dict(message=u''))
-    response.status == '200 OK'
+    assert response.status == '200 OK'
+    assert u'Es gab ein Problem mit Ihren Angaben' in response.text
 
 
 @fixture
