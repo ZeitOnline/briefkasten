@@ -49,18 +49,18 @@ def dropbox(dropbox_container):
 def test_dropbox_status_manual(dropbox):
     with open(join(dropbox.fs_path, 'status'), 'w') as status_file:
             status_file.write(u'23 in limbo'.encode('utf-8'))
-    assert dropbox.status == u'in limbo'
+    assert dropbox.status == u'23 in limbo'
 
 
 def test_dropbox_status_initial(dropbox):
     """ the initial status of a dropbox is 'created'"""
-    assert dropbox.status == u'created'
+    assert dropbox.status == u'010 created'
 
 
 def test_dropbox_status_submitted(dropbox):
     """once a dropbox has initiated its processing, its status changes to 'quarantined'"""
     dropbox.process()
-    assert dropbox.status == u'submitted'
+    assert dropbox.status == u'020 submitted'
 
 
 def test_dropbox_retrieval(dropbox_container):
