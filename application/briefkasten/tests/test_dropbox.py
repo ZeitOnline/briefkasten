@@ -46,6 +46,11 @@ def dropbox(dropbox_container):
     return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
 
 
+def test_dropbox_status_no_file(dropbox):
+    os.remove(join(dropbox.fs_path, 'status'))
+    assert dropbox.status == u'000 no status file'
+
+
 def test_dropbox_status_manual(dropbox):
     with open(join(dropbox.fs_path, 'status'), 'w') as status_file:
             status_file.write(u'23 in limbo'.encode('utf-8'))

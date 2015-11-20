@@ -159,8 +159,11 @@ class Dropbox(object):
     def status(self):
         """ returns either 'created', 'quarantined', 'success' or 'failure'
         """
-        with open(join(self.fs_path, u'status')) as status_file:
-            return status_file.readline()
+        try:
+            with open(join(self.fs_path, u'status')) as status_file:
+                return status_file.readline()
+        except IOError:
+            return u'000 no status file'
 
     @status.setter
     def status(self, state):
