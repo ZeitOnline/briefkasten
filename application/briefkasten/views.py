@@ -117,6 +117,7 @@ def dropbox_submitted(dropbox, request):
     appstruct = defaults()
     appstruct.update(title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
+        status_code=dropbox.status[0],
         status=dropbox.status,
         replies=dropbox.replies)
     return appstruct
