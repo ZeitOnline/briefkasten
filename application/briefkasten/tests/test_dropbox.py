@@ -68,6 +68,10 @@ def test_dropbox_status_submitted(dropbox):
     assert dropbox.status == u'020 submitted'
 
 
+def test_dropbox_process_failure(dropbox):
+    import pdb; pdb.set_trace()
+
+
 def test_dropbox_retrieval(dropbox_container):
     dropbox = dropbox_container.add_dropbox(message=u'Schönen guten Tag!',
         attachments=[dict(fp=open(join(dirname(__file__), 'attachment.txt'), 'r'),

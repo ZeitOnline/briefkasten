@@ -125,8 +125,11 @@ class Dropbox(object):
             'briefkasten%s.conf' % ('_test' if testing else ''))
         shellenv = environ.copy()
         shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.container.settings['fs_bin_path'])
-        return call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
+        process_status = call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
             env=shellenv)
+        if process_status != 0:
+            import pdb; pdb.set_trace(  )
+        return process_status
 
     def add_reply(self, reply):
         """ Add an editorial reply to the drop box.

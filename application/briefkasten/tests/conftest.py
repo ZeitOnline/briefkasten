@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
-from pytest import fixture
+from mock import patch
+from pytest import fixture, yield_fixture
 from tempfile import mkdtemp
 from webtest import TestApp
 
@@ -33,3 +34,11 @@ def browser(app, request):
     extra_environ = dict(HTTP_HOST='example.com')
     browser = TestApp(app, extra_environ=extra_environ)
     return browser
+
+
+@yield_fixture(autouse=True)
+def mocked_process_call():
+    with patch('briefkasten.dropbox.call') as mocked_call:
+        mocked_call.return_value = 0
+        yield mocked_call
+
