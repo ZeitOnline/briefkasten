@@ -14,6 +14,7 @@
     <p tal:condition="status_code=='5'">An error has occured while processing your submission. All your data has been deleted from the server. You may want to try it again.</p>
     <p tal:condition="status_code=='9'">Your submission has been successfully processed, encrypted and has been sent off to our editor.</p>
     </tal:status>
+    <p>You can reload this page to follow the state of your submission and/or view any replies</p>
     <tal:replies tal:condition="replies">
       <p class="byline"><span class="author">${replies[0]['author']}</span></p>
       <p>${replies[0]['reply']}</p>
