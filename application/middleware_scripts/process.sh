@@ -27,6 +27,7 @@ RM=`which srm`
 
 # define our bail out shortcut
 exerr () { echo "ERROR: $*" >&2 ; exit 1; }
+exnerr() { printf "%s\n%s" $1 $2 > "${the_dropdir}"/status; exit 1; }
 
 case `uname -s` in
   Darwin)  the_sendmail_bin="/usr/sbin/sendmail";;
@@ -65,8 +66,11 @@ done
 # XXX maybe send an unencrypted email. Get feedback on this
 [ -n "${the_backup_recipients}" ] || exerr "None of the admins or editors has a valid public key"
 
+# Our initial sanity checks are done. Set status to 100
+printf "100\nProcessor running.\n" > "${the_dropdir}"/status
+
 # Archive and encrypt
-tar cf - ${the_dropdir} | gpg -e ${the_backup_recipients} -o "${the_dropdir}/backup.tar.gpg" --trust-model always 2>/dev/null || exerr "Can't encrypt primary backup"
+tar cf - ${the_dropdir} | gpg -e ${the_backup_recipients} -o "${the_dropdir}/backup.tar.gpg" --trust-model always 2>/dev/null || exnerr 501 "Can't encrypt primary backup"
 
 # If there is no message from user, make one up
 [ -r "${the_dropdir}/message" ] || cp ${the_default_message} ${the_dropdir}/message
@@ -74,14 +78,14 @@ tar cf - ${the_dropdir} | gpg -e ${the_backup_recipients} -o "${the_dropdir}/bac
 # Clean all attachments and move cleaned versions to the clean/ directory
 export the_config
 if ! process-attachments.sh -d "${the_dropdir}"; then
-  # If this fails, send the report to the editors for later retrieval
-  # Also remove all clear text, keeping only the encrypted backup
-  [ -f ${the_dropdir}/report ] && mv ${the_dropdir}/report ${the_dropdir}/message
-  rm -rf ${the_dropdir}/attach ${the_dropdir}/clean
-
+  # If processing the attachments failed, we assume that process-attachments.sh
+  # has set the status. Clean up and return the error to web app
+  ${RM} -rf ${the_dropdir}/message ${the_dropdir}/attach ${the_dropdir}/clean ${the_dropdir}/backup.tar.gpg
+  exit 1
 fi
 
 # All went fine, send mails to the editors
+unset out fail
 for the_editor in ${the_editors}; do
 
   # Collect all attachments
@@ -90,11 +94,12 @@ for the_editor in ${the_editors}; do
 
   if [ $? = 0 ]; then
     ${the_sendmail_bin} -t ${the_sender} < ${the_dropdir}/mail.eml
+    out=X${out}
   else
     for the_admin in ${the_admins}; do
-      echo -n | create-multipart.sh -f ${the_sender} -t ${the_admin} -s "FAILURE: Drop ID `basename ${the_dropdir}`" -p ${the_dropdir}/report > ${the_dropdir}/fail.eml 2> /dev/null
-      ${the_sendmail_bin} -t ${the_sender} < ${the_dropdir}/fail.eml
+      echo -n | create-multipart.sh -f ${the_sender} -t ${the_admin} -s "FAILURE: Drop ID `basename ${the_dropdir}`" -p ${the_dropdir}/report | ${the_sendmail_bin} -t ${the_sender}  2> /dev/null
     done
+    fail=X${fail}
   fi
 
   ${RM} -f ${the_dropdir}/mail.eml
@@ -104,5 +109,18 @@ done
 # wipe it
 ${RM} -rf ${the_dropdir}/message ${the_dropdir}/attach ${the_dropdir}/clean ${the_dropdir}/backup.tar.gpg
 
+# if at least one message has been sent, we consider it "not a failure"
+if [ "${out}" -a "${fail}" ]; then
+  printf "901\nSuccess. %s encrypted emails sent, %d failed.\n The administrators have been notified.\n" ${#out} ${#fail} > "${the_dropdir}"/status
+elif [ "${out}" ]; then
+  printf "900\nSuccess. %s encrypted emails sent.\n" ${#out} > "${the_dropdir}"/status
+else
+  printf "500\nFailure. Sending to all %s editors failed.\n" ${#fail} > "${the_dropdir}"/status
+  exit 1
+fi
+
 # Create directory for editor's replies
 mkdir -p ${the_dropdir}/replies
+
+# Return success code
+exit 0
