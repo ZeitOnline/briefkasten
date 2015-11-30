@@ -29,13 +29,13 @@
 - name: Ensure our self-signed cert will be accepted
   copy:
     src: cert.pem
-    dest: "{{ jails_dir }}/newjail/etc/ssl/cert.pem"
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.dtfh.de.pem"
   tags: poudriere
 
 - name: Ensure our self-signed poudriere packages will be accepted
   copy:
     src: poudriere.cert
-    dest: "{{ jails_dir }}/newjail/etc/ssl/poudriere.cert"
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.dtfh.de.pub"
   tags: poudriere
 
 - name: Ensure pkg configuration will be present in each jail
