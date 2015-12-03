@@ -64,6 +64,10 @@ class Dropbox(object):
     def __init__(self, container, drop_id=None, message=None, attachments=None):
         """ if drop_id is None, this will create a dropbox on the file system, if not, it will populate itself
         from a given instance.
+        the attachments are expected to conform to what the deform library serializes for a file widget,
+        namely a dictionary containing:
+            - a file handle under the key `fp`
+            - the name of the file under `filename`
         """
         self.container = container
         self.paths_created = []
