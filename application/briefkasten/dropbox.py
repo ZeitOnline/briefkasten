@@ -4,7 +4,7 @@ from os import mkdir, chmod, environ
 from os.path import exists, join, splitext
 from random import SystemRandom
 from shutil import rmtree
-from subprocess import call
+from subprocess import call, Popen
 
 
 allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
@@ -129,7 +129,11 @@ class Dropbox(object):
             'briefkasten%s.conf' % ('_test' if testing else ''))
         shellenv = environ.copy()
         shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.container.settings['fs_bin_path'])
-        process_status = call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
+        if self.num_attachments > 0:
+            caller = call
+        else:
+            caller = call
+        process_status = caller("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
             env=shellenv)
         if process_status != 0:
             import pdb; pdb.set_trace(  )
