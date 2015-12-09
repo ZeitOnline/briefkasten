@@ -50,7 +50,7 @@ process_single_file () {
 
 # define our bail out shortcut
 exerr () { echo "ERROR: $*" >&2 ; exit 1; }
-exnerr() { printf "%s\n%s\n" $1 $2 > "${the_dropdir}"/status; exit 1; }
+exnerr() { printf "%s %s\n" $1 $2 > "${the_dropdir}"/status; exit 1; }
 
 # this is the usage string in case of error
 usage="process-attachments.sh [-d dropdir] [-f config]"
@@ -90,7 +90,7 @@ if [ "${the_jdispatcher_dir}" ]; then
   # to connect, return an error
   [ "${the_cleanser}" ] || exnerr 503 "Cleanser config error"
 
-  printf "201\nAcquired remote cleanser: %s\nCopying data.\n" "${the_cleanser}" > "${the_dropdir}"/status
+  printf "201 Acquired remote cleanser: %s\n\nCopying data.\n" "${the_cleanser}" > "${the_dropdir}"/status
 fi
 
 # If we have a remote cleanser host, clean the attachments there
@@ -99,13 +99,13 @@ if [ "${the_cleanser}" ]; then
   [ "${the_cleanser_ssh_conf}" ] && the_ssh_conf="-F ${the_cleanser_ssh_conf} ${the_ssh_conf}"
   the_remote_dir=`basename "${the_dropdir}"`
 
-  [ "${my_dispatcher}" ] || printf "202\nUsing static remote cleanser: %s.\nCopying data.\n" "${the_cleanser}" > "${the_dropdir}"/status
+  [ "${my_dispatcher}" ] || printf "202 Using static remote cleanser: %s.\n\nCopying data.\n" "${the_cleanser}" > "${the_dropdir}"/status
 
   # copy over the attachments
   scp ${the_ssh_conf} -r ${the_dropdir} ${the_cleanser}:${the_remote_dir}
   [ $? -eq 0 ] || exnerr 504 "Could not copy dropdir to cleanser."
 
-  printf "203\nAttachments being processed by actual cleanser\n" > "${the_dropdir}"/status
+  printf "203 Attachments being processed by actual cleanser\n" > "${the_dropdir}"/status
 
   # execute remote cleanser job
   ssh ${the_ssh_conf} ${the_cleanser} process-attachments.sh -d ${the_remote_dir}
@@ -132,7 +132,7 @@ fi
 
 # this is the recursion path, when this script is being run on the remote
 # host, usually without the config parameter.
-printf "204\nAttachments in quarantine on actual cleanser host.\n" > "${the_dropdir}"/status
+printf "204 Attachments in quarantine on actual cleanser host.\n" > "${the_dropdir}"/status
 
 mkdir "${the_dropdir}"/clean
 for the_attachment in "${the_dropdir}"/attach/*; do

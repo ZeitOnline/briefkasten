@@ -27,7 +27,7 @@ RM=`which srm`
 
 # define our bail out shortcut
 exerr () { echo "ERROR: $*" >&2 ; exit 1; }
-exnerr() { printf "%s\n%s" $1 $2 > "${the_dropdir}"/status; exit 1; }
+exnerr() { printf "%s %s" $1 $2 > "${the_dropdir}"/status; exit 1; }
 
 case `uname -s` in
   Darwin)  the_sendmail_bin="/usr/sbin/sendmail";;
@@ -67,7 +67,7 @@ done
 [ -n "${the_backup_recipients}" ] || exerr "None of the admins or editors has a valid public key"
 
 # Our initial sanity checks are done. Set status to 100
-printf "100\nProcessor running.\n" > "${the_dropdir}"/status
+printf "100 Processor running.\n" > "${the_dropdir}"/status
 
 # Archive and encrypt
 tar cf - ${the_dropdir} | gpg -e ${the_backup_recipients} -o "${the_dropdir}/backup.tar.gpg" --trust-model always 2>/dev/null || exnerr 501 "Can't encrypt primary backup"
@@ -111,11 +111,11 @@ ${RM} -rf ${the_dropdir}/message ${the_dropdir}/attach ${the_dropdir}/clean ${th
 
 # if at least one message has been sent, we consider it "not a failure"
 if [ "${out}" -a "${fail}" ]; then
-  printf "901\nSuccess. %s encrypted emails sent, %d failed.\n The administrators have been notified.\n" ${#out} ${#fail} > "${the_dropdir}"/status
+  printf "901 Success. %s encrypted emails sent, %d failed.\n\nThe administrators have been notified.\n" ${#out} ${#fail} > "${the_dropdir}"/status
 elif [ "${out}" ]; then
-  printf "900\nSuccess. %s encrypted emails sent.\n" ${#out} > "${the_dropdir}"/status
+  printf "900 Success. %s encrypted emails sent.\n" ${#out} > "${the_dropdir}"/status
 else
-  printf "500\nFailure. Sending to all %s editors failed.\n" ${#fail} > "${the_dropdir}"/status
+  printf "500 Failure. Sending to all %s editors failed.\n" ${#fail} > "${the_dropdir}"/status
   exit 1
 fi
 
