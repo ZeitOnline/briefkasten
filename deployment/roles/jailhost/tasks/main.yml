@@ -48,3 +48,8 @@
     src: pkg_repo.conf
     dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg/repos/FreeBSD.conf"
   tags: poudriere
+
+- name: Make sure temporary files are cleared during startup
+  sysrc:
+    name: clear_tmp_enable
+    value: "YES"

@@ -1,11 +1,25 @@
 # -*- coding: utf-8 -*-
 from pyramid.config import Configurator
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound, HTTPGone
 from pyramid.i18n import TranslationStringFactory
+from itsdangerous import SignatureExpired
 from dropbox import DropboxContainer
 
 dropbox_container = DropboxContainer()
 _ = TranslationStringFactory('briefkasten')
+
+
+def dropbox_post_factory(request):
+    from .dropbox import parse_post_token
+    try:
+        drop_id = parse_post_token(
+            token=request.matchdict['token'],
+            secret=request.registry.settings['post_secret'])
+    except SignatureExpired:
+        raise HTTPGone('dropbox expired')
+    except Exception:  # don't be too specific on the reason for the error
+        raise HTTPNotFound('no such dropbox')
+    return dropbox_container.get_dropbox(drop_id)
 
 
 def dropbox_factory(request):
@@ -48,14 +62,14 @@ def main(global_config, **settings):
     config = Configurator(settings=settings, locale_negotiator=german_locale)
     config.add_translation_dirs('briefkasten:locale')
     app_route = settings.get('appserver_root_url', '/')
-    config.add_static_view('%sstatic/deform' % app_route, 'deform:static')
     config.add_static_view('%sstatic' % app_route, 'briefkasten:static')
     config.add_renderer('.pt', 'pyramid_chameleon.zpt.renderer_factory')
-    config.include('pyramid_deform')
     config.add_route('fingerprint', '%sfingerprint' % app_route)
-    config.add_route('dropbox_form', '%ssubmit' % app_route)
-    config.add_route('dropbox_editor', '%s{drop_id}/{editor_token}' % app_route, factory=dropbox_editor_factory)
-    config.add_route('dropbox_view', '%s{drop_id}' % app_route, factory=dropbox_factory)
+    config.add_route('dropbox_form_submit', '%s{token}/submit' % app_route, factory=dropbox_post_factory)
+    config.add_route('dropbox_fileupload', '%s{token}/upload' % app_route, factory=dropbox_post_factory)
+    config.add_route('dropbox_editor', '%sdropbox/{drop_id}/{editor_token}' % app_route, factory=dropbox_editor_factory)
+    config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
+    config.add_route('dropbox_form', app_route)
     config.scan()
     dropbox_container.init(settings)
     return config.make_wsgi_app()

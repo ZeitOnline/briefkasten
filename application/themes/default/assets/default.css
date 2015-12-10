@@ -1,8 +1,3 @@
-h1 {
-    font-size: 18pt;
-    font-weight: bold;
-}
-
 #warning {
     background-color: red;
     border: 2px solid black;
@@ -12,10 +7,6 @@ h1 {
     color: white;
 }
 
-a {
-    color: #222;
-    text-decoration: none;
-}
 
 #version-info {
     font-family: Verdana, Helvetica, Arial, sans-serif;

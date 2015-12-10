@@ -42,8 +42,29 @@ def test_dropbox_is_created_if_it_does_not_exist():
 
 
 @fixture
-def dropbox(dropbox_container):
+def dropbox_without_attachment(dropbox_container):
     return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
+
+
+@fixture
+def dropbox(dropbox_container):
+    open(join(dirname(__file__), 'attachment.txt'), 'r')
+    return dropbox_container.add_dropbox(
+        message=u'Schönen guten Tag!',
+        attachments=[
+            dict(
+                filename=u'attachment.txt',
+                fp=open(join(dirname(__file__), 'attachment.txt'), 'r')
+            )
+        ])
+
+
+def test_dropbox_status_no_message(dropbox_container):
+    dropbox = dropbox_container.add_dropbox(
+        drop_id=u'foo',
+        force_create=True
+    )
+    assert dropbox.status == u'001 initialised'
 
 
 def test_dropbox_status_no_file(dropbox):
@@ -60,6 +81,13 @@ def test_dropbox_status_manual(dropbox):
 def test_dropbox_status_initial(dropbox):
     """ the initial status of a dropbox is 'created'"""
     assert dropbox.status == u'010 created'
+
+
+def test_dropbox_status_submitted_without_attachment(dropbox_without_attachment):
+    """a dropbox without an attachment won't be cleansed and will be set to 'success' directly
+       after processing"""
+    dropbox_without_attachment.process()
+    assert dropbox_without_attachment.status == u'090 sucess'
 
 
 def test_dropbox_status_submitted(dropbox):

@@ -2,7 +2,8 @@
 -------------------
 
 - major refactoring
-
+- use ephemeral cleanser jails
+- use ephemeral storage for initial fileupload
 
 0.1.10 - Unreleased
 -------------------
