@@ -6,17 +6,9 @@
   metal:define-macro="master">
 
   <head>
-<!-- Force latest IE rendering engine or ChromeFrame if installed -->
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
     <meta charset="utf-8" />
     <title>Briefkasten</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Bootstrap styles -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <!-- Generic page styles -->
-    <link rel="stylesheet" href="${static_url}style.css">
-    <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
-    <link rel="stylesheet" href="${static_url}jquery.fileupload.css">
     <base href="${request.route_url('dropbox_form')}"/>
   </head>
 
