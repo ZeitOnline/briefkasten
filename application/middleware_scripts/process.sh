@@ -37,7 +37,7 @@ case `uname -s` in
 esac
 
 test_pgp() {
-  gpg --quiet --list-pub --with-colons "<$1>" 2>/dev/null | grep ^pub:[ofqmu-]: > /dev/null
+  gpg --quiet --list-pub --with-colons "<$1>" 2>/dev/null | grep -q ^pub:[ofqmu-]:
 }
 
 # this is the usage string in case of error
