@@ -36,6 +36,9 @@ case `uname -s` in
   *) echo "Can't deduct your operating system, exiting" >&2; exit 1;;
 esac
 
+test_pgp() {
+  gpg --quiet --list-pub --with-colons "<$1>" 2>/dev/null | grep ^pub:[ofqmu-]: > /dev/null
+}
 
 # this is the usage string in case of error
 usage="process.sh [-c config] [-d dropdir]"
@@ -57,7 +60,7 @@ esac; done; shift $(( ${OPTIND} - 1 ))
 # The file is encrypted to the editors and the admins
 the_backup_recipients=
 for the_recipient in ${the_editors} ${the_admins}; do
-  test-gpg.sh ${the_recipient} && the_backup_recipients="${the_backup_recipients} -r ${the_recipient}"
+  test_gpg ${the_recipient} && the_backup_recipients="${the_backup_recipients} -r ${the_recipient}"
 done
 
 # If we have no valid pgp keys at all, bail out
