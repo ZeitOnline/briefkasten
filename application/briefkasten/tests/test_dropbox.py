@@ -1,35 +1,26 @@
 # -*- coding: utf-8 -*-
+import hashlib
 import os
 import stat
 from os.path import dirname, exists, join
 from tempfile import mkdtemp
 
-from pytest import raises
+from pytest import fixture, raises
 
 
 #
 # tempfile store tests
 #
-def setup_dropbox_container():
+
+
+@fixture(scope='function')
+def dropbox_container(request):
     from briefkasten.dropbox import DropboxContainer
-    return DropboxContainer(dict(fs_dropbox_root=mkdtemp(),
+    dropbox_container = DropboxContainer(dict(fs_dropbox_root=mkdtemp(),
         fs_bin_path=join(dirname(__file__), 'bin')
     ))
-
-
-def teardown_dropbox_container(dropbox_container):
-    try:
-        dropbox_container.destroy()
-    except OSError:
-        pass
-
-
-def pytest_funcarg__dropbox_container(request):
-    return request.cached_setup(
-        setup=setup_dropbox_container,
-        teardown=teardown_dropbox_container,
-        scope="function"
-    )
+    request.addfinalizer(dropbox_container.destroy)
+    return dropbox_container
 
 
 def test_dropbox_is_created_if_it_does_not_exist():
@@ -48,6 +39,65 @@ def test_dropbox_is_created_if_it_does_not_exist():
     assert exists(dropbox_root)
     # clean up after ourselves
     rmtree(dropbox_root)
+
+
+@fixture
+def dropbox_without_attachment(dropbox_container):
+    return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
+
+
+@fixture
+def dropbox(dropbox_container):
+    open(join(dirname(__file__), 'attachment.txt'), 'r')
+    return dropbox_container.add_dropbox(
+        message=u'Schönen guten Tag!',
+        attachments=[
+            dict(
+                filename=u'attachment.txt',
+                fp=open(join(dirname(__file__), 'attachment.txt'), 'r')
+            )
+        ])
+
+
+def test_dropbox_status_no_message(dropbox_container):
+    dropbox = dropbox_container.add_dropbox(
+        drop_id=u'foo',
+        force_create=True
+    )
+    assert dropbox.status == u'001 initialised'
+
+
+def test_dropbox_status_no_file(dropbox):
+    os.remove(join(dropbox.fs_path, 'status'))
+    assert dropbox.status == u'000 no status file'
+
+
+def test_dropbox_status_manual(dropbox):
+    with open(join(dropbox.fs_path, 'status'), 'w') as status_file:
+            status_file.write(u'23 in limbo'.encode('utf-8'))
+    assert dropbox.status == u'23 in limbo'
+
+
+def test_dropbox_status_initial(dropbox):
+    """ the initial status of a dropbox is 'created'"""
+    assert dropbox.status == u'010 created'
+
+
+def test_dropbox_status_submitted_without_attachment(dropbox_without_attachment):
+    """a dropbox without an attachment won't be cleansed and will be set to 'success' directly
+       after processing"""
+    dropbox_without_attachment.process()
+    assert dropbox_without_attachment.status == u'090 sucess'
+
+
+def test_dropbox_status_submitted(dropbox):
+    """once a dropbox has initiated its processing, its status changes to 'quarantined'"""
+    dropbox.process()
+    assert dropbox.status == u'020 submitted'
+
+
+def test_dropbox_process_failure(dropbox):
+    import pdb; pdb.set_trace()
 
 
 def test_dropbox_retrieval(dropbox_container):
@@ -109,7 +159,7 @@ def test_attachment_creation_outside_container(dropbox_container):
     dropbox_container.add_dropbox(message=u'Überraschung!', attachments=[attachment])
     assert not exists(join(dropbox_container.fs_path, 'authorized_keys'))
 
-import hashlib
+
 md5 = hashlib.md5()
 
 

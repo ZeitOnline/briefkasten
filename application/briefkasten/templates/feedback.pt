@@ -7,6 +7,14 @@
 
   <tal:content  metal:fill-slot="content">
     <h4 i18n:translate="">Reply to your anonymous submission <span i18n:name="drop_id">"${drop_id}"</span></h4>
+    <tal:status tal:condition="status[:3] != '000'">
+    <p tal:condition="status_code=='0'">Your submission has been received and is awaiting processing</p>
+    <p tal:condition="status_code=='1'">Your submission is being moved into quarantine, where it will be stripped of meta data before being sent on.</p>
+    <p tal:condition="status_code=='2'">Your submission is now in quarantine, where it will be stripped of meta data before being sent on.</p>
+    <p tal:condition="status_code=='5'">An error has occured while processing your submission. All your data has been deleted from the server. You may want to try it again.</p>
+    <p tal:condition="status_code=='9'">Your submission has been successfully processed, encrypted and has been sent off to our editor.</p>
+    </tal:status>
+    <p>You can reload this page to follow the state of your submission and/or view any replies</p>
     <tal:replies tal:condition="replies">
       <p class="byline"><span class="author">${replies[0]['author']}</span></p>
       <p>${replies[0]['reply']}</p>

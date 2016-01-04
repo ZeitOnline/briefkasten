@@ -1,18 +1,18 @@
 pyversion = 2.7
 python = python$(pyversion)
-buildoutcfg = development
-cfgs = buildout development deployment
 
-all: buildout
+all: bin/tox
 
-$(cfgs): %: %.cfg bin/buildout
-	bin/buildout -c $@.cfg
+tests: bin/py.test
+	@bin/py.test
 
-buildout.cfg:
-	ln -s $(buildoutcfg).cfg buildout.cfg
+bin/pserve: requirements.txt bin/pip
+	bin/pip install -r requirements.txt
+	@touch $@
 
-bin/buildout: bin/pip
-	bin/pip install zc.buildout
+bin/tox bin/py.test: bin/python bin/pip setup.py bin/pserve
+	bin/python setup.py dev
+	@touch $@
 
 bin/python bin/pip:
 	virtualenv .

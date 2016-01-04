@@ -1,5 +1,0 @@
-ipnat_rules:
-    - "# https forward for webserver:"
-    - "rdr {{ ansible_default_ipv4.interface }} {{ ansible_default_ipv4.address }}/32 port {{ awsome_https_port }} -> {{ hostvars['webserver']['awsome_ip'] }} port 443"
-    - "# uncomment for debugging the app directly:"
-    - "#rdr {{ ansible_default_ipv4.interface }} {{ ansible_default_ipv4.address }}/32 port {{ application_port }} -> {{ hostvars['appserver']['awsome_ip'] }} port {{ application_port }}"

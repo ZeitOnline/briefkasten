@@ -1,2 +1,0 @@
-#!/bin/bash
-for i in lib/*/site-packages/setuptools-*.egg-info/dependency_links.txt; do echo > "$i"; done

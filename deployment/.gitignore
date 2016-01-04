@@ -1,0 +1,11 @@
+/bin/
+/etc
+/etc.*
+/include/
+/lib/
+/src/
+/share
+/host
+/vm
+/downloads
+/etc/known_hosts

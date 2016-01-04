@@ -1,0 +1,55 @@
+---
+- name: create root data filesystem
+  zfs:
+    name: tank/data
+    state: present
+  tags:
+    - zfs-layout
+
+- name: create data filesystem
+  zfs:
+    name: tank/data/{{item}}
+    state: present
+  with_items:
+    - shared
+    - jails
+  tags:
+    - zfs-layout
+
+- name: upgrade ZFS version
+  command: zpool upgrade tank 
+  tags: zfs-layout 
+
+- name: Ensure basejail etc exists
+  file:
+    path: "{{ jails_dir }}/newjail/etc/pkg/repos"
+    state: directory
+  tags: poudriere
+
+- name: Ensure our self-signed cert will be accepted
+  copy:
+    src: cert.pem
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.dtfh.de.pem"
+  tags: poudriere
+
+- name: Ensure our self-signed poudriere packages will be accepted
+  copy:
+    src: poudriere.cert
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.dtfh.de.pub"
+  tags: poudriere
+
+- name: Ensure pkg configuration will be present in each jail
+  copy:
+    src: pkg.conf
+    dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg.conf"
+
+- name: Ensure pkg repo configuration will be present in each jail
+  template:
+    src: pkg_repo.conf
+    dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg/repos/FreeBSD.conf"
+  tags: poudriere
+
+- name: Make sure temporary files are cleared during startup
+  sysrc:
+    name: clear_tmp_enable
+    value: "YES"

@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1.10-dev'
+version = '0.2.0.dev1'
 
 
 setup(name='briefkasten',
@@ -18,19 +18,35 @@ setup(name='briefkasten',
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Pyramid',
-        'pyramid_deform',
-        'deform',
+        'Pyramid<1.6',
+        'pyramid_chameleon',
+        'diazo',
+        'itsdangerous',
+        'repoze.xmliter',
         'Paste',
-        'zope.testbrowser',
-        'pyquery',
     ],
     extras_require={
-        "tests": [
-            'wsgi_intercept',
-            'zope.testbrowser'],
+        'development': [
+            'webtest',
+            'flake8',
+            'mock',
+            'pep8 < 1.6',
+            'pyramid_debugtoolbar',
+            'pytest <2.8',
+            'py >= 1.4.17',
+            'pyflakes < 0.9',
+            'pytest-flakes',
+            'pytest-pep8',
+            'pytest-cov',
+            'pytest-capturelog',
+            'tox',
+            'pyquery',
+            'mr.hermes',
+            'setuptools-git',
+            'devpi-client',
+            'click',
+        ],
     },
-    test_suite="briefkasten",
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main

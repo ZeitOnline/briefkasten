@@ -1,0 +1,13 @@
+ZPOOL={{ zpool_name }}
+FREEBSD_HOST=ftp://ftp.freebsd.org
+RESOLV_CONF=/etc/resolv.conf
+BASEFS=/usr/local/poudriere
+PKG_REPO_SIGNING_KEY={{pkg_repo_signing_key}}
+URL_BASE={{poudriere_url_base}}
+USE_PORTLINT=no
+USE_TMPFS=yes
+DISTFILES_CACHE={{ distfiles_cache }}
+CHECK_CHANGED_DEPS=yes
+CCACHE_DIR=/var/cache/ccache
+SAVE_WRKDIR=yes
+NOLINUX=yes

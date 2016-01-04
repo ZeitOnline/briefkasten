@@ -1,6 +1,0 @@
-- hosts: webserver
-  user: root
-  roles:
-    - common
-    - custom_nginx
-    - webserver

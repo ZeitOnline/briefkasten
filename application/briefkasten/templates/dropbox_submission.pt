@@ -6,15 +6,78 @@
   metal:use-macro="master">
   <body>
     <tal:content metal:fill-slot="content">
-      <form tal:condition="form" tal:replace="structure form" />
-      <tal:submitted tal:condition="form_submitted">
-        <h2 i18n:translate="">Anonymous submission to the editors</h2>
-        <h1 i18n:translate="" class="texttitle">We have received your documents. Thank you!</h1>
-        <p i18n:translate="submission_success">Your submission has been received under the
-          following token <strong id="feedback-token" i18n:name="drop_id">${drop_id}</strong>.
-          You will shortly be able to use it <a i18n:translate="" i18n:name="location" id="feedback-url" href="${request.route_url('dropbox_view', drop_id=drop_id)}">here</a> to check for a reply from one of our editors.</p>
-        <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Submit further documents</a>.</p>
-      </tal:submitted>
+        <form
+            id="briefkasten-form"
+            method="POST"
+            role="form"
+            enctype="multipart/form-data"
+            accept-charset="utf-8"
+            action="${action}">
+            <div class="form-group">
+                <label>Anonymisierte Nachricht an die Redaktion</label>
+                <textarea class="form-control" id="message" name="message" rows="10" cols="60"></textarea>
+                <div class="panel no-js" id="fallback-upload">
+                    <p>Datei(en) anh&auml;ngen</p>
+                    <input type="file" name="upload">
+                </div>
+                <!-- The fileinput-button span is used to style the file input field as button -->
+                <span class="btn btn-success fileinput-button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Select files...</span>
+                    <!-- The file input field used as target for the file upload widget -->
+                    <input id="fileupload" type="file" name="attachment" multiple>
+                </span>
+                <br>
+                <br>
+                <!-- The global progress bar -->
+                <div id="progress" class="progress">
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+                <!-- The container for the uploaded files -->
+                <div id="files" class="files"></div>
+                <br>
+                <input type="hidden" name="testing_secret" value="" />
+                <div class="form-group">
+                    <button id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
+                    <label for="submit">Beim Abschicken werden die hochgeladenen Dateien zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
+                </div>
+            </div>
+        </form>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+        <script src="${static_url}/jquery.ui.widget.js"></script>
+        <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+        <script src="${static_url}/jquery.iframe-transport.js"></script>
+        <!-- The basic File Upload plugin -->
+        <script src="${static_url}/jquery.fileupload.js"></script>
+        <!-- Bootstrap JS is not required, but included for the responsive demo navigation -->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <script>
+        /*jslint unparam: true */
+        /*global window, $ */
+        $(function () {
+            'use strict';
+            $('body').addClass('js');
+            var url = '${fileupload_url}';
+            $('#fileupload').fileupload({
+                url: url,
+                dataType: 'json',
+                done: function (e, data) {
+                    $.each(data.result.files, function (index, file) {
+                        $('<p/>').text(file.name).appendTo('#files');
+                    });
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .progress-bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                }
+            }).prop('disabled', !$.support.fileInput)
+                .parent().addClass($.support.fileInput ? undefined : 'disabled');
+        });
+        </script>
     </tal:content>
   </body>
 </html>
