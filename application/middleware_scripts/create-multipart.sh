@@ -58,7 +58,7 @@ esac; done; shift $(( ${OPTIND} - 1 ))
 [ -n "${the_message}" ] || exerr "No message file specified"
 
 # ensure that we have a public key
-gpg --list-public-keys ${the_recipient} >/dev/null 2>/dev/null || exerr "No public key available for ${the_recipient}"
+gpg --quiet --list-pub --with-colons "<${the_recipient}>" 2>/dev/null | grep -q ^pub:[ofqmu-]: || exerr "No public key available for ${the_recipient}"
 
 # start composing the email
 echo "From: ${the_sender}"
