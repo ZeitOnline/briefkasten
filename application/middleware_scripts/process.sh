@@ -60,7 +60,7 @@ esac; done; shift $(( ${OPTIND} - 1 ))
 # The file is encrypted to the editors and the admins
 the_backup_recipients=
 for the_recipient in ${the_editors} ${the_admins}; do
-  test_gpg ${the_recipient} && the_backup_recipients="${the_backup_recipients} -r ${the_recipient}"
+  test_pgp ${the_recipient} && the_backup_recipients="${the_backup_recipients} -r ${the_recipient}"
 done
 
 # If we have no valid pgp keys at all, bail out
