@@ -193,6 +193,8 @@ class Dropbox(object):
             self.status = u'500 no valid keys at all'
             return self.status
 
+        self.status = u'100 processor running'
+
         if asbool(self.settings.get('debug', False)): #  use bool helper
             file_out = BIO()
             with tarfile.open(mode = 'w|', fileobj = file_out) as tar:
@@ -204,6 +206,8 @@ class Dropbox(object):
                 always_trust=True,
                 output=join(self.fs_path, 'backup.tar.gpg')
             )
+
+
 
         # TODO: do the actual processing, erdgeist!
         return self.status
