@@ -5,6 +5,7 @@ import smtplib
 import tarfile
 from cStringIO import StringIO as BIO
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
 from os import mkdir, chmod, listdir
