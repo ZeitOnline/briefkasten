@@ -8,7 +8,6 @@ from smtplib import SMTP
 
 dropbox_container = DropboxContainer()
 _ = TranslationStringFactory('briefkasten')
-smtp = SMTP()
 
 
 def dropbox_post_factory(request):
@@ -64,8 +63,7 @@ def german_locale(request):
 
 def setup_smtp(**settings):
     """ expects a dictionary with 'smtp.' keys to create an appropriate smtplib.SMTP instance"""
-    global smtp
-    smtp = SMTP()
+    return SMTP(host=settings.get('mail.host', 'localhost'), port=settings.get('mail.port', 25))
 
 def main(global_config, **settings):
     """ Configure and create the main application. """
@@ -81,5 +79,6 @@ def main(global_config, **settings):
     config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
     config.add_route('dropbox_form', app_route)
     config.scan()
+    config.registry.settings['smtp'] = setup_smtp(**settings)
     dropbox_container.init(settings)
     return config.make_wsgi_app()

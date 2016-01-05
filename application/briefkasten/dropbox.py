@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import gnupg
 import shutil
-import smtplib
 import tarfile
 from cStringIO import StringIO as BIO
 from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from email.mime import MIMEBase
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
 from os import mkdir, chmod, listdir
@@ -81,7 +80,9 @@ def checkRecipient(gpg_context, r):
     return bool(valid_keys)
 
 
-def sendMultiPart(smtp, sender, recipients, subject, attachments):
+def sendMultiPart(smtp, gpg_context, sender, recipients, subject, attachments):
+    """ a helper method that composes and sends an email with attachments
+    requires a pre-configured smtplib.SMTP instance"""
     sent = 0
     for to in recipients:
         if not checkRecipient(gpg_context, to):
@@ -98,7 +99,7 @@ def sendMultiPart(smtp, sender, recipients, subject, attachments):
                 attach = MIMEBase('application', 'octet-stream')
                 attach.set_payload(
                     gpg_context.encrypt_file(fp, to, always_trust=True) )
-                encoders.encode_base64(attach)
+                # encoders.encode_base64(attach) */
 
             attach.add_header('Content-Disposition', 'attachment', filename=attachment+'.pgp')
             msg.attach(attach)
@@ -146,7 +147,7 @@ class Dropbox(object):
                 if attachment is None:
                     continue
                 self.add_attachment(attachment)
-
+        sendMultiPart(self.settings['smtp'])
         self.fs_replies_path = join(self.fs_path, 'replies')
 
     @property
@@ -259,6 +260,7 @@ class Dropbox(object):
 
     @property
     def status_int(self):
+        """ returns the status as integer, so it can be used in comparisons"""
         return int(self.status.split()[0])
 
     @status.setter
