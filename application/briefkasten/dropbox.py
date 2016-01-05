@@ -184,7 +184,6 @@ class Dropbox(object):
         if asbool(self.settings.get('debug', False)): #  use bool helper
             file_out = BIO()
             with tarfile.open(mode = 'w|', fileobj = file_out) as tar:
-                import pdb; pdb.set_trace()
                 tar.add(join(self.fs_path, 'message'))
                 tar.add(join(self.fs_path, 'attach'))
             gpg_context.encrypt(
