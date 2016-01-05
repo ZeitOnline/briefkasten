@@ -114,8 +114,6 @@ def dropbox_submission(dropbox, request):
         request)
     dropbox.update_message(notification_text)
     # now we can call the process method
-    # TODO: use erdgeist's new python interface
-    # something like from .process import process; process(dropbox)
     dropbox.process(testing=is_test_submission)
     return HTTPFound(location=drop_url)
 

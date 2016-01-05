@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+import gnupg
 import shutil
+import smtplib
+import tarfile
+from cStringIO import StringIO as BIO
+from email.mime.multipart import MIMEMultipart
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, environ, listdir
+from os import mkdir, chmod, listdir
 from os.path import exists, join, splitext
+from pyramid.settings import asbool, aslist
 from random import SystemRandom
-from subprocess import call, Popen
 
 
 allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
@@ -69,6 +74,30 @@ class DropboxContainer(object):
         return exists(join(self.fs_path, drop_id))
 
 
+def checkRecipient(gpg_context, r):
+    uid = '<' + r + '>'
+    valid_keys = [ k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-' ]
+#   pprint(valid_keys)
+    return bool(valid_keys)
+
+
+def sendMultiPart(sender, to, subject, attachments):
+    msg = MIMEMultipart()
+
+    msg['From'] = sender
+    msg['To'] = to
+    msg['Subject'] = subject
+
+    for textfile in attachments:
+        with open(textfile, 'rb') as fp:
+            attach = MIMEText(fp.read())
+            msg.attach(attach)
+
+    s = smtplib.SMTP('localhost')
+    s.sendmail(sender, to, msg.as_string())
+    s.quit()
+
+
 class Dropbox(object):
 
     def __init__(self, container, drop_id, message=None, attachments=None):
@@ -109,6 +138,10 @@ class Dropbox(object):
         self.fs_replies_path = join(self.fs_path, 'replies')
 
     @property
+    def settings(self):
+        return self.container.settings
+
+    @property
     def fs_attachment_container(self):
         return join(self.fs_path, 'attach')
 
@@ -136,20 +169,33 @@ class Dropbox(object):
             send the contents of the dropbox via email.
         """
         self.status = u'020 submitted'
-        fs_process = join(self.container.settings['fs_bin_path'], 'process.sh')
-        fs_config = join(self.container.settings['fs_bin_path'],
-            'briefkasten%s.conf' % ('_test' if testing else ''))
-        shellenv = environ.copy()
-        shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.container.settings['fs_bin_path'])
-        if self.num_attachments > 0:
-            caller = call
-        else:
-            caller = call
-        process_status = caller("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
-            env=shellenv)
-        if process_status != 0:
-            import pdb; pdb.set_trace(  )
-        return process_status
+        gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
+        editors = aslist(self.settings['editors'])
+        admins = aslist(self.settings['admins'])
+
+        # create initial backup if we can't clean
+        backup_recipients = [ r for r in editors + admins if checkRecipient(gpg_context, r) ]
+
+        # this will be handled by watchdog, no need to send for each drop
+        if not backup_recipients:
+            self.status = u'500 no valid keys at all'
+            return self.status
+
+        if asbool(self.settings.get('debug', False)): #  use bool helper
+            file_out = BIO()
+            with tarfile.open(mode = 'w|', fileobj = file_out) as tar:
+                import pdb; pdb.set_trace()
+                tar.add(join(self.fs_path, 'message'))
+                tar.add(join(self.fs_path, 'attach'))
+            gpg_context.encrypt(
+                file_out.getvalue(),
+                backup_recipients,
+                always_trust=True,
+                output=join(self.fs_path, 'backup.tar.gpg')
+            )
+
+        # TODO: do the actual processing, erdgeist!
+        return self.status
 
     def add_reply(self, reply):
         """ Add an editorial reply to the drop box.
@@ -196,7 +242,21 @@ class Dropbox(object):
         except IOError:
             return u'000 no status file'
 
+    @property
+    def status_int(self):
+        return int(self.status.split()[0])
+
     @status.setter
     def status(self, state):
         with open(join(self.fs_path, u'status'), 'w') as status_file:
             status_file.write(state)
+        if self.status_int >= 500:
+            self.wipe()
+
+    def sanitize(self):
+        """ removes all unencrypted user input """
+
+    def wipe(self):
+        """ removes all data except the status file"""
+        # TODO: erdgeist :)
+        pass

@@ -1,7 +1,6 @@
 Chameleon==2.24
 colander==1.0
 cssselect==0.9.1
-deform==2.0a2
 diazo==1.2.2
 future==0.15.2
 iso8601==0.1.11
@@ -11,7 +10,7 @@ PasteDeploy==1.5.2
 peppercorn==0.5
 pyramid==1.5.7
 pyramid-chameleon==0.3
-pyramid-deform==0.2
+python-gnupg==0.3.8
 repoze.lru==0.6
 repoze.xmliter==0.6
 six==1.10.0
