@@ -81,21 +81,34 @@ def checkRecipient(gpg_context, r):
     return bool(valid_keys)
 
 
-def sendMultiPart(smtp, sender, to, subject, attachments):
-    msg = MIMEMultipart()
+def sendMultiPart(smtp, sender, recipients, subject, attachments):
+    sent = 0
+    for to in recipients:
+        if not checkRecipient(gpg_context, to):
+            continue
 
-    msg['From'] = sender
-    msg['To'] = to
-    msg['Subject'] = subject
+        msg = MIMEMultipart()
 
-    for textfile in attachments:
-        with open(textfile, 'rb') as fp:
-            attach = MIMEText(fp.read())
+        msg['From'] = sender
+        msg['To'] = to
+        msg['Subject'] = subject
+
+        for attachment in attachments:
+            with open(attachment, 'rb') as fp:
+                attach = MIMEBase('application', 'octet-stream')
+                attach.set_payload(
+                    gpg_context.encrypt_file(fp, to, always_trust=True) )
+                encoders.encode_base64(attach)
+
+            attach.add_header('Content-Disposition', 'attachment', filename=attachment+'.pgp')
             msg.attach(attach)
 
-    smtp.sendmail(sender, to, msg.as_string())
-    smtp.quit()
+        # TODO: need to catch exception?
+        smtp.sendmail(sender, to, msg.as_string())
+        smtp.quit()
+        sent += 1
 
+    return sent
 
 class Dropbox(object):
 
