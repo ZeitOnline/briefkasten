@@ -81,7 +81,7 @@ def checkRecipient(gpg_context, r):
     return bool(valid_keys)
 
 
-def sendMultiPart(sender, to, subject, attachments):
+def sendMultiPart(smtp, sender, to, subject, attachments):
     msg = MIMEMultipart()
 
     msg['From'] = sender
@@ -93,9 +93,8 @@ def sendMultiPart(sender, to, subject, attachments):
             attach = MIMEText(fp.read())
             msg.attach(attach)
 
-    s = smtplib.SMTP('localhost')
-    s.sendmail(sender, to, msg.as_string())
-    s.quit()
+    smtp.sendmail(sender, to, msg.as_string())
+    smtp.quit()
 
 
 class Dropbox(object):

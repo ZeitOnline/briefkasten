@@ -4,9 +4,11 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPGone
 from pyramid.i18n import TranslationStringFactory
 from itsdangerous import SignatureExpired
 from dropbox import DropboxContainer
+from smtplib import SMTP
 
 dropbox_container = DropboxContainer()
 _ = TranslationStringFactory('briefkasten')
+smtp = SMTP()
 
 
 def dropbox_post_factory(request):
@@ -59,6 +61,11 @@ def german_locale(request):
     """ a 'negotiator' that always returns german"""
     return 'de'
 
+
+def setup_smtp(**settings):
+    """ expects a dictionary with 'smtp.' keys to create an appropriate smtplib.SMTP instance"""
+    global smtp
+    smtp = SMTP()
 
 def main(global_config, **settings):
     """ Configure and create the main application. """
