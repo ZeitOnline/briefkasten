@@ -78,7 +78,6 @@ class DropboxContainer(object):
 def checkRecipient(gpg_context, r):
     uid = '<' + r + '>'
     valid_keys = [ k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-' ]
-#   pprint(valid_keys)
     return bool(valid_keys)
 
 
@@ -166,7 +165,7 @@ class Dropbox(object):
         return sanitized
 
     def process(self, purge_meta_data=True, testing=False):
-        """ Calls the external helper scripts to (optionally) purge the meta data and then
+        """ Calls the external cleanser scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
         """
         self.status = u'020 submitted'
