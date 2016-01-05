@@ -61,9 +61,22 @@ def german_locale(request):
     return 'de'
 
 
-def setup_smtp(**settings):
-    """ expects a dictionary with 'smtp.' keys to create an appropriate smtplib.SMTP instance"""
-    return SMTP(host=settings.get('mail.host', 'localhost'), port=settings.get('mail.port', 25))
+class CustomSMTP(SMTP):
+
+    def __init__(self, *args, **kwargs):
+        self.host = kwargs.pop('host', 'localhost')
+        self.port = kwargs.pop('port', 25)
+        SMTP.__init__(self, *args, **kwargs)
+
+    def begin(self):
+        """ connects and optionally authenticates a connection."""
+        self.connect(self.host, self.port)
+        # TODO: add auth and ssl support
+
+
+def setup_smtp_factory(**settings):
+    """ expects a dictionary with 'mail.' keys to create an appropriate smtplib.SMTP instance"""
+    return CustomSMTP(host=settings.get('mail.host', 'localhost'), port=settings.get('mail.port', 25))
 
 def main(global_config, **settings):
     """ Configure and create the main application. """
@@ -79,6 +92,6 @@ def main(global_config, **settings):
     config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
     config.add_route('dropbox_form', app_route)
     config.scan()
-    config.registry.settings['smtp'] = setup_smtp(**settings)
-    dropbox_container.init(settings)
+    config.registry.settings['smtp'] = setup_smtp_factory(**settings)
+    dropbox_container.init(config.registry.settings)
     return config.make_wsgi_app()

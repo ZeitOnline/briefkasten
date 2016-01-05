@@ -4,7 +4,7 @@ import shutil
 import tarfile
 from cStringIO import StringIO as BIO
 from email.mime.multipart import MIMEMultipart
-from email.mime import MIMEBase
+from email.mime.base import MIMEBase
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
 from os import mkdir, chmod, listdir
@@ -97,14 +97,13 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, attachments):
         for attachment in attachments:
             with open(attachment, 'rb') as fp:
                 attach = MIMEBase('application', 'octet-stream')
-                attach.set_payload(
-                    gpg_context.encrypt_file(fp, to, always_trust=True) )
-                # encoders.encode_base64(attach) */
+                attach.set_payload(str(gpg_context.encrypt_file(fp, to, always_trust=True)))
 
             attach.add_header('Content-Disposition', 'attachment', filename=attachment+'.pgp')
             msg.attach(attach)
 
         # TODO: need to catch exception?
+        smtp.begin()
         smtp.sendmail(sender, to, msg.as_string())
         smtp.quit()
         sent += 1
@@ -147,7 +146,6 @@ class Dropbox(object):
                 if attachment is None:
                     continue
                 self.add_attachment(attachment)
-        sendMultiPart(self.settings['smtp'])
         self.fs_replies_path = join(self.fs_path, 'replies')
 
     @property
@@ -208,6 +206,14 @@ class Dropbox(object):
                 output=join(self.fs_path, 'backup.tar.gpg')
             )
 
+        sendMultiPart(
+            self.settings['smtp'],
+            gpg_context,
+            self.settings['mail.default_sender'],
+            editors,
+            u'Drop %s' % self.drop_id,
+            [join(self.fs_path, 'message')]
+        )
 
 
         # TODO: do the actual processing, erdgeist!
