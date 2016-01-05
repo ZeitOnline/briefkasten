@@ -58,6 +58,8 @@ class DropboxContainer(object):
         return Dropbox(self, drop_id, message=message, attachments=attachments)
 
     def get_dropbox(self, drop_id):
+        """ returns the dropbox with the given id, if it does not exist an empty dropbox
+        will be created and returned"""
         return Dropbox(self, drop_id=drop_id)
 
     def destroy(self):

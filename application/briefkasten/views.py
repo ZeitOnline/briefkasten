@@ -70,6 +70,7 @@ def dropbox_form(request):
     renderer='json',
     request_method='POST')
 def dropbox_fileupload(dropbox, request):
+    """ accepts a list of files and adds them to the dropbox as attachments"""
     attachment = request.POST['attachment']
     attached = dropbox.add_attachment(attachment)
     print('added attachment for at %s' % dropbox.fs_path)
@@ -83,10 +84,13 @@ def dropbox_fileupload(dropbox, request):
     route_name='dropbox_form_submit',
     request_method='POST')
 def dropbox_submission(dropbox, request):
+    """ handles the form submission, redirects to the dropbox's status page."""
     try:
         data = DropboxSchema().deserialize(request.POST)
     except Exception as exc:
         print(exc)
+        # at this point the dropbox already exists,
+        # TODO: how to handle form errors in this case
         import pdb; pdb.set_trace(  )
     # recognize submissions from the watchdog:
     is_test_submission = is_equal(request.registry.settings.get('test_submission_secret', ''),
@@ -101,16 +105,19 @@ def dropbox_submission(dropbox, request):
         drop_id=dropbox.drop_id,
         editor_token=dropbox.editor_token)
     # prepare the notification email text (we render it for process.sh, because... Python :-)
-    notification_text = render('briefkasten:templates/editor_email.pt', dict(
-        reply_url=editor_url,
-        message=data['message'],
-        num_attachments=dropbox.num_attachments), request)
+    notification_text = render(
+        'briefkasten:templates/editor_email.pt',
+        dict(
+            reply_url=editor_url,
+            message=data['message'],
+            num_attachments=dropbox.num_attachments),
+        request)
     dropbox.update_message(notification_text)
     # now we can call the process method
-    process_status = dropbox.process(testing=is_test_submission)
-    if process_status == 0:
-        return HTTPFound(location=drop_url)
-    # TODO: handle failed processing
+    # TODO: use erdgeist's new python interface
+    # something like from .process import process; process(dropbox)
+    dropbox.process(testing=is_test_submission)
+    return HTTPFound(location=drop_url)
 
 
 @view_config(route_name="dropbox_view",

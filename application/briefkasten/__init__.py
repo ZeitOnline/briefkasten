@@ -10,6 +10,8 @@ _ = TranslationStringFactory('briefkasten')
 
 
 def dropbox_post_factory(request):
+    """receives a UUID via the request and returns either a fresh or an existing dropbox
+    for it"""
     from .dropbox import parse_post_token
     try:
         drop_id = parse_post_token(
@@ -23,6 +25,7 @@ def dropbox_post_factory(request):
 
 
 def dropbox_factory(request):
+    """ expects the id of an existing dropbox and returns its instance"""
     try:
         return dropbox_container.get_dropbox(request.matchdict['drop_id'])
     except KeyError:
