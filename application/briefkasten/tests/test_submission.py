@@ -10,17 +10,15 @@ def test_visit_fingerprint(browser):
     response.status == '200 OK'
 
 
-def test_successful_submission(browser):
-    response = browser.post('/briefkasten/submit', params=dict(message=u'hey'))
+@fixture
+def submit_url(testing, post_token):
+    return testing.route_url('dropbox_form_submit', token=post_token)
+
+
+def test_successful_submission(browser, submit_url):
+    response = browser.post(submit_url, params=dict(message=u'hey'))
     assert response.status == '302 Found'
-    redirected = browser.get(response.location)
-    assert u'No reply has been posted so far' in redirected.text
-
-
-def test_submission_validation_failure(browser):
-    response = browser.post('/briefkasten/submit', params=dict(message=u''))
-    assert response.status == '200 OK'
-    assert u'Es gab ein Problem mit Ihren Angaben' in response.text
+    browser.get(response.location)
 
 
 @fixture

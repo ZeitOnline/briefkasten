@@ -4,25 +4,14 @@ import os
 import stat
 from cgi import FieldStorage
 from os.path import dirname, exists, join
-from briefkasten.dropbox import generate_post_token, generate_drop_id
 
 from pytest import fixture, raises, xfail
 
 
-@fixture
-def post_token():
-    return generate_post_token(secret=u't0ps3cr3t')
-
-
-@fixture
-def drop_id():
-    return generate_drop_id()
-
-
 @fixture(scope='function')
-def dropbox_container(request, settings):
+def dropbox_container(request, config):
     from briefkasten.dropbox import DropboxContainer
-    dropbox_container = DropboxContainer(settings)
+    dropbox_container = DropboxContainer(config.registry.settings)
     request.addfinalizer(dropbox_container.destroy)
     return dropbox_container
 

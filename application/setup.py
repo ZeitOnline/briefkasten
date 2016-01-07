@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 version = '0.2.0.dev1'
 
 
-setup(name='briefkasten',
+setup(
+    name='briefkasten',
     version=version,
     description='a reasonably secure web application for submitting content anonymously',
     long_description="",
@@ -21,6 +22,7 @@ setup(name='briefkasten',
         'Pyramid<1.7',
         'pyramid_chameleon',
         'colander',
+        'deform',
         'diazo',
         'itsdangerous',
         'python-gnupg',
@@ -52,6 +54,8 @@ setup(name='briefkasten',
     entry_points="""
         [paste.app_factory]
         main = briefkasten:main
+        [pytest11]
+        briefkasten = briefkasten.testing
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),

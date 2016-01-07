@@ -79,8 +79,7 @@ def setup_smtp_factory(**settings):
     return CustomSMTP(host=settings.get('mail.host', 'localhost'), port=settings.get('mail.port', 25))
 
 
-def main(global_config, **settings):
-    """ Configure and create the main application. """
+def configure(global_config, **settings):
     config = Configurator(settings=settings, locale_negotiator=german_locale)
     config.add_translation_dirs('briefkasten:locale')
     app_route = settings.get('appserver_root_url', '/')
@@ -92,7 +91,13 @@ def main(global_config, **settings):
     config.add_route('dropbox_editor', '%sdropbox/{drop_id}/{editor_token}' % app_route, factory=dropbox_editor_factory)
     config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
     config.add_route('dropbox_form', app_route)
-    config.scan()
+    config.scan(ignore=['.testing'])
     config.registry.settings['smtp'] = setup_smtp_factory(**settings)
     dropbox_container.init(config.registry.settings)
-    return config.make_wsgi_app()
+    config.commit()
+    return config
+
+
+def main(global_config, **settings):
+    """ Configure and create the main application. """
+    return configure(global_config, **settings).make_wsgi_app()
