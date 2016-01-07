@@ -8,8 +8,9 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, listdir
-from os.path import exists, join, splitext
+from os import mkdir, chmod, listdir, environ
+from os.path import exists, isfile, join, splitext, basename
+from subprocess import call
 from pyramid.settings import asbool, aslist
 from random import SystemRandom
 
@@ -106,7 +107,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
                 attach = MIMEBase('application', 'octet-stream')
                 attach.set_payload(str(gpg_context.encrypt_file(fp, to, always_trust=True)))
 
-            attach.add_header('Content-Disposition', 'attachment', filename='%s.pgp' % attachment)
+            attach.add_header('Content-Disposition', 'attachment', filename=basename('%s.pgp' % attachment) )
             msg.attach(attach)
 
         # TODO: need to catch exception?
@@ -215,10 +216,24 @@ class Dropbox(object):
                 output=join(self.fs_path, 'backup.tar.gpg')
             )
 
+        # TODO: do the actual processing, erdgeist!
+        if self.num_attachments > 0:
+            fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
+            fs_config = join(self.settings['fs_bin_path'],
+                'briefkasten%s.conf' % ('_test' if testing else ''))
+            shellenv = environ.copy()
+            shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
+
+            process_status = call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
+                env=shellenv)
+
+            if process_status != 0:
+                import pdb; pdb.set_trace(  )
+
         attachments_cleaned = []
         cleaned = join(self.fs_path, 'clean')
         if exists(cleaned):
-            attachments_cleaned = [f for f in listdir(cleaned) if isfile(join(cleaned, f))]
+            attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
 
         sendMultiPart(
             self.settings['smtp'],
@@ -230,7 +245,6 @@ class Dropbox(object):
             attachments_cleaned
         )
 
-        # TODO: do the actual processing, erdgeist!
         return self.status
 
     def add_reply(self, reply):
