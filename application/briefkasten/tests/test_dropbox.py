@@ -4,19 +4,26 @@ import os
 import stat
 from os.path import dirname, exists, join
 from tempfile import mkdtemp
+from .dropbox import generate_post_token, generate_drop_id
 
 from pytest import fixture, raises
 
 
-#
-# tempfile store tests
-#
+@fixture
+def post_token():
+    return generate_post_token(secret=u't0ps3cr3t')
+
+
+@fixture
+def drop_id():
+    return generate_drop_id()
 
 
 @fixture(scope='function')
 def dropbox_container(request):
     from briefkasten.dropbox import DropboxContainer
-    dropbox_container = DropboxContainer(dict(fs_dropbox_root=mkdtemp(),
+    dropbox_container = DropboxContainer(dict(
+        fs_dropbox_root=mkdtemp(),
         fs_bin_path=join(dirname(__file__), 'bin')
     ))
     request.addfinalizer(dropbox_container.destroy)
@@ -42,8 +49,8 @@ def test_dropbox_is_created_if_it_does_not_exist():
 
 
 @fixture
-def dropbox_without_attachment(dropbox_container):
-    return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
+def dropbox_without_attachment(dropbox_container, drop_id):
+    return dropbox_container.add_dropbox(drop_id, message=u'Schönen guten Tag!')
 
 
 @fixture
@@ -97,7 +104,8 @@ def test_dropbox_status_submitted(dropbox):
 
 
 def test_dropbox_process_failure(dropbox):
-    import pdb; pdb.set_trace()
+    # TODO
+    pass
 
 
 def test_dropbox_retrieval(dropbox_container):
