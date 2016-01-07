@@ -2,9 +2,10 @@
 import hashlib
 import os
 import stat
+from cgi import FieldStorage
 from os.path import dirname, exists, join
 from tempfile import mkdtemp
-from .dropbox import generate_post_token, generate_drop_id
+from briefkasten.dropbox import generate_post_token, generate_drop_id
 
 from pytest import fixture, raises
 
@@ -54,24 +55,28 @@ def dropbox_without_attachment(dropbox_container, drop_id):
 
 
 @fixture
-def dropbox(dropbox_container):
+def attachment():
+    attachment = FieldStorage()
+    attachment.filename = u'attachment.txt'
+    attachment.file = open(join(dirname(__file__), 'attachment.txt'), 'r')
+    return attachment
+
+
+@fixture
+def dropbox(dropbox_container, drop_id, attachment):
     open(join(dirname(__file__), 'attachment.txt'), 'r')
     return dropbox_container.add_dropbox(
+        drop_id,
         message=u'Schönen guten Tag!',
-        attachments=[
-            dict(
-                filename=u'attachment.txt',
-                fp=open(join(dirname(__file__), 'attachment.txt'), 'r')
-            )
-        ])
+        attachments=[attachment],
+    )
 
 
 def test_dropbox_status_no_message(dropbox_container):
     dropbox = dropbox_container.add_dropbox(
         drop_id=u'foo',
-        force_create=True
     )
-    assert dropbox.status == u'001 initialised'
+    assert dropbox.status == u'010 created'
 
 
 def test_dropbox_status_no_file(dropbox):

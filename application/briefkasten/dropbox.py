@@ -123,9 +123,9 @@ class Dropbox(object):
 
     def __init__(self, container, drop_id, message=None, attachments=None):
         """
-        the attachments are expected to conform to what the deform library serializes for a file widget,
-        namely a dictionary containing:
-            - a file handle under the key `fp`
+        the attachments are expected to conform to what the webob library uses for file uploads,
+        namely an instance of `cgi.FieldStorage` with the following attributes:
+            - a file handle under the key `file`
             - the name of the file under `filename`
         """
         self.drop_id = drop_id
