@@ -37,4 +37,3 @@ def mocked_process_call():
     with patch('briefkasten.dropbox.call') as mocked_call:
         mocked_call.return_value = 0
         yield mocked_call
-

@@ -78,6 +78,7 @@ def setup_smtp_factory(**settings):
     """ expects a dictionary with 'mail.' keys to create an appropriate smtplib.SMTP instance"""
     return CustomSMTP(host=settings.get('mail.host', 'localhost'), port=settings.get('mail.port', 25))
 
+
 def main(global_config, **settings):
     """ Configure and create the main application. """
     config = Configurator(settings=settings, locale_negotiator=german_locale)
