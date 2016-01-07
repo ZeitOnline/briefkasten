@@ -214,6 +214,11 @@ class Dropbox(object):
                 output=join(self.fs_path, 'backup.tar.gpg')
             )
 
+        attachments_cleaned = []
+        cleaned = join(self.fs_path, 'clean')
+        if exists(cleaned):
+            attachments_cleaned = [f for f in listdir(cleaned) if isfile(join(cleaned, f))]
+
         sendMultiPart(
             self.settings['smtp'],
             gpg_context,
@@ -221,9 +226,8 @@ class Dropbox(object):
             editors,
             u'Drop %s' % self.drop_id,
             join(self.fs_path, 'message'),
-            []
+            attachments_cleaned
         )
-
 
         # TODO: do the actual processing, erdgeist!
         return self.status
