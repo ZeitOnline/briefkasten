@@ -53,12 +53,12 @@ exerr () { echo "ERROR: $*" >&2 ; exit 1; }
 exnerr() { printf "%s %s\n" $1 $2 > "${the_dropdir}"/status; exit 1; }
 
 # this is the usage string in case of error
-usage="process-attachments.sh [-d dropdir] [-f config]"
+usage="process-attachments.sh [-d dropdir] [-c config]"
 
 # parse commands
-while getopts :d:f: arg; do case ${arg} in
+while getopts :d:c: arg; do case ${arg} in
   d) the_dropdir="${OPTARG}";;
-  f) the_config="${OPTARG}";;
+  c) the_config="${OPTARG}";;
   ?) exerr $usage;;
 esac; done; shift $(( ${OPTIND} - 1 ))
 
