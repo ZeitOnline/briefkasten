@@ -17,7 +17,18 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        'briefkasten': [
+            'templates/*.*',
+            'tests/*.*',
+            'tests/gpghome/*.*',
+        ],
+    },
     zip_safe=False,
+    setup_requires=[
+        'setuptools-git >= 0',
+        'setuptools-git-version'
+    ],
     install_requires=[
         'Pyramid<1.7',
         'pyramid_chameleon',
