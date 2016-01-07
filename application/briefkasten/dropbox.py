@@ -205,7 +205,8 @@ class Dropbox(object):
             file_out = BIO()
             with tarfile.open(mode = 'w|', fileobj = file_out) as tar:
                 tar.add(join(self.fs_path, 'message'))
-                tar.add(join(self.fs_path, 'attach'))
+                if exists(join(self.fs_path, 'attach')):
+                    tar.add(join(self.fs_path, 'attach'))
             gpg_context.encrypt(
                 file_out.getvalue(),
                 backup_recipients,
