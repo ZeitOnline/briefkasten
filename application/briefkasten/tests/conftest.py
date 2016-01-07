@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
-from mock import patch
-from pytest import fixture, yield_fixture
+from mock import Mock
+from pytest import fixture
 from tempfile import mkdtemp
 from webtest import TestApp
 
@@ -9,17 +9,32 @@ from webtest import TestApp
 from briefkasten import main
 
 
-#
-# functional tests with an isolated, temporary dropbox
-#
 @fixture
-def app(request):
-    fs_dropbox_root = mkdtemp()
-    return main(
-        {},
+def smtp():
+    return Mock()
+
+
+@fixture
+def settings(smtp):
+    settings = dict(
+        smtp=smtp,
+        fs_pgp_pubkeys=join(dirname(__file__), 'gpghome'),
+        editors=['editor@briefkasten.dtfh.de'],
+        admins=['admin@briefkasten.dtfh.de'],
         appserver_root_url='/briefkasten/',
-        fs_dropbox_root=fs_dropbox_root,
-        fs_bin_path=join(dirname(__file__), 'bin'))
+        fs_dropbox_root=mkdtemp(),
+        fs_bin_path=join(dirname(__file__), 'bin')
+    )
+    settings['mail.default_sender'] = 'noreply@briefkasten.dtfh.de'
+    return settings
+
+
+@fixture
+def app(request, settings):
+    return main(
+        dict(),
+        **settings
+    )
 
 
 @fixture
@@ -30,10 +45,3 @@ def browser(app, request):
     extra_environ = dict(HTTP_HOST='example.com')
     browser = TestApp(app, extra_environ=extra_environ)
     return browser
-
-
-@yield_fixture(autouse=True)
-def mocked_process_call():
-    with patch('briefkasten.dropbox.call') as mocked_call:
-        mocked_call.return_value = 0
-        yield mocked_call
