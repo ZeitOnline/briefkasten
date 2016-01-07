@@ -81,6 +81,7 @@ def setup_smtp_factory(**settings):
 
 def configure(global_config, **settings):
     config = Configurator(settings=settings, locale_negotiator=german_locale)
+    config.begin()
     config.add_translation_dirs('briefkasten:locale')
     app_route = settings.get('appserver_root_url', '/')
     config.add_static_view('%sstatic' % app_route, 'briefkasten:static')
