@@ -18,7 +18,7 @@ setup(name='briefkasten',
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Pyramid<1.6',
+        'Pyramid<1.7',
         'pyramid_chameleon',
         'diazo',
         'itsdangerous',
