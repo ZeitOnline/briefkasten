@@ -15,17 +15,13 @@ from briefkasten import main
 @fixture
 def app(request):
     fs_dropbox_root = mkdtemp()
-    return main({},
+    return main(
+        {},
         appserver_root_url='/briefkasten/',
         fs_dropbox_root=fs_dropbox_root,
         fs_bin_path=join(dirname(__file__), 'bin'))
 
 
-#
-# webtest based browser tests
-#
-# testbrowser based browser tests
-#
 @fixture
 def browser(app, request):
     """ Returns an instance of `webtest.TestApp`.  The `user` pytest marker

@@ -17,7 +17,7 @@ attachments_max_len = 10
 
 
 class Attachment(colander.MappingSchema):
-    filename = colander.SchemaNode( colander.String())
+    filename = colander.SchemaNode(colander.String())
 
 
 class FileUpload(colander.MappingSchema):
@@ -74,10 +74,12 @@ def dropbox_fileupload(dropbox, request):
     attachment = request.POST['attachment']
     attached = dropbox.add_attachment(attachment)
     print('added attachment for at %s' % dropbox.fs_path)
-    return dict(files=[dict(
-      name=attached,
-        type=attachment.type,
-    )])
+    return dict(
+        files=[dict(
+            name=attached,
+            type=attachment.type,
+        )]
+    )
 
 
 @view_config(
@@ -91,9 +93,9 @@ def dropbox_submission(dropbox, request):
         print(exc)
         # at this point the dropbox already exists,
         # TODO: how to handle form errors in this case
-        import pdb; pdb.set_trace(  )
     # recognize submissions from the watchdog:
-    is_test_submission = is_equal(request.registry.settings.get('test_submission_secret', ''),
+    is_test_submission = is_equal(
+        request.registry.settings.get('test_submission_secret', ''),
         data.pop('testing_secret', ''))
     # a non-js client might have uploaded attachments via the form fileupload field:
     if data['attachments'] is not None:
@@ -101,7 +103,8 @@ def dropbox_submission(dropbox, request):
             dropbox.add_attachment(attachment)
 
     drop_url = request.route_url('dropbox_view', drop_id=dropbox.drop_id)
-    editor_url = request.route_url('dropbox_editor',
+    editor_url = request.route_url(
+        'dropbox_editor',
         drop_id=dropbox.drop_id,
         editor_token=dropbox.editor_token)
     # prepare the notification email text (we render it for process.sh, because... Python :-)
@@ -118,11 +121,13 @@ def dropbox_submission(dropbox, request):
     return HTTPFound(location=drop_url)
 
 
-@view_config(route_name="dropbox_view",
+@view_config(
+    route_name="dropbox_view",
     renderer='briefkasten:templates/feedback.pt')
 def dropbox_submitted(dropbox, request):
     appstruct = defaults(request)
-    appstruct.update(title='%s - %s' % (title, dropbox.status),
+    appstruct.update(
+        title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
         status_code=dropbox.status[0],
         status=dropbox.status,
@@ -131,18 +136,21 @@ def dropbox_submitted(dropbox, request):
 
 
 class DropboxReplySchema(colander.MappingSchema):
-    reply = colander.SchemaNode(colander.String(),
+    reply = colander.SchemaNode(
+        colander.String(),
         widget=deform.widget.TextAreaWidget(rows=10, cols=60),)
     author = colander.SchemaNode(colander.String())
 dropboxreply_schema = DropboxReplySchema()
 
 
-@view_config(route_name="dropbox_editor",
+@view_config(
+    route_name="dropbox_editor",
     request_method='GET',
     renderer='briefkasten:templates/editor_reply.pt')
 def dropbox_editor_view(dropbox, request):
     appstruct = defaults(request)
-    appstruct.update(title='%s - %s' % (title, dropbox.status),
+    appstruct.update(
+        title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
         status=dropbox.status,
         replies=dropbox.replies,
@@ -151,25 +159,30 @@ def dropbox_editor_view(dropbox, request):
     return appstruct
 
 
-@view_config(route_name="dropbox_editor",
+@view_config(
+    route_name="dropbox_editor",
     request_method='POST',
     renderer='briefkasten:templates/editor_reply.pt')
 def dropbox_reply_submitted(dropbox, request):
     appstruct = defaults(request)
     try:
-        data = deform.Form(dropboxreply_schema,
+        data = deform.Form(
+            dropboxreply_schema,
             buttons=('submit',)).validate(request.POST.items())
         dropbox.add_reply(data)
-        appstruct.update(title=u'%s – Reply sent.' % title,
+        appstruct.update(
+            title=u'%s – Reply sent.' % title,
             message=u'Reply sent',
             form=None)
     except deform.ValidationFailure, exception:
-        appstruct.update(message=None,
+        appstruct.update(
+            message=None,
             form=exception.render())
     return appstruct
 
 
-@view_config(route_name='fingerprint',
+@view_config(
+    route_name='fingerprint',
     request_method='GET',
     renderer='briefkasten:templates/fingerprint.pt')
 def fingerprint(request):

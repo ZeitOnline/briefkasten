@@ -77,7 +77,7 @@ class DropboxContainer(object):
 
 def checkRecipient(gpg_context, r):
     uid = '<' + r + '>'
-    valid_keys = [ k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-' ]
+    valid_keys = [k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-']
     return bool(valid_keys)
 
 
@@ -106,7 +106,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
                 attach = MIMEBase('application', 'octet-stream')
                 attach.set_payload(str(gpg_context.encrypt_file(fp, to, always_trust=True)))
 
-            attach.add_header('Content-Disposition', 'attachment', filename=attachment+'.pgp')
+            attach.add_header('Content-Disposition', 'attachment', filename='%s.pgp' % attachment)
             msg.attach(attach)
 
         # TODO: need to catch exception?
@@ -116,6 +116,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
         sent += 1
 
     return sent
+
 
 class Dropbox(object):
 
@@ -176,7 +177,7 @@ class Dropbox(object):
         sanitized = sanitize_filename(attachment.filename)
         fs_attachment_path = join(fs_attachment_container, sanitized)
         with open(fs_attachment_path, 'w') as fs_attachment:
-            shutil.copyfileobj(attachment.file , fs_attachment)
+            shutil.copyfileobj(attachment.file, fs_attachment)
         fs_attachment.close()
         chmod(fs_attachment_path, 0660)
         self.paths_created.append(fs_attachment_path)
@@ -192,7 +193,7 @@ class Dropbox(object):
         admins = aslist(self.settings['admins'])
 
         # create initial backup if we can't clean
-        backup_recipients = [ r for r in editors + admins if checkRecipient(gpg_context, r) ]
+        backup_recipients = [r for r in editors + admins if checkRecipient(gpg_context, r)]
 
         # this will be handled by watchdog, no need to send for each drop
         if not backup_recipients:
@@ -201,9 +202,9 @@ class Dropbox(object):
 
         self.status = u'100 processor running'
 
-        if asbool(self.settings.get('debug', False)): #  use bool helper
+        if asbool(self.settings.get('debug', False)):  # use bool helper
             file_out = BIO()
-            with tarfile.open(mode = 'w|', fileobj = file_out) as tar:
+            with tarfile.open(mode='w|', fileobj=file_out) as tar:
                 tar.add(join(self.fs_path, 'message'))
                 if exists(join(self.fs_path, 'attach')):
                     tar.add(join(self.fs_path, 'attach'))
@@ -223,7 +224,6 @@ class Dropbox(object):
             join(self.fs_path, 'message'),
             []
         )
-
 
         # TODO: do the actual processing, erdgeist!
         return self.status
