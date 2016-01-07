@@ -10,7 +10,7 @@ from webtest import TestApp
 
 settings = {
     'smtp': Mock(),
-    'fs_pgp_pubkeys': join(dirname(__file__), 'gpghome'),
+    'fs_pgp_pubkeys': join(dirname(__file__), 'tests', 'gpghome'),
     'editors': ['editor@briefkasten.dtfh.de'],
     'admins': ['admin@briefkasten.dtfh.de'],
     'appserver_root_url': '/briefkasten/',
