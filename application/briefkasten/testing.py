@@ -37,9 +37,6 @@ def app(config):
 
 @fixture
 def browser(app, request):
-    """ Returns an instance of `webtest.TestApp`.  The `user` pytest marker
-        (`pytest.mark.user`) can be used to pre-authenticate the browser
-        with the given login name: `@user('admin')`. """
     extra_environ = dict(HTTP_HOST='example.com')
     browser = TestApp(app, extra_environ=extra_environ)
     return browser
