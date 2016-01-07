@@ -49,8 +49,8 @@ def test_dropbox_is_created_if_it_does_not_exist():
 
 
 @fixture
-def dropbox_without_attachment(dropbox_container):
-    return dropbox_container.add_dropbox(message=u'Schönen guten Tag!')
+def dropbox_without_attachment(dropbox_container, drop_id):
+    return dropbox_container.add_dropbox(drop_id, message=u'Schönen guten Tag!')
 
 
 @fixture
