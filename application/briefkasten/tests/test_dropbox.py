@@ -2,18 +2,9 @@
 import hashlib
 import os
 import stat
-from cgi import FieldStorage
 from os.path import dirname, exists, join
 
-from pytest import fixture, raises, xfail
-
-
-@fixture(scope='function')
-def dropbox_container(request, config):
-    from briefkasten.dropbox import DropboxContainer
-    dropbox_container = DropboxContainer(config.registry.settings)
-    request.addfinalizer(dropbox_container.destroy)
-    return dropbox_container
+from pytest import raises, xfail
 
 
 def test_dropbox_is_created_if_it_does_not_exist():
@@ -32,35 +23,6 @@ def test_dropbox_is_created_if_it_does_not_exist():
     assert exists(dropbox_root)
     # clean up after ourselves
     rmtree(dropbox_root)
-
-
-@fixture
-def dropbox_without_attachment(dropbox_container, drop_id):
-    return dropbox_container.add_dropbox(drop_id, message=u'Schönen guten Tag!')
-
-
-def attachment_factory(**kwargs):
-    a = FieldStorage()
-    for key, value in kwargs.items():
-        setattr(a, key, value)
-    return a
-
-
-@fixture
-def attachment():
-    return attachment_factory(
-        filename=u'attachment.txt',
-        file=open(join(dirname(__file__), 'attachment.txt'), 'r')
-    )
-
-
-@fixture
-def dropbox(dropbox_container, drop_id, attachment):
-    return dropbox_container.add_dropbox(
-        drop_id,
-        message=u'Schönen guten Tag!',
-        attachments=[attachment],
-    )
 
 
 def test_dropbox_status_no_message(dropbox_container):
@@ -126,8 +88,8 @@ def test_editor_token_created(dropbox_container, dropbox):
     assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0660
 
 
-def test_attachment_creation_and_permissions(dropbox_container, drop_id):
-    attachment = attachment_factory(**{
+def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing):
+    attachment = testing.attachment_factory(**{
         'file': open(os.path.join(os.path.dirname(__file__), 'attachment.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
@@ -145,8 +107,8 @@ def test_attachment_creation_and_permissions(dropbox_container, drop_id):
     assert open(dropbox.paths_created[-1]).read().decode('utf-8') == u'Schönen Guten Tag!'  # contents of attachment.txt
 
 
-def test_attachment_creation_outside_container(dropbox_container, drop_id):
-    attachment = attachment_factory(**{
+def test_attachment_creation_outside_container(dropbox_container, drop_id, testing):
+    attachment = testing.attachment_factory(**{
         'file': open(os.path.join(os.path.dirname(__file__), 'attachment.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
@@ -166,8 +128,8 @@ def md5sum(f):
     return md5.digest()
 
 
-def test_attachment_is_image(dropbox_container, drop_id):
-    attachment = attachment_factory(**{
+def test_attachment_is_image(dropbox_container, drop_id, testing):
+    attachment = testing.attachment_factory(**{
         'file': open(os.path.join(os.path.dirname(__file__), 'attachment.png'), 'rb'),
         'mimetype': 'image/jpeg',
         'uid': 'foobar',
@@ -182,8 +144,8 @@ def test_attachment_is_image(dropbox_container, drop_id):
     assert md5sum(open(dropbox.paths_created[-1], 'rb')) == md5sum(attachment.file)
 
 
-def test_attachment_is_unicode(dropbox_container, drop_id):
-    attachment = attachment_factory(**{
+def test_attachment_is_unicode(dropbox_container, drop_id, testing):
+    attachment = testing.attachment_factory(**{
         'file': open(os.path.join(os.path.dirname(__file__), 'unicode.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',

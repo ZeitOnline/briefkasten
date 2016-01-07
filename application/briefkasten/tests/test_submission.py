@@ -26,7 +26,7 @@ def form(browser):
     from briefkasten import views
     # patch the default number of attachments, since the browser cannot execute javascript
     views.attachments_min_len = 3
-    return browser.get('/briefkasten/submit').forms[0]
+    return browser.get('/briefkasten/').forms[0]
 
 
 def test_submission_with_one_attachment_post(form):

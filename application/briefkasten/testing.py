@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cgi import FieldStorage
 from os.path import dirname, join
 from mock import Mock
 from pyramid.testing import DummyRequest, setUp, tearDown
@@ -17,6 +18,7 @@ settings = {
     'fs_dropbox_root': mkdtemp(),
     'fs_bin_path': join(dirname(__file__), 'bin'),
     'mail.default_sender': 'noreply@briefkasten.dtfh.de',
+    'post_secret': u's3cr3t',
 }
 
 
@@ -56,3 +58,10 @@ def testing():
 
 def route_url(name, **kwargs):
     return unquote(DummyRequest().route_url(name, **kwargs))
+
+
+def attachment_factory(**kwargs):
+    a = FieldStorage()
+    for key, value in kwargs.items():
+        setattr(a, key, value)
+    return a
