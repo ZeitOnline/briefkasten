@@ -81,7 +81,7 @@ def checkRecipient(gpg_context, r):
     return bool(valid_keys)
 
 
-def sendMultiPart(smtp, gpg_context, sender, recipients, subject, attachments):
+def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachments):
     """ a helper method that composes and sends an email with attachments
     requires a pre-configured smtplib.SMTP instance"""
     sent = 0
@@ -96,8 +96,8 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, attachments):
         msg['Subject'] = subject
         msg.preamble = u'This is an email in encrypted multipart format.'
 
-        with open(attachments[0], 'r') as message:
-            attach = MIMEText(str(gpg_context.encrypt_file(message, to, always_trust=True)))
+        with open(text, 'r') as text_message:
+            attach = MIMEText(str(gpg_context.encrypt_file(text_message, to, always_trust=True)))
             attach.set_charset('UTF-8')
             msg.attach(attach)
 
@@ -220,7 +220,8 @@ class Dropbox(object):
             self.settings['mail.default_sender'],
             editors,
             u'Drop %s' % self.drop_id,
-            [join(self.fs_path, 'message')]
+            join(self.fs_path, 'message'),
+            []
         )
 
 
