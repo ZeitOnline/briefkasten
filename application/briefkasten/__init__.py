@@ -93,7 +93,9 @@ def configure(global_config, **settings):
     config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
     config.add_route('dropbox_form', app_route)
     config.scan(ignore=['.testing'])
-    config.registry.settings['smtp'] = setup_smtp_factory(**settings)
+    # set smtp instance defensively, to not overwrite mocked version from test settings:
+    if 'smtp' not in config.registry.settings:
+        config.registry.settings['smtp'] = setup_smtp_factory(**settings)
     dropbox_container.init(config.registry.settings)
     config.commit()
     return config
