@@ -5,16 +5,16 @@ from briefkasten.dropbox import generate_post_token, generate_drop_id
 
 
 @fixture
-def post_token(config):
+def post_token(dropbox_container, config):
     return generate_post_token(secret=config.registry.settings['post_secret'])
 
 
 @fixture
-def drop_id():
+def drop_id(dropbox_container):
     return generate_drop_id()
 
 
-@fixture(scope='function')
+@fixture(scope="function")
 def dropbox_container(request, config):
     from briefkasten.dropbox import DropboxContainer
     dropbox_container = DropboxContainer(config.registry.settings)

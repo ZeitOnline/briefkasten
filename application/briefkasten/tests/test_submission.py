@@ -10,12 +10,12 @@ def test_visit_fingerprint(browser):
     response.status == '200 OK'
 
 
-@fixture
+@fixture(scope="function")
 def submit_url(testing, post_token):
     return testing.route_url('dropbox_form_submit', token=post_token)
 
 
-@fixture
+@fixture(scope="function")
 def upload_url(testing, post_token):
     return testing.route_url('dropbox_fileupload', token=post_token)
 
