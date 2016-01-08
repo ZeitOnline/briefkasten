@@ -32,8 +32,6 @@ def form(browser):
 def test_submission_with_one_attachment_post(form):
     from briefkasten import dropbox_container
     assert len(listdir(dropbox_container.fs_path)) == 0
-    from briefkasten.views import tempstore
-    assert len(tempstore.keys()) == 0
     form.set(
         'upload',
         Upload(
@@ -44,7 +42,6 @@ def test_submission_with_one_attachment_post(form):
     form['message'] = 'Hello there'
     form.submit()
     # ensure that the temporary storage has been cleared
-    assert len(tempstore.keys()) == 0
     fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
     assert len(listdir(join(fs_dropbox, 'attach'))) == 1
     fs_attachments = join(
