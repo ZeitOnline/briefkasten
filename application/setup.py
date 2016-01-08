@@ -10,6 +10,7 @@ setup(
     long_description="",
     maintainer=u'Tom Lazar',
     maintainer_email=u'tom@tomster.org',
+    url=u'https://github.com/ZeitOnline/briefkasten',
     classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
