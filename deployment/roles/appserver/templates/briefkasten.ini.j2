@@ -18,16 +18,12 @@ fs_bin_path = {{apphome}}/middleware_scripts
 # appserver_root_url *must* end with trailing slash!
 appserver_root_url = {{ploy_approot_url}}
 test_submission_secret = {{ploy_test_submission_secret}}
-post_secret = blubberlutschlimoschmecktoll
-editors =
-    tom@tomster.org
-    erdgeist@erdgeist.org
-admins = 
-    tom@tomster.org
-    erdgeist@erdgeist.org
-mail.host = localhost
-mail.port = 25
-mail.default_sender = noreply@briefkasten
+post_secret = {{ploy_post_secret}}
+editors = {{ploy_editors}}
+admins = {{ploy_admins}}
+mail.host = {{ploy_mailhost}}
+mail.port = {{ploy_mailport}}
+mail.default_sender = {{ploy_mailsender}}
 
 [server:main]
 use = egg:pyramid#wsgiref
