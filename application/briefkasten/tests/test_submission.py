@@ -71,9 +71,8 @@ def test_submission_with_multiple_attachments(form):
     assert len(listdir(fs_attachments)) == 2
 
 
-def test_submission_generates_message_to_editors(browser):
-    browser.post('/briefkasten/submit', params=dict(message=u'Hello'))
-    from briefkasten import dropbox_container
+def test_submission_generates_message_to_editors(dropbox_container, browser, submit_url):
+    browser.post(submit_url, params=dict(message=u'Hello'))
     fs_message = join(
         dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'message')
