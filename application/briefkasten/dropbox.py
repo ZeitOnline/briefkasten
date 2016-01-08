@@ -244,7 +244,7 @@ class Dropbox(object):
             join(self.fs_path, 'message'),
             attachments_cleaned
         )
-
+        self.status = '090 success'
         return self.status
 
     def add_reply(self, reply):

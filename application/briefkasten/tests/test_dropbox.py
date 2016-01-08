@@ -50,8 +50,7 @@ def test_dropbox_status_submitted_without_attachment(dropbox_without_attachment)
     """a dropbox without an attachment won't be cleansed and will be set to 'success' directly
        after processing"""
     dropbox_without_attachment.process()
-    xfail("Needs to be implemented together with erdgeist")
-    assert dropbox_without_attachment.status == u'090 sucess'
+    assert dropbox_without_attachment.status == u'090 success'
 
 
 def test_dropbox_status_submitted(dropbox):
