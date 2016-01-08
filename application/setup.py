@@ -8,6 +8,8 @@ setup(
     version=version,
     description='a reasonably secure web application for submitting content anonymously',
     long_description="",
+    maintainer=u'Tom Lazar',
+    maintainer_email=u'tom@tomster.org',
     classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
