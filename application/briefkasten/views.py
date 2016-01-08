@@ -16,16 +16,14 @@ attachments_min_len = 1
 attachments_max_len = 10
 
 
-class Attachment(colander.MappingSchema):
-    filename = colander.SchemaNode(colander.String())
-
-
-class FileUpload(colander.MappingSchema):
-    attachment = Attachment()
-
-
-class Attachments(colander.SequenceSchema):
-    _ = Attachment()
+class _FieldStorage(colander.SchemaType):
+    def deserialize(self, node, cstruct):
+        if cstruct in (colander.null, None, ''):
+            return colander.null
+        # weak attempt at duck-typing
+        if not hasattr(cstruct, 'file'):
+            raise colander.Invalid(node, "%s is not a FieldStorage instance" % cstruct)
+        return cstruct
 
 
 class DropboxSchema(colander.MappingSchema):
@@ -33,9 +31,10 @@ class DropboxSchema(colander.MappingSchema):
         colander.String(),
         title=_(u'Anonymous submission to the editors'),
         missing=None)
-    attachments = Attachments(
-        title=_(u'Upload files'),
-        missing=None)
+    upload = colander.SchemaNode(
+        _FieldStorage(),
+        missing=None
+    )
     testing_secret = colander.SchemaNode(
         colander.String(),
         missing=u'')
@@ -98,9 +97,8 @@ def dropbox_submission(dropbox, request):
         request.registry.settings.get('test_submission_secret', ''),
         data.pop('testing_secret', ''))
     # a non-js client might have uploaded attachments via the form fileupload field:
-    if data['attachments'] is not None:
-        for attachment in data['attachments']:
-            dropbox.add_attachment(attachment)
+    if data.get('upload') is not None:
+        dropbox.add_attachment(data['upload'])
 
     drop_url = request.route_url('dropbox_view', drop_id=dropbox.drop_id)
     editor_url = request.route_url(
