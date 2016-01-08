@@ -52,7 +52,7 @@ def defaults(request):
 @view_config(
     route_name='dropbox_form',
     request_method='GET',
-    renderer='briefkasten:templates/dropbox_submission.pt')
+    renderer='briefkasten:templates/dropbox_form.pt')
 def dropbox_form(request):
     """ generates a dropbox uid and renders the submission form with a signed version of that id"""
     from .dropbox import generate_post_token
