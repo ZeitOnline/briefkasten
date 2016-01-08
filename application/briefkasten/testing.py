@@ -9,14 +9,18 @@ from urllib import unquote
 from webtest import TestApp
 
 
+def asset_path(*parts):
+    return abspath(join(dirname(__file__), 'tests', *parts))
+
+
 settings = {
     'smtp': Mock(),
-    'fs_pgp_pubkeys': join(dirname(__file__), 'tests', 'gpghome'),
+    'fs_pgp_pubkeys': asset_path('gpghome'),
     'editors': ['editor@briefkasten.dtfh.de'],
     'admins': ['admin@briefkasten.dtfh.de'],
     'appserver_root_url': '/briefkasten/',
     'fs_dropbox_root': mkdtemp(),
-    'fs_bin_path': join(dirname(__file__), 'bin'),
+    'fs_bin_path': asset_path('bin'),
     'mail.default_sender': 'noreply@briefkasten.dtfh.de',
     'post_secret': u's3cr3t',
 }
@@ -65,7 +69,3 @@ def attachment_factory(**kwargs):
     for key, value in kwargs.items():
         setattr(a, key, value)
     return a
-
-
-def asset_path(*parts):
-    return abspath(join(dirname(__file__), 'tests', *parts))

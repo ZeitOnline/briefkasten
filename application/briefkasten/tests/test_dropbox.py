@@ -4,7 +4,7 @@ import os
 import stat
 from os.path import dirname, exists, join
 
-from pytest import raises, xfail
+from pytest import raises
 
 
 def test_dropbox_is_created_if_it_does_not_exist():
@@ -54,9 +54,11 @@ def test_dropbox_status_submitted_without_attachment(dropbox_without_attachment)
 
 
 def test_dropbox_status_submitted(dropbox):
-    """once a dropbox has initiated its processing, its status changes to 'quarantined'"""
+    """once a dropbox has initiated its processing, its status changes to 'quarantined',
+    however, in our test setup this always succeeds immediately.
+    """
     dropbox.process()
-    assert dropbox.status == u'100 processor running'
+    assert dropbox.status == u'090 success'
 
 
 def test_dropbox_process_failure(dropbox):

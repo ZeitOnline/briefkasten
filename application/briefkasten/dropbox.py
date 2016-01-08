@@ -106,8 +106,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
             with open(attachment, 'rb') as fp:
                 attach = MIMEBase('application', 'octet-stream')
                 attach.set_payload(str(gpg_context.encrypt_file(fp, to, always_trust=True)))
-
-            attach.add_header('Content-Disposition', 'attachment', filename=basename('%s.pgp' % attachment) )
+            attach.add_header('Content-Disposition', 'attachment', filename=basename('%s.pgp' % attachment))
             msg.attach(attach)
 
         # TODO: need to catch exception?
@@ -216,19 +215,14 @@ class Dropbox(object):
                 output=join(self.fs_path, 'backup.tar.gpg')
             )
 
-        # TODO: do the actual processing, erdgeist!
         if self.num_attachments > 0:
             fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
             fs_config = join(self.settings['fs_bin_path'],
                 'briefkasten%s.conf' % ('_test' if testing else ''))
             shellenv = environ.copy()
             shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
-
-            process_status = call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
+            call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
                 env=shellenv)
-
-            if process_status != 0:
-                import pdb; pdb.set_trace(  )
 
         attachments_cleaned = []
         cleaned = join(self.fs_path, 'clean')
