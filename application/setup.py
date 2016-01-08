@@ -33,7 +33,6 @@ setup(
         'Pyramid<1.7',
         'pyramid_chameleon',
         'colander',
-        'deform',
         'diazo',
         'itsdangerous',
         'python-gnupg',

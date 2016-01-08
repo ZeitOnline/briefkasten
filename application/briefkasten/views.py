@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pkg_resources
 import colander
-import deform
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render
@@ -72,7 +71,6 @@ def dropbox_fileupload(dropbox, request):
     """ accepts a single file upload and adds it to the dropbox as attachment"""
     attachment = request.POST['attachment']
     attached = dropbox.add_attachment(attachment)
-    print('added attachment for at %s' % dropbox.fs_path)
     return dict(
         files=[dict(
             name=attached,
@@ -88,15 +86,13 @@ def dropbox_submission(dropbox, request):
     """ handles the form submission, redirects to the dropbox's status page."""
     try:
         data = DropboxSchema().deserialize(request.POST)
-    except Exception as exc:
-        print(exc)
-        # at this point the dropbox already exists,
-        # TODO: how to handle form errors in this case
+    except Exception:
+        return HTTPFound(location=request.route_url('dropbox_form'))
     # recognize submissions from the watchdog:
     is_test_submission = is_equal(
         request.registry.settings.get('test_submission_secret', ''),
         data.pop('testing_secret', ''))
-    # a non-js client might have uploaded attachments via the form fileupload field:
+    # a non-js client might have uploaded an attachment via the form's fileupload field:
     if data.get('upload') is not None:
         dropbox.add_attachment(data['upload'])
 
@@ -105,7 +101,7 @@ def dropbox_submission(dropbox, request):
         'dropbox_editor',
         drop_id=dropbox.drop_id,
         editor_token=dropbox.editor_token)
-    # prepare the notification email text (we render it for process.sh, because... Python :-)
+    # prepare the notification email text
     notification_text = render(
         'briefkasten:templates/editor_email.pt',
         dict(
@@ -116,6 +112,7 @@ def dropbox_submission(dropbox, request):
     dropbox.update_message(notification_text)
     # now we can call the process method
     dropbox.process(testing=is_test_submission)
+    print("Created dropbox %s / %s" % (drop_url, editor_url))
     return HTTPFound(location=drop_url)
 
 
@@ -134,9 +131,7 @@ def dropbox_submitted(dropbox, request):
 
 
 class DropboxReplySchema(colander.MappingSchema):
-    reply = colander.SchemaNode(
-        colander.String(),
-        widget=deform.widget.TextAreaWidget(rows=10, cols=60),)
+    reply = colander.SchemaNode(colander.String())
     author = colander.SchemaNode(colander.String())
 dropboxreply_schema = DropboxReplySchema()
 
@@ -153,7 +148,8 @@ def dropbox_editor_view(dropbox, request):
         status=dropbox.status,
         replies=dropbox.replies,
         message=None,
-        form=deform.Form(dropboxreply_schema, buttons=('submit',)).render())
+        action=request.url,
+    )
     return appstruct
 
 
@@ -162,21 +158,18 @@ def dropbox_editor_view(dropbox, request):
     request_method='POST',
     renderer='briefkasten:templates/editor_reply.pt')
 def dropbox_reply_submitted(dropbox, request):
-    appstruct = defaults(request)
     try:
-        data = deform.Form(
-            dropboxreply_schema,
-            buttons=('submit',)).validate(request.POST.items())
-        dropbox.add_reply(data)
+        data = DropboxReplySchema().deserialize(request.POST)
+    except Exception:
+        appstruct = defaults(request)
         appstruct.update(
-            title=u'%s – Reply sent.' % title,
-            message=u'Reply sent',
-            form=None)
-    except deform.ValidationFailure, exception:
-        appstruct.update(
-            message=None,
-            form=exception.render())
-    return appstruct
+            title='%s - %s' % (title, dropbox.status),
+            action=request.url,
+            message=u'Alle Felder müssen ausgefüllt werden.',
+        )
+        return appstruct
+    dropbox.add_reply(data)
+    return HTTPFound(location=request.route_url('dropbox_view', drop_id=dropbox.drop_id))
 
 
 @view_config(
