@@ -27,11 +27,8 @@ def test_successful_submission(browser, submit_url):
 
 
 @fixture
-def form(browser):
-    from briefkasten import views
-    # patch the default number of attachments, since the browser cannot execute javascript
-    views.attachments_min_len = 3
-    return browser.get('/briefkasten/').forms[0]
+def form(testing, browser):
+    return browser.get(testing.route_url('dropbox_form')).forms[0]
 
 
 def test_submission_with_one_attachment_post(testing, dropbox_container, form):

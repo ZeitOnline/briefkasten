@@ -1,22 +1,31 @@
 # -*- coding: utf-8 -*-
+from pytest import fixture
 from briefkasten import dropbox_container
 
 
-def test_incorrect_token_raises_not_found(browser, dropbox):
-    response = browser.get('/briefkasten/%s/xxxx' % dropbox.drop_id, status=404)
+def test_incorrect_token_raises_not_found(testing, browser, dropbox):
+    response = browser.get(testing.route_url('dropbox_editor', drop_id=dropbox.drop_id, editor_token='xxx'), status=404)
     assert response.status == '404 Not Found'
 
 
-def test_correct_token(browser, dropbox):
-    response = browser.get('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token))
+@fixture
+def editor_url(testing, dropbox):
+    return testing.route_url('dropbox_editor', drop_id=dropbox.drop_id, editor_token=dropbox.editor_token)
+
+
+def test_correct_token(testing, browser, editor_url):
+    response = browser.get(editor_url)
     assert response.status == '200 OK'
 
 
-def test_editor_posts_reply(browser, dropbox):
+@fixture
+def form(testing, browser, editor_url):
+    return browser.get(editor_url).forms[0]
+
+
+def test_editor_posts_reply(form, dropbox):
     reply = u'How do you do?'
     author = u'John Doe'
-    page = browser.get('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token))
-    form = page.forms['deform']
     form['reply'] = reply
     form['author'] = author
     form.submit()
@@ -26,6 +35,6 @@ def test_editor_posts_reply(browser, dropbox):
     assert refetched_dropbox.replies[0]['author'] == author
 
 
-def test_editor_posts_empty_reply(browser, dropbox):
-    browser.get('/briefkasten/%s/%s' % (dropbox.drop_id, dropbox.editor_token)).forms[0].submit()
+def test_editor_posts_empty_reply(browser, dropbox, editor_url):
+    browser.get(editor_url).forms[0].submit()
     assert dropbox.replies == []
