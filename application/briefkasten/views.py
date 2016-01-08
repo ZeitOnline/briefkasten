@@ -69,7 +69,7 @@ def dropbox_form(request):
     renderer='json',
     request_method='POST')
 def dropbox_fileupload(dropbox, request):
-    """ accepts a list of files and adds them to the dropbox as attachments"""
+    """ accepts a single file upload and adds it to the dropbox as attachment"""
     attachment = request.POST['attachment']
     attached = dropbox.add_attachment(attachment)
     print('added attachment for at %s' % dropbox.fs_path)

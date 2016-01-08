@@ -15,6 +15,11 @@ def submit_url(testing, post_token):
     return testing.route_url('dropbox_form_submit', token=post_token)
 
 
+@fixture
+def upload_url(testing, post_token):
+    return testing.route_url('dropbox_fileupload', token=post_token)
+
+
 def test_successful_submission(browser, submit_url):
     response = browser.post(submit_url, params=dict(message=u'hey'))
     assert response.status == '302 Found'
@@ -29,19 +34,18 @@ def form(browser):
     return browser.get('/briefkasten/').forms[0]
 
 
-def test_submission_with_one_attachment_post(form):
-    from briefkasten import dropbox_container
+def test_submission_with_one_attachment_post(testing, dropbox_container, form):
+    fs_attachment = testing.asset_path('attachment.txt')
     assert len(listdir(dropbox_container.fs_path)) == 0
     form.set(
         'upload',
         Upload(
             'attachment.txt',
-            open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
+            open(fs_attachment, 'r').read(),
             'text/plain'),
         index=0)
     form['message'] = 'Hello there'
     form.submit()
-    # ensure that the temporary storage has been cleared
     fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
     assert len(listdir(join(fs_dropbox, 'attach'))) == 1
     fs_attachments = join(
@@ -49,11 +53,33 @@ def test_submission_with_one_attachment_post(form):
         listdir(dropbox_container.fs_path)[0], 'attach')
     fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
     assert open(fs_attachment).read().decode('utf-8') == \
-        open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')
+        open(fs_attachment, 'r').read().decode('utf-8')
 
 
-def test_submission_with_multiple_attachments(form):
-    from briefkasten import dropbox_container
+def test_upload_attachment_directly(testing, dropbox_container, browser, upload_url, submit_url):
+    """clients can also upload files directly, i.e. w/o submitting the form.
+    files uploaded like this will be stored in the dropbox."""
+    fs_attachment = testing.asset_path('attachment.txt')
+    browser.post(
+        upload_url,
+        params=dict(
+            attachment=Upload(
+                'attachment.txt',
+                open(fs_attachment, 'r').read(),
+                'text/plain'),
+        ),
+    )
+    fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
+    assert len(listdir(join(fs_dropbox, 'attach'))) == 1
+    fs_attachments = join(
+        dropbox_container.fs_path,
+        listdir(dropbox_container.fs_path)[0], 'attach')
+    fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
+    assert open(fs_attachment).read().decode('utf-8') == \
+        open(fs_attachment, 'r').read().decode('utf-8')
+
+
+def test_submission_with_multiple_attachments(dropbox_container, form):
     form.set(
         'upload',
         Upload(
@@ -61,14 +87,12 @@ def test_submission_with_multiple_attachments(form):
             open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
             'text/plain'),
         index=0)
-    # we skip the second upload field simply to cover that edge case while we're at it...
-    form.set('upload', Upload('attachment.png', open(join(dirname(__file__), 'attachment.png'), 'r').read(), 'image/png'), index=2)
     form['message'] = 'Hello there'
     form.submit()
     fs_attachments = join(
         dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'attach')
-    assert len(listdir(fs_attachments)) == 2
+    assert len(listdir(fs_attachments)) == 1
 
 
 def test_submission_generates_message_to_editors(dropbox_container, browser, submit_url):

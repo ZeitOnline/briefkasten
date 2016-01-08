@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cgi import FieldStorage
-from os.path import dirname, join
+from os.path import abspath, dirname, join
 from mock import Mock
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pytest import fixture
@@ -65,3 +65,7 @@ def attachment_factory(**kwargs):
     for key, value in kwargs.items():
         setattr(a, key, value)
     return a
+
+
+def asset_path(*parts):
+    return abspath(join(dirname(__file__), 'tests', *parts))
