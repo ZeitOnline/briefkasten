@@ -8,7 +8,7 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, listdir, environ
+from os import mkdir, chmod, listdir, environ, remove
 from os.path import exists, isfile, join, splitext, basename
 from subprocess import call
 from pyramid.settings import asbool, aslist
@@ -110,6 +110,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
             msg.attach(attach)
 
         # TODO: need to catch exception?
+        # yes :-) we need to adjust the status accordingly (>500 so it will be destroyed)
         smtp.begin()
         smtp.sendmail(sender, to, msg.as_string())
         smtp.quit()
@@ -229,16 +230,19 @@ class Dropbox(object):
         if exists(cleaned):
             attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
 
-        sendMultiPart(
-            self.settings['smtp'],
-            gpg_context,
-            self.settings['mail.default_sender'],
-            editors,
-            u'Drop %s' % self.drop_id,
-            join(self.fs_path, 'message'),
-            attachments_cleaned
-        )
-        self.status = '090 success'
+        try:
+            sendMultiPart(
+                self.settings['smtp'],
+                gpg_context,
+                self.settings['mail.default_sender'],
+                editors,
+                u'Drop %s' % self.drop_id,
+                join(self.fs_path, 'message'),
+                attachments_cleaned
+            )
+            self.status = '090 success'
+        except:
+            self.status = '510 smtp error'
         return self.status
 
     def add_reply(self, reply):
@@ -301,12 +305,12 @@ class Dropbox(object):
     def sanitize(self):
         """ removes all unencrypted user input """
         shutil.rmtree(join(self.fs_path, u'attach'))
-        os.remove(join(self.fs_path, u'message'))
-        os.remove(join(self.fs_path, u'backup.tar.pgp'))
+        remove(join(self.fs_path, u'message'))
+        remove(join(self.fs_path, u'backup.tar.pgp'))
 
     def wipe(self):
         """ removes all data except the status file"""
         self.sanitize()
         shutil.rmtree(join(self.fs_path, u'clean'))
-        os.remove(join(self.fs_path, u'backup.tar.pgp'))
+        remove(join(self.fs_path, u'backup.tar.pgp'))
         pass
