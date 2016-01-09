@@ -110,6 +110,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
             msg.attach(attach)
 
         # TODO: need to catch exception?
+        # yes :-) we need to adjust the status accordingly (>500 so it will be destroyed)
         smtp.begin()
         smtp.sendmail(sender, to, msg.as_string())
         smtp.quit()
@@ -229,16 +230,19 @@ class Dropbox(object):
         if exists(cleaned):
             attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
 
-        sendMultiPart(
-            self.settings['smtp'],
-            gpg_context,
-            self.settings['mail.default_sender'],
-            editors,
-            u'Drop %s' % self.drop_id,
-            join(self.fs_path, 'message'),
-            attachments_cleaned
-        )
-        self.status = '090 success'
+        try:
+            sendMultiPart(
+                self.settings['smtp'],
+                gpg_context,
+                self.settings['mail.default_sender'],
+                editors,
+                u'Drop %s' % self.drop_id,
+                join(self.fs_path, 'message'),
+                attachments_cleaned
+            )
+            self.status = '090 success'
+        except:
+            self.status = '510 smtp error'
         return self.status
 
     def add_reply(self, reply):
