@@ -212,7 +212,7 @@ class Dropbox(object):
                 file_out.getvalue(),
                 backup_recipients,
                 always_trust=True,
-                output=join(self.fs_path, 'backup.tar.gpg')
+                output=join(self.fs_path, 'backup.tar.pgp')
             )
 
         if self.num_attachments > 0:
@@ -300,8 +300,13 @@ class Dropbox(object):
 
     def sanitize(self):
         """ removes all unencrypted user input """
+        shutil.rmtree(join(self.fs_path, u'attach'))
+        os.remove(join(self.fs_path, u'message'))
+        os.remove(join(self.fs_path, u'backup.tar.pgp'))
 
     def wipe(self):
         """ removes all data except the status file"""
-        # TODO: erdgeist :)
+        self.sanitize()
+        shutil.rmtree(join(self.fs_path, u'clean'))
+        os.remove(join(self.fs_path, u'backup.tar.pgp'))
         pass
