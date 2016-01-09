@@ -64,9 +64,9 @@ def german_locale(request):
 class CustomSMTP(SMTP):
 
     def __init__(self, *args, **kwargs):
-        self.host     = kwargs.pop('host', 'localhost')
-        self.port     = kwargs.pop('port', 25)
-        self.user     = kwargs.pop('user', '')
+        self.host = kwargs.pop('host', 'localhost')
+        self.port = kwargs.pop('port', 25)
+        self.user = kwargs.pop('user', '')
         self.password = kwargs.pop('password', '')
         SMTP.__init__(self, *args, **kwargs)
 
