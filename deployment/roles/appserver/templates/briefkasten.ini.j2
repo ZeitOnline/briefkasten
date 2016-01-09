@@ -21,9 +21,11 @@ test_submission_secret = {{ploy_test_submission_secret}}
 post_secret = {{ploy_post_secret}}
 editors = {{ploy_editors}}
 admins = {{ploy_admins}}
-mail.host = {{ploy_mailhost}}
-mail.port = {{ploy_mailport}}
-mail.default_sender = {{ploy_mailsender}}
+mail.host = {{ploy_mail_host}}
+mail.port = {{ploy_mail_port}}
+mail.user = {{ploy_mail_user}}
+mail.password = {{ploy_mail_password}}
+mail.default_sender = {{ploy_mail_sender}}
 
 [server:main]
 use = egg:pyramid#wsgiref

@@ -2,6 +2,6 @@
 appuser: pyramid
 ploy_approot_url: /
 ploy_theme_name: default
-ploy_mailsender: noreply@briefkasten
-ploy_mailhost: localhost
-ploy_mailport: 25
+ploy_mail_sender: noreply@briefkasten
+ploy_mail_host: localhost
+ploy_mail_port: 25
