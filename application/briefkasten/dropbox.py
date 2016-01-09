@@ -304,13 +304,18 @@ class Dropbox(object):
 
     def sanitize(self):
         """ removes all unencrypted user input """
-        shutil.rmtree(join(self.fs_path, u'attach'))
-        remove(join(self.fs_path, u'message'))
-        remove(join(self.fs_path, u'backup.tar.pgp'))
+        shutil.rmtree(join(self.fs_path, u'attach'), ignore_errors=True)
+        try:
+            remove(join(self.fs_path, u'message'))
+            remove(join(self.fs_path, u'backup.tar.pgp'))
+        except OSError:
+            pass
 
     def wipe(self):
         """ removes all data except the status file"""
         self.sanitize()
-        shutil.rmtree(join(self.fs_path, u'clean'))
-        remove(join(self.fs_path, u'backup.tar.pgp'))
-        pass
+        shutil.rmtree(join(self.fs_path, u'clean'), ignore_errors=True)
+        try:
+            remove(join(self.fs_path, u'backup.tar.pgp'))
+        except OSError:
+            pass
