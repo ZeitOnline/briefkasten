@@ -39,15 +39,17 @@ def upload_theme():
 def upload_pgp_keys():
     """ upload and/or update the PGP keys for editors, import them into PGP"""
     # TODO: use env vars instead:
-    appuser = 'pyramid'
-    apphome = '/usr/local/briefkasten'
+    get_vars()
+    upload_target = '/tmp/pgp_pubkeys.tmp'
     with fab.settings(fab.hide('running')):
+        fab.run('rm -rf %s' % upload_target)
+        fab.run('mkdir %s' % upload_target)
         local_key_path = path.join(fab.env['config_base'], fab.env.instance.config['local_pgpkey_path'])
-        remote_key_path = '%s/var/pgp_pubkeys/' % apphome
-        rsync('-av', local_key_path, '{host_string}:%s' % remote_key_path)
-        fab.run('chown -R %s %s' % (appuser, remote_key_path))
+        remote_key_path = '{apphome}/var/pgp_pubkeys/'.format(**AV)
+        rsync('-av', local_key_path, '{host_string}:%s' % upload_target)
+        fab.run('chown -R %s %s' % (AV['appuser'], remote_key_path))
+        fab.run('chmod 700 %s' % remote_key_path)
         with fab.shell_env(GNUPGHOME=remote_key_path):
-            fab.sudo('''gpg --import %s/*.gpg''' % remote_key_path,
-                user=appuser, shell_escape=False)
-
-
+            fab.sudo('''gpg --import %s/*.pgp''' % upload_target,
+                user=AV['appuser'], shell_escape=False)
+        fab.run('rm -rf %s' % upload_target)
