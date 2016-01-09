@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# PROVIDE: jdispatch
+# REQUIRE: jaildaemon ezjail
+
+. /etc/rc.subr
+
+name="jdispatch"
+start_cmd="${name}_start"
+stop_cmd=":"
+
+jdispatch_start()
+{
+    /usr/local/bin/jdispatch.sh
+}
+
+load_rc_config $name
+run_rc_command "$1"
