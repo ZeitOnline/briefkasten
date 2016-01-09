@@ -8,7 +8,7 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, listdir, environ
+from os import mkdir, chmod, listdir, environ, remove
 from os.path import exists, isfile, join, splitext, basename
 from subprocess import call
 from pyramid.settings import asbool, aslist
@@ -301,12 +301,12 @@ class Dropbox(object):
     def sanitize(self):
         """ removes all unencrypted user input """
         shutil.rmtree(join(self.fs_path, u'attach'))
-        os.remove(join(self.fs_path, u'message'))
-        os.remove(join(self.fs_path, u'backup.tar.pgp'))
+        remove(join(self.fs_path, u'message'))
+        remove(join(self.fs_path, u'backup.tar.pgp'))
 
     def wipe(self):
         """ removes all data except the status file"""
         self.sanitize()
         shutil.rmtree(join(self.fs_path, u'clean'))
-        os.remove(join(self.fs_path, u'backup.tar.pgp'))
+        remove(join(self.fs_path, u'backup.tar.pgp'))
         pass
