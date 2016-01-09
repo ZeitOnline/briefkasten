@@ -138,4 +138,19 @@
         mode: "0644"
       with_sequence: start=1 end="{{ploy_cleanser_count}}" format="%02d"
       tags: cleanser_clones
-
+    - name: install jdispatcher rc script
+      copy:
+        src: files/jdispatch.rc
+        dest: /usr/local/etc/rc.d/jdispatch
+        mode: "0755"
+        owner: root
+        group: wheel
+      tags:
+      - jdispatch
+    - name: make sure jdispatch tool is running and enabled
+      service:
+        name: jdispatch
+        state: running
+        enabled: true
+      tags:
+      - jdispatch
