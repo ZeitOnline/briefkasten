@@ -231,7 +231,7 @@ class Dropbox(object):
             attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
 
         try:
-            sendMultiPart(
+            sent = sendMultiPart(
                 self.settings['smtp'],
                 gpg_context,
                 self.settings['mail.default_sender'],
@@ -240,7 +240,10 @@ class Dropbox(object):
                 join(self.fs_path, 'message'),
                 attachments_cleaned
             )
-            self.status = '090 success'
+            if sent > 0:
+                self.status = '090 success'
+            else:
+                self.status = '505 smtp failure'
         except:
             self.status = '510 smtp error'
         return self.status
