@@ -64,14 +64,18 @@ def german_locale(request):
 class CustomSMTP(SMTP):
 
     def __init__(self, *args, **kwargs):
-        self.host = kwargs.pop('host', 'localhost')
-        self.port = kwargs.pop('port', 25)
+        self.host     = kwargs.pop('host', 'localhost')
+        self.port     = kwargs.pop('port', 25)
+        self.user     = kwargs.pop('user', '')
+        self.password = kwargs.pop('password', '')
         SMTP.__init__(self, *args, **kwargs)
 
     def begin(self):
         """ connects and optionally authenticates a connection."""
         self.connect(self.host, self.port)
-        # TODO: add auth and ssl support
+        if self.user:
+            self.starttls()
+            self.login(self.user, self.password)
 
 
 def setup_smtp_factory(**settings):
