@@ -94,8 +94,8 @@ EOF
     # 1) worker dir does not exist (then we need to initially create one)
     # 2) worker dir mutex is older than timeout
     # 3) worker dir done token is set
-    [ -e "${worker_dir}/taken" ] && birthtime=$( /usr/bin/stat -f %B "${worker_dir}/taken" ) || birthtime=${timeout}
-    if [ ! -d "${worker_dir}" -o -e "${worker_dir}/done" -o "${birthtime}" -lt "${timeout}" ]; then
+    [ -e "${worker_dir}/token/taken" ] && birthtime=$( /usr/bin/stat -f %B "${worker_dir}/token/taken" ) || birthtime=${timeout}
+    if [ ! -d "${worker_dir}" -o -e "${worker_dir}/token/done" -o "${birthtime}" -lt "${timeout}" ]; then
 
       # to avoid interferences with stale claim/release scripts remove them
       /bin/rm -rf "${worker_dir}/release" "${worker_dir}/claim" "${worker_dir}/ip"
@@ -115,8 +115,8 @@ EOF
     /bin/mkdir -p "${worker_dir}" || continue
 
     # Copy claim and release scripts into worker dir
-    printf "#!/bin/sh\n\n/usr/bin/touch %s/done\n/bin/pkill -HUP -f %s\n" ${worker_suffix} ${the_proctitle} > "${worker_dir}/release"
-    printf "#!/bin/sh\n\n/usr/bin/mktemp %s 2> /dev/null >/dev/null\nexit \$?\n" "${worker_suffix}/taken" > "${worker_dir}/claim"
+    printf "#!/bin/sh\n\n/usr/bin/touch %s/token/done\n/bin/pkill -HUP -f %s\n" ${worker_suffix} ${the_proctitle} > "${worker_dir}/release"
+    printf "#!/bin/sh\n\n/usr/bin/mktemp %s 2> /dev/null >/dev/null\nexit \$?\n" "${worker_suffix}/token/taken" > "${worker_dir}/claim"
     /bin/chmod 0755 "${worker_dir}/claim" "${worker_dir}/release"
 
     # Dump the jail's IP address so the master jail knows whom to talk to
@@ -124,7 +124,9 @@ EOF
     printf "%s\n" "${worker_ipport##*=}" > "${worker_dir}/ip"
 
     # Finally remove all tokens, jail is available, again
-    [ "${cleanup}" ] && /bin/rm -rf "${worker_dir}"/done "${worker_dir}"/taken
+    [ "${cleanup}" ] && /bin/rm -rf "${worker_dir}"/token/
+
+    mkdir -m 01777 -p "${worker_dir}"/token/
   done
 
   # Finally insert probe into master jail to allow triggering the reaper
