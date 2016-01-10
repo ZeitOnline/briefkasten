@@ -6,6 +6,7 @@ from cStringIO import StringIO as BIO
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.Utils import formatdate
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
 from os import mkdir, chmod, listdir, environ, remove
@@ -95,6 +96,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
         msg['From'] = sender
         msg['To'] = to
         msg['Subject'] = subject
+        msg["Date"] = formatdate(localtime=True)
         msg.preamble = u'This is an email in encrypted multipart format.'
 
         with open(text, 'r') as text_message:
