@@ -50,6 +50,14 @@
     owner: "{{appuser}}"
     mode: "770"
 
+- name: install middleware scripts
+  copy:
+    dest: "{{apphome}}/middleware_scripts/"
+    src: "../../../../application/middleware_scripts/process-attachments.sh"
+    owner: "{{appuser}}"
+    mode: "770"
+  tags: mw
+
 - name: configure the cleanser script (testing and production)
   template:
     src: briefkasten.conf.j2
