@@ -54,7 +54,7 @@ main () {
   # Create dispatch directory, if it does not exist
   /bin/mkdir -p "${the_dispatchdir}" || exerr "Error: Can not create dispatch directory ${the_dispatchdir}."
   if [ ! -f "${the_dispatchdir}/claim" ]; then
-    printf "#!/bin/sh\nall_workers=\$( /bin/ls %s/*/claim | sort -R )\n" "${the_dispatchdir_suffix}" > "${the_dispatchdir}/claim"
+    printf "#!/bin/sh\nall_workers=\$( /usr/bin/find %s -name claim | sort -R )\n" "${the_dispatchdir_suffix}" > "${the_dispatchdir}/claim"
     cat <<- 'EOF' >> "${the_dispatchdir}/claim"
       for worker in ${all_workers}; do
         [ -x "${worker}" ] && /bin/sh "${worker}" && echo $( dirname "${worker}" ) && exit 0
