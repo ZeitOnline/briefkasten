@@ -248,6 +248,8 @@ class Dropbox(object):
                 self.status = '505 smtp failure'
         except:
             self.status = '510 smtp error'
+
+        self.cleanup()
         return self.status
 
     def add_reply(self, reply):
@@ -304,8 +306,13 @@ class Dropbox(object):
     def status(self, state):
         with open(join(self.fs_path, u'status'), 'w') as status_file:
             status_file.write(state)
+
+    def cleanup(self):
+        """ ensures that no data leaks from drop after processing """
         if self.status_int >= 500:
             self.wipe()
+        else:
+            self.sanitize()
 
     def sanitize(self):
         """ removes all unencrypted user input """
