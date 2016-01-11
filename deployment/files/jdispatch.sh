@@ -135,7 +135,7 @@ EOF
 
   jail_name=$( printf ${the_master_jail} | /usr/bin/tr -c '[:alnum:]' _ )
   /bin/pgrep -f ${the_proctitle} > /dev/null 2>/dev/null
-  [ $? -eq 1 ] && /usr/local/bin/jaildaemon -c "${the_dispatch_script}" -j ${jail_name} -r -t ${the_proctitle}
+  [ $? -eq 1 ] && /usr/local/bin/jaildaemon -u 1001 -c "${the_dispatch_script}" -j ${jail_name} -r -t ${the_proctitle}
 
   /bin/rm -r "${the_dispatch_lock}"
 }
