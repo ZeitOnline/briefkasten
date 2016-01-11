@@ -205,7 +205,7 @@ class Dropbox(object):
 
         self.status = u'100 processor running'
 
-        if asbool(self.settings.get('debug', False)):  # use bool helper
+        if asbool(self.settings.get('debug', False)):
             file_out = BIO()
             with tarfile.open(mode='w|', fileobj=file_out) as tar:
                 tar.add(join(self.fs_path, 'message'))
@@ -218,6 +218,7 @@ class Dropbox(object):
                 output=join(self.fs_path, 'backup.tar.pgp')
             )
 
+        # process attachments
         if self.num_attachments > 0:
             fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
             fs_config = join(
