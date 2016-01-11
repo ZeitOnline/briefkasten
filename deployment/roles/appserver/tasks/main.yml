@@ -132,7 +132,7 @@
 - name: enable supervisord at startup time
   service:
     name: supervisord
-    enabled: true 
+    enabled: true
 
 - name: upload frontend theme
   synchronize:
