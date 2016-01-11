@@ -23,7 +23,7 @@ editors = {{ploy_editors}}
 admins = {{ploy_admins}}
 mail.host = {{ploy_mail_host}}
 mail.port = {{ploy_mail_port}}
-{% if mail.password %}
+{% if mail_password is defined %}
 mail.user = {{ploy_mail_user}}
 mail.password = {{ploy_mail_password}}
 {% endif %}
