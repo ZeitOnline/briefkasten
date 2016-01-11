@@ -225,13 +225,6 @@ In all cases except `900` the attachments will have been deleted from the fileys
 Further Documentation
 *********************
 
-Roadmap
--------
-
-While the original releases were geared towards an instance of the briefkasten application hosted by `ZEIT ONLINE <https://ssl.zeit.de/briefkasten/submit>`_ further development is planned to make the application useful 'out of the box'. In particular:
-
- * provide fully functional deployment scripts that create a 'best practice' installation from scratch, including web server, SSL setup, installation of all dependencies etc.
-
 
 TODO
 ====
