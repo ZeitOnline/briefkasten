@@ -15,6 +15,7 @@
   # this creates /home/pyramid/.ssh/id_rsa{.pub}
   user:
     name: "{{appuser}}"
+    uid: "{{appuserid}}"
     createhome: yes
     generate_ssh_key: yes
 
