@@ -206,7 +206,7 @@ If the submission was successful (the process script returns `0` as exit code) t
 
 Once submitted, the cleanser performs basic sanity checking. If that fails for whatever reason it will set the status to `500 cleanser init failure`. Since it's basically being able to accept the attachments it will delete the attachment itself (TODO: confirm with @erdgeist)
 
-If the process script determines that the cleansing setup is intact (whether locally or via one or more cleanser jails) it will set the status to `100 accepted`.
+If the process script determines that the cleansing setup is intact (whether locally or via one or more cleanser jails) it will set the status to `100 processing`.
 The submission still resides in plaintext inside the application jail.
 
 The process will now initiate the cleansing, either locally or by submitting it to a cleanser jail. Either way, once the submission is sucessful, the status will change to `200 quarantined`, and the submission is (finally) no longer readable inside the application jail.
