@@ -177,6 +177,12 @@ Finally::
 
 After restarting the application, the new translations will be active.
 
+For more details check these links:
+
+ * `pyramid.i18n <http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/i18n.html>`_
+ * `Chameleon <http://chameleon.repoze.org/docs/latest/i18n.html>`_
+ * `Babel <http://babel.edgewall.org/wiki/Documentation/0.9/index.html>`_ 
+
 
 The life cycle of a submission
 ******************************
@@ -218,12 +224,6 @@ In all cases except `900` the attachments will have been deleted from the fileys
 
 Further Documentation
 *********************
-
-For more details check these links:
-
- * `pyramid.i18n <http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/i18n.html>`_
- * `Chameleon <http://chameleon.repoze.org/docs/latest/i18n.html>`_
- * `Babel <http://babel.edgewall.org/wiki/Documentation/0.9/index.html>`_ 
 
 Roadmap
 -------
