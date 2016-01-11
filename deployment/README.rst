@@ -48,7 +48,7 @@ Create your own configuration directory inside::
 
 Create a copy from the provided example::
 
-  $ cp etc.sample/ploy.conf etc/
+  $ cp etc.sample/plain.conf etc/
 
 If you want to use VirtualBox to try out the installation on a local virtual machine, you can copy ``etc.sample/vbox.conf`` instead, which contains a ready-to-use setup. 
 
