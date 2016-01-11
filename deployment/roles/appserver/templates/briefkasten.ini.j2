@@ -23,10 +23,11 @@ editors = {{ploy_editors}}
 admins = {{ploy_admins}}
 mail.host = {{ploy_mail_host}}
 mail.port = {{ploy_mail_port}}
+{% if mail.password %}
 mail.user = {{ploy_mail_user}}
 mail.password = {{ploy_mail_password}}
+{% endif %}
 mail.default_sender = {{ploy_mail_sender}}
-
 [server:main]
 use = egg:pyramid#wsgiref
 host = 0.0.0.0
