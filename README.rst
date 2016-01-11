@@ -231,3 +231,12 @@ Roadmap
 While the original releases were geared towards an instance of the briefkasten application hosted by `ZEIT ONLINE <https://ssl.zeit.de/briefkasten/submit>`_ further development is planned to make the application useful 'out of the box'. In particular:
 
  * provide fully functional deployment scripts that create a 'best practice' installation from scratch, including web server, SSL setup, installation of all dependencies etc.
+
+
+TODO
+====
+
+- fix claim mechanism
+- investigate 'heisenbug'
+- update docs re: `source bin/activate`
+- ensure appserver is running after config changes
