@@ -134,6 +134,9 @@ class Dropbox(object):
         self.container = container
         self.paths_created = []
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
+        self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
+        self.editors = aslist(self.settings['editors'])
+        self.admins = aslist(self.settings['admins'])
 
         if not exists(fs_dropbox_path):
             mkdir(fs_dropbox_path)
@@ -186,24 +189,13 @@ class Dropbox(object):
         self.paths_created.append(fs_attachment_path)
         return sanitized
 
-    def process(self, purge_meta_data=True, testing=False):
-        """ Calls the external cleanser scripts to (optionally) purge the meta data and then
-            send the contents of the dropbox via email.
-        """
-        self.status = u'020 submitted'
-        gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
-        editors = aslist(self.settings['editors'])
-        admins = aslist(self.settings['admins'])
-
-        # create initial backup if we can't clean
-        backup_recipients = [r for r in editors + admins if checkRecipient(gpg_context, r)]
+    def _create_backup(self):
+        backup_recipients = [r for r in self.editors + self.admins if checkRecipient(self.gpg_context, r)]
 
         # this will be handled by watchdog, no need to send for each drop
         if not backup_recipients:
             self.status = u'500 no valid keys at all'
             return self.status
-
-        self.status = u'100 processor running'
 
         if asbool(self.settings.get('debug', False)):
             file_out = BIO()
@@ -211,12 +203,23 @@ class Dropbox(object):
                 tar.add(join(self.fs_path, 'message'))
                 if exists(join(self.fs_path, 'attach')):
                     tar.add(join(self.fs_path, 'attach'))
-            gpg_context.encrypt(
+            self.gpg_context.encrypt(
                 file_out.getvalue(),
                 backup_recipients,
                 always_trust=True,
                 output=join(self.fs_path, 'backup.tar.pgp')
             )
+
+    def process(self, purge_meta_data=True, testing=False):
+        """ Calls the external cleanser scripts to (optionally) purge the meta data and then
+            send the contents of the dropbox via email.
+        """
+        self.status = u'020 submitted'
+
+        # create initial backup in case we can't clean
+        self._create_backup()
+
+        self.status = u'100 processor running'
 
         # process attachments
         if self.num_attachments > 0:
@@ -239,9 +242,9 @@ class Dropbox(object):
         try:
             sent = sendMultiPart(
                 self.settings['smtp'],
-                gpg_context,
+                self.gpg_context,
                 self.settings['mail.default_sender'],
-                editors,
+                self.editors,
                 u'Drop %s' % self.drop_id,
                 join(self.fs_path, 'message'),
                 attachments_cleaned
