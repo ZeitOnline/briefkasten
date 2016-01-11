@@ -43,14 +43,6 @@ def test_submission_with_one_attachment_post(testing, dropbox_container, form):
         index=0)
     form['message'] = 'Hello there'
     form.submit()
-    fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
-    assert len(listdir(join(fs_dropbox, 'attach'))) == 1
-    fs_attachments = join(
-        dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'attach')
-    fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
-    assert open(fs_attachment).read().decode('utf-8') == \
-        open(fs_attachment, 'r').read().decode('utf-8')
 
 
 def test_upload_attachment_directly(testing, dropbox_container, browser, upload_url, submit_url):
@@ -86,20 +78,3 @@ def test_submission_with_multiple_attachments(dropbox_container, form):
         index=0)
     form['message'] = 'Hello there'
     form.submit()
-    fs_attachments = join(
-        dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'attach')
-    assert len(listdir(fs_attachments)) == 1
-
-
-def test_submission_generates_message_to_editors(dropbox_container, browser, submit_url):
-    browser.post(submit_url, params=dict(message=u'Hello'))
-    fs_message = join(
-        dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'message')
-    created_message = open(fs_message).read().decode('utf-8')
-    assert u'Hello' in created_message
-    editor_token = open(join(
-        dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'editor_token')).read().decode('utf-8')
-    assert editor_token in created_message
