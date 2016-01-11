@@ -150,7 +150,7 @@
     - name: make sure jdispatch tool is running and enabled
       service:
         name: jdispatch
-        state: running
+        state: started
         enabled: true
       tags:
       - jdispatch
