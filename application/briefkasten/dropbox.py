@@ -220,11 +220,14 @@ class Dropbox(object):
 
         if self.num_attachments > 0:
             fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
-            fs_config = join(self.settings['fs_bin_path'],
+            fs_config = join(
+                self.settings['fs_bin_path'],
                 'briefkasten%s.conf' % ('_test' if testing else ''))
             shellenv = environ.copy()
             shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
-            call("%s -d %s -c %s" % (fs_process, self.fs_path, fs_config), shell=True,
+            call(
+                "%s -d %s -c %s" % (fs_process, self.fs_path, fs_config),
+                shell=True,
                 env=shellenv)
 
         attachments_cleaned = []
