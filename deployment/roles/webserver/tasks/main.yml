@@ -16,11 +16,14 @@
   copy:
     src: "{{ cert_location }}"
     dest: /usr/local/etc/nginx/briefkasten.crt
+  notify: restart nginx
 
 - name: upload ssl key
   copy:
     src: "{{ key_location }}"
     dest: /usr/local/etc/nginx/briefkasten.key
+  notify: restart nginx
+
 
 - name: make sure nginx is running or reloaded
   service:

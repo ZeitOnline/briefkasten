@@ -5,6 +5,10 @@
   service: name=sshd state=restarted
 - name: restart pf
   service: name=pf state=restarted
+- name: restart nginx
+  service: name=nginx state=restarted
+- name: reload nginx
+  service: name=nginx state=reloaded
 - name: restart supervisord
   service: name=supervisord state=restarted
 - name: restart application
