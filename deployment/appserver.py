@@ -105,10 +105,12 @@ def login_devpi(index='dev', user=None):
     if user is None:
         user = fab.env['user']
     publish_devpi = AV.get('ploy_default_publish_devpi')
-    fab.local('bin/devpi use {base_url}/briefkasten/{index}'.format(
-        index=index,
-        base_url=publish_devpi,
-    ))
-    fab.local('bin/devpi login {user}'.format(user=user))
-
-
+    login = fab.local(
+        'bin/devpi use {base_url}/briefkasten/{index}'.format(
+            index=index,
+            base_url=publish_devpi,
+        ),
+        capture=True
+    )
+    if not login.splitlines()[0].endswith('(logged in as {user})'.format(user=user)):
+        fab.local('bin/devpi login {user}'.format(user=user))
