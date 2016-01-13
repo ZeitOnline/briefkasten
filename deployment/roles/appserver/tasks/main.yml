@@ -57,7 +57,7 @@
     src: "../../../../application/middleware_scripts/process-attachments.sh"
     owner: "{{appuser}}"
     mode: "770"
-  tags: mw
+  tags: update-middleware
 
 - name: configure the cleanser script (testing and production)
   template:
@@ -68,6 +68,7 @@
   with_items:
     - { the_editors: "{{ploy_editors}}", the_admins: "{{ploy_admins}}", dest: briefkasten.conf }
     - { the_editors: "{{watchdog_imap_recipient}}", the_admins: "{{watchdog_imap_recipient}}", dest: briefkasten_test.conf }
+  tags: update-middleware
 
 - name: ssh config for the the cleanser script
   template:
