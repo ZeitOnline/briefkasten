@@ -75,7 +75,7 @@ def briefkasten_ctl(action='restart'):
 
 
 @task
-def update_backend(index='dev', build=False, user='briefkasten', version=None):
+def update_backend(index='dev', build=False, user=None, version=None):
     """
     Install the backend from the given devpi index at the given version on the target host and restart the service.
 
@@ -88,7 +88,7 @@ def update_backend(index='dev', build=False, user='briefkasten', version=None):
     if value_asbool(build):
         upload_backend(index=index, user=user)
     with fab.cd('{apphome}'.format(**AV)):
-        command = 'bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/{user}/{index}/+simple/ briefkasten'.format(
+        command = 'bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/briefkasten/{index}/+simple/ briefkasten'.format(
             index=index,
             user=user,
             **AV)
@@ -105,7 +105,7 @@ def login_devpi(index='dev', user=None):
     if user is None:
         user = fab.env['user']
     publish_devpi = AV.get('ploy_default_publish_devpi')
-    fab.local('bin/devpi use {base_url}/briefkasten}/{index}'.format(
+    fab.local('bin/devpi use {base_url}/briefkasten/{index}'.format(
         index=index,
         base_url=publish_devpi,
     ))
