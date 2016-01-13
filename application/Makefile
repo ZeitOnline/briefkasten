@@ -10,9 +10,12 @@ bin/pserve: requirements.txt bin/pip
 	bin/pip install -r requirements.txt
 	@touch $@
 
-bin/tox bin/py.test: bin/python bin/pip setup.py bin/pserve
+bin/tox bin/py.test bin/devpi: bin/python bin/pip setup.py bin/pserve
 	bin/python setup.py dev
 	@touch $@
+
+upload: setup.py bin/py.test bin/devpi
+	PATH=${PWD}/bin:${PATH} bin/devpi upload --no-vcs
 
 bin/python bin/pip:
 	virtualenv .
@@ -21,4 +24,4 @@ bin/python bin/pip:
 clean:
 	git clean -fXd
 
-.PHONY: all $(cfgs) clean
+.PHONY: all $(cfgs) clean tests upload
