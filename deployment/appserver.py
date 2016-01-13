@@ -75,7 +75,7 @@ def briefkasten_ctl(action='restart'):
 
 
 @task
-def update_backend(index='dev', build=False, user=None, version=None):
+def update_backend(index='dev', build=True, user=None, version=None):
     """
     Install the backend from the given devpi index at the given version on the target host and restart the service.
 
