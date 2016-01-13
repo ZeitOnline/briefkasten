@@ -1,11 +1,9 @@
 from setuptools import setup, find_packages
 
-version = '0.2.0.dev4'
-
 
 setup(
     name='briefkasten',
-    version=version,
+    version_format="{tag}.{commitcount}+{gitsha}",
     description='a reasonably secure web application for submitting content anonymously',
     long_description="",
     maintainer=u'Tom Lazar',
