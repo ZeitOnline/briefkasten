@@ -25,6 +25,7 @@ def settings():
         'fs_bin_path': asset_path('bin'),
         'mail.default_sender': 'noreply@briefkasten.dtfh.de',
         'post_secret': u's3cr3t',
+        'attachment_size_threshold': '200',
     }
 
 

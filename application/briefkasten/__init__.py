@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from humanfriendly import parse_size
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound, HTTPGone
 from pyramid.i18n import TranslationStringFactory
@@ -105,6 +106,8 @@ def configure(global_config, **settings):
     # set smtp instance defensively, to not overwrite mocked version from test settings:
     if 'smtp' not in config.registry.settings:
         config.registry.settings['smtp'] = setup_smtp_factory(**settings)
+    # convert human readable size to bytes
+    config.registry.settings['attachment_size_threshold'] = parse_size(config.registry.settings['attachment_size_threshold'])
     dropbox_container.init(config.registry.settings)
     config.commit()
     return config

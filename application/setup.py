@@ -37,6 +37,7 @@ setup(
         'pyramid_chameleon',
         'colander',
         'diazo',
+        'humanfriendly',
         'itsdangerous',
         'python-gnupg',
         'repoze.xmliter',
