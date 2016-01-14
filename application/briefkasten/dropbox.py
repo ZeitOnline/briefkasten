@@ -7,9 +7,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.Utils import formatdate
+from glob import glob
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, listdir, environ, remove
+from os import mkdir, chmod, listdir, environ, remove, stat
 from os.path import exists, isfile, join, splitext, basename
 from subprocess import call
 from pyramid.settings import asbool, aslist
@@ -284,6 +285,15 @@ class Dropbox(object):
             return len(listdir(self.fs_attachment_container))
         else:
             return 0
+
+    @property
+    def size_attachments(self):
+        """returns the number of bytes that the attachments take up on disk"""
+        total_size = 0
+        if exists(self.fs_attachment_container):
+            for attachment in glob('%s/*.*' % self.fs_attachment_container):
+                total_size += stat(attachment).st_size
+        return total_size
 
     @property
     def replies(self):
