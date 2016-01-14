@@ -135,6 +135,7 @@ class Dropbox(object):
         self.container = container
         self.paths_created = []
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
+        self.fs_replies_path = join(self.fs_path, 'replies')
         self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
         self.editors = aslist(self.settings['editors'])
         self.admins = aslist(self.settings['admins'])
@@ -161,7 +162,6 @@ class Dropbox(object):
                 if attachment is None:
                     continue
                 self.add_attachment(attachment)
-        self.fs_replies_path = join(self.fs_path, 'replies')
 
     @property
     def settings(self):
@@ -181,14 +181,14 @@ class Dropbox(object):
             mkdir(fs_attachment_container)
             chmod(fs_attachment_container, 0770)
             self.paths_created.append(fs_attachment_container)
-        sanitized = sanitize_filename(attachment.filename)
-        fs_attachment_path = join(fs_attachment_container, sanitized)
+        sanitized_filename = sanitize_filename(attachment.filename)
+        fs_attachment_path = join(fs_attachment_container, sanitized_filename)
         with open(fs_attachment_path, 'w') as fs_attachment:
             shutil.copyfileobj(attachment.file, fs_attachment)
         fs_attachment.close()
         chmod(fs_attachment_path, 0660)
         self.paths_created.append(fs_attachment_path)
-        return sanitized
+        return sanitized_filename
 
     def _create_backup(self):
         backup_recipients = [r for r in self.editors + self.admins if checkRecipient(self.gpg_context, r)]
