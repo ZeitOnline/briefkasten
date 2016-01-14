@@ -229,7 +229,54 @@ Further Documentation
 TODO
 ====
 
-- fix claim mechanism
+general bugs
+------------
+
+X fix claim mechanism
+
 - investigate 'heisenbug'
+
 - update docs re: `source bin/activate`
-- ensure appserver is running after config changes
+
+x ensure appserver is running after config changes
+
+- ensure testing secret is present in themed forms
+
+
+x use private devpi with git-setuptools-version
+
+
+
+feature: refactor process workflow
+----------------------------------
+
+- break into wrapping `process` call which will catch any exceptions and set the status accordingly
+  and will also be responsible for calling cleanup
+
+- separate 'private' tasks:
+
+  - if we have attachments:
+
+    - create uncleansed, encrypted fallback copy of attachments
+
+    - clean attachments (this also encrypts them)
+
+    - archive clean attachments if cleaning was successful and size is over limit
+
+    - archive uncleaned attachments if cleaning failed
+
+    - notify editors via email
+
+      - (include cleaned attachments if cleaning was sucessful and size below limit)
+      - otherwise include link to share
+
+- cleeanup
+
+
+feature: large attachments support
+----------------------------------
+
+- calculate total size of attachments
+- add configurable threshold value (support MB/GB via humanfriendly)
+- configure cleansed/uncleansed file system paths
+- configure formatstrings to render them as shares
