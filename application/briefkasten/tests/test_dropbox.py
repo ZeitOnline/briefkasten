@@ -218,3 +218,14 @@ def test_filename_sanitizing():
 def test_filename_has_no_ending():
     from briefkasten.dropbox import sanitize_filename
     assert not sanitize_filename('blubber') == 'blubber'
+
+
+def test_drop_url(dropbox, app, testing):
+    assert dropbox.drop_url == testing.route_url('dropbox_view', drop_id=dropbox.drop_id)
+
+
+def test_editor_url(dropbox, app, testing):
+    assert dropbox.editor_url == testing.route_url(
+        'dropbox_editor',
+        drop_id=dropbox.drop_id,
+        editor_token=dropbox.editor_token)

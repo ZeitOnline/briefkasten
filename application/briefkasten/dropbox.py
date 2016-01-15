@@ -360,3 +360,13 @@ class Dropbox(object):
             self.status,
             self.fs_path,
         )
+
+    @property
+    def drop_url(self):
+        return self.settings['dropbox_view_url_format'] % self.drop_id
+
+    @property
+    def editor_url(self):
+        return self.settings['dropbox_editor_url_format'] % (
+            self.drop_id,
+            self.editor_token)

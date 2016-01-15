@@ -26,6 +26,8 @@ def settings():
         'mail.default_sender': 'noreply@briefkasten.dtfh.de',
         'post_secret': u's3cr3t',
         'attachment_size_threshold': '200',
+        'dropbox_view_url_format': 'http://example.com/briefkasten/dropbox/%s',
+        'dropbox_editor_url_format': 'http://example.com/briefkasten/dropbox/%s/%s',
     }
 
 
