@@ -24,7 +24,6 @@ def get_settings(fs_config):
     'drop_id',
     required=False,
     default=None,
-    # help=u'provide an optional drop_id to limit processing the dropbox of that id'
 )
 def main(config, drop_id=None):     # pragma: no cover
     settings = get_settings(path.abspath(config))
