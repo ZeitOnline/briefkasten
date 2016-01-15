@@ -276,7 +276,7 @@ feature: refactor process workflow
 feature: large attachments support
 ----------------------------------
 
-- calculate total size of attachments
-- add configurable threshold value (support MB/GB via humanfriendly)
+x calculate total size of attachments
+x add configurable threshold value (support MB/GB via humanfriendly)
 - configure cleansed/uncleansed file system paths
 - configure formatstrings to render them as shares
