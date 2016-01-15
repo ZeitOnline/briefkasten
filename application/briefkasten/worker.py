@@ -20,9 +20,20 @@ def get_settings(fs_config):
     '-c',
     default='development.ini',
     help='location of the configuration file')
-def main(config):     # pragma: no cover
+@click.argument(
+    'drop_id',
+    required=False,
+    default=None,
+    # help=u'provide an optional drop_id to limit processing the dropbox of that id'
+)
+def main(config, drop_id=None):     # pragma: no cover
     settings = get_settings(path.abspath(config))
     drop_root = DropboxContainer(settings=settings)
 
-    for drop in drop_root:
+    if drop_id is not None:
+        drops = [drop_root.get_dropbox(drop_id)]
+    else:
+        drops = drop_root
+
+    for drop in drops:
         print(drop)
