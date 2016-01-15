@@ -242,7 +242,6 @@ x ensure appserver is running after config changes
 
 - ensure testing secret is present in themed forms
 
-
 x use private devpi with git-setuptools-version
 
 
@@ -253,30 +252,70 @@ feature: refactor process workflow
 - break into wrapping `process` call which will catch any exceptions and set the status accordingly
   and will also be responsible for calling cleanup
 
-- separate 'private' tasks:
+- `Dropbox.process` is
+
+  - the only entry point into and encapsulates the entire cleansing process
+
+  - a long-running, synchronous call that always succeeds (to the caller)
+
+  - but catches underlying failures and updates the status of the dropbox accordingly
+
+  - always calls cleanup
+
+  - separate 'private' tasks:
 
   - if we have attachments:
 
     - create uncleansed, encrypted fallback copy of attachments
+      - failures:
+        - no valid keys
 
     - clean attachments (this also encrypts them)
+      - failures:
+        - no cleansers configured
+        - no cleansers available
+        - time-out
 
     - archive clean attachments if cleaning was successful and size is over limit
 
     - archive uncleaned attachments if cleaning failed
+      (re-uses the initially created encrypted backup before that is wiped during cleanup)
 
     - notify editors via email
 
       - (include cleaned attachments if cleaning was sucessful and size below limit)
       - otherwise include link to share
 
-- cleeanup
-
 
 feature: large attachments support
 ----------------------------------
 
-x calculate total size of attachments
-x add configurable threshold value (support MB/GB via humanfriendly)
-- configure cleansed/uncleansed file system paths
-- configure formatstrings to render them as shares
+ x calculate total size of attachments
+
+ x add configurable threshold value (support MB/GB via humanfriendly)
+
+ - configure cleansed/uncleansed file system paths
+
+ - configure formatstrings to render them as shares
+
+
+feature: asynchronous workers
+-----------------------------
+
+- separate worker process (either using celery, or a custom worker)
+
+- runs in separate jail with mapped dropbox container file system
+
+- reads identical confguration on init
+
+- watches for appearance of new dropboxes and reacts to according to their status
+
+TODOS:
+
+ - create `worker` entry point
+
+ - create supervisord config for worker
+
+ - create configuration reader (hardcode python dict for now)
+
+ - factor rendering of email text out of pyramid view into separate dropbox subtask
