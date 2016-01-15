@@ -11,7 +11,7 @@ from glob import glob
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
 from os import mkdir, chmod, listdir, environ, remove, stat
-from os.path import exists, isfile, join, splitext, basename
+from os.path import exists, isfile, isdir, join, splitext, basename
 from subprocess import call
 from pyramid.settings import asbool, aslist
 from random import SystemRandom
@@ -76,6 +76,11 @@ class DropboxContainer(object):
 
     def __contains__(self, drop_id):
         return exists(join(self.fs_path, drop_id))
+
+    def __iter__(self):
+        for candidate in listdir(self.fs_path):
+            if isdir(join(self.fs_path, candidate)):
+                yield self.get_dropbox(candidate)
 
 
 def checkRecipient(gpg_context, r):
@@ -348,3 +353,10 @@ class Dropbox(object):
             remove(join(self.fs_path, u'backup.tar.pgp'))
         except OSError:
             pass
+
+    def __repr__(self):
+        return u'Dropbox %s (%s) at %s' % (
+            self.drop_id,
+            self.status,
+            self.fs_path,
+        )

@@ -35,6 +35,7 @@ setup(
     install_requires=[
         'Pyramid<1.7',
         'pyramid_chameleon',
+        'click',
         'colander',
         'diazo',
         'humanfriendly',
@@ -70,6 +71,8 @@ setup(
         main = briefkasten:main
         [pytest11]
         briefkasten = briefkasten.testing
+        [console_scripts]
+        worker = briefkasten.worker:main
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),
