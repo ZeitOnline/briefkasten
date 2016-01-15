@@ -17,8 +17,8 @@ fs_pgp_pubkeys = {{apphome}}/var/pgp_pubkeys
 fs_bin_path = {{apphome}}/middleware_scripts
 # appserver_root_url *must* end with trailing slash!
 appserver_root_url = {{ploy_approot_url}}
-dropbox_view_url_format = http://{{fqdn}}{{ploy_approot_url}}/dropbox/%s
-dropbox_editor_url_format = http://{{fqdn}}{{ploy_approot_url}}/dropbox/%s/%s
+dropbox_view_url_format = http://{{ploy_fqdn}}{{ploy_approot_url}}/dropbox/%s
+dropbox_editor_url_format = http://{{ploy_fqdn}}{{ploy_approot_url}}/dropbox/%s/%s
 test_submission_secret = {{ploy_test_submission_secret}}
 post_secret = {{ploy_post_secret}}
 editors = {{ploy_editors}}
