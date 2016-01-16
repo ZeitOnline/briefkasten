@@ -40,6 +40,7 @@ setup(
         'diazo',
         'humanfriendly',
         'itsdangerous',
+        'jinja2',
         'python-gnupg',
         'repoze.xmliter',
         'Paste',

@@ -1,22 +1,19 @@
-<tal:block>
-Dies ist eine Nachricht des elektronischen Briefkastenservers.                       
-                                                                                      
-Die unten angefügte Nachricht wurde für Sie hinterlassen. Zum                      
-Beantworten schreiben Sie nicht an die Absenderadresse, sondern                      
-benutzen das Webformular unter der Adresse:                                          
-${reply_url}
-<tal:attachments tal:condition="num_attachments > 1">
-Die Einreichung enthielt ${num_attachments} Anhänge.
-</tal:attachments>
-<tal:attachments tal:condition="num_attachments == 1">
+Dies ist eine Nachricht des elektronischen Briefkastenservers.
+
+Die unten angefügte Nachricht wurde für Sie hinterlassen. Zum
+Beantworten schreiben Sie nicht an die Absenderadresse, sondern
+benutzen das Webformular unter der Adresse:
+
+{{dropbox.drop_url}}
+{% if num_attachments > 1 %}
+Die Einreichung enthielt {{num_attachments}} Anhänge.
+{% elif num_attachments == 1 %}
 Die Einreichung enthielt einen Anhang.
-</tal:attachments>
-<tal:attachments tal:condition="num_attachments == 0">
+{% elif num_attachments == 0 %}
 Die Einreichung enthielt keine Anhänge.
-</tal:attachments>
+{% endif %}
 
 ----
 
-${message}
+{{message}}
 
-</tal:block>

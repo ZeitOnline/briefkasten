@@ -229,3 +229,23 @@ def test_editor_url(dropbox, app, testing):
         'dropbox_editor',
         drop_id=dropbox.drop_id,
         editor_token=dropbox.editor_token)
+
+
+def test_notification_text_zero(dropbox_without_attachment):
+    assert u'Die Einreichung enthielt keine Anhänge.' in dropbox_without_attachment._notification_text
+
+
+def test_notification_text_one(dropbox):
+    assert u'Die Einreichung enthielt einen Anhang' in dropbox._notification_text
+
+
+def test_notification_text_two(dropbox, testing):
+    attachment = testing.attachment_factory(**{
+        'file': open(os.path.join(os.path.dirname(__file__), 'unicode.txt'), 'r'),
+        'mimetype': 'text/plain',
+        'uid': 'foobar',
+        'preview_url': None,
+        'filename': u'unicode.txt',
+        'size': -1})
+    dropbox.add_attachment(attachment)
+    assert u'Die Einreichung enthielt 2 Anhänge.' in dropbox._notification_text

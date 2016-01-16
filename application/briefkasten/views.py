@@ -97,19 +97,6 @@ def dropbox_submission(dropbox, request):
         dropbox.add_attachment(data['upload'])
 
     drop_url = request.route_url('dropbox_view', drop_id=dropbox.drop_id)
-    editor_url = request.route_url(
-        'dropbox_editor',
-        drop_id=dropbox.drop_id,
-        editor_token=dropbox.editor_token)
-    # prepare the notification email text
-    notification_text = render(
-        'briefkasten:templates/editor_email.pt',
-        dict(
-            reply_url=editor_url,
-            message=data['message'],
-            num_attachments=dropbox.num_attachments),
-        request)
-    dropbox.update_message(notification_text)
     # now we can call the process method
     dropbox.process(testing=is_test_submission)
     print("Created dropbox %s / %s" % (drop_url, editor_url))

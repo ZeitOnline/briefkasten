@@ -17,6 +17,9 @@ from pyramid.settings import asbool, aslist
 from random import SystemRandom
 
 
+from jinja2 import Environment, PackageLoader
+jinja_env = Environment(loader=PackageLoader('briefkasten', 'templates'))
+
 allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
 
 
@@ -282,6 +285,12 @@ class Dropbox(object):
             fs_reply.write(message.encode('utf-8'))
         chmod(fs_reply_path, 0660)
         self.paths_created.append(fs_reply_path)
+
+    @property
+    def _notification_text(self):
+        return jinja_env.get_template('editor_email.pt').render(
+            num_attachments=self.num_attachments,
+            dropbox=self)
 
     @property
     def num_attachments(self):
