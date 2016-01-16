@@ -5,11 +5,6 @@ from pytest import fixture
 from webtest import Upload
 
 
-def test_visit_fingerprint(browser):
-    response = browser.get('/briefkasten/fingerprint')
-    response.status == '200 OK'
-
-
 @fixture(scope="function")
 def submit_url(testing, post_token):
     return testing.route_url('dropbox_form_submit', token=post_token)

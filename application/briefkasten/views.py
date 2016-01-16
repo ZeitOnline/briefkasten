@@ -161,11 +161,3 @@ def dropbox_reply_submitted(dropbox, request):
         return appstruct
     dropbox.add_reply(data)
     return HTTPFound(location=request.route_url('dropbox_view', drop_id=dropbox.drop_id))
-
-
-@view_config(
-    route_name='fingerprint',
-    request_method='GET',
-    renderer='briefkasten:templates/fingerprint.pt')
-def fingerprint(request):
-    return defaults(request)
