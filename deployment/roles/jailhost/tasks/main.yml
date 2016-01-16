@@ -8,11 +8,9 @@
 
 - name: create data filesystem
   zfs:
-    name: tank/data/{{item}}
+    name: tank/data/briefkasten
     state: present
-  with_items:
-    - shared
-    - jails
+    mountpoint: /var/briefkasten
   tags:
     - zfs-layout
 

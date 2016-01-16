@@ -26,23 +26,17 @@
     owner: "{{appuser}}"
     mode: "775"
 
-- name: ensure log & var directory
+- name: ensure data directories
   file:
-    path: "{{apphome}}/{{item}}"
-    state: directory
-    owner: "{{appuser}}"
-    mode: "775"
-  with_items:
-    - log
-    - var
-    - themes
-
-- name: ensure key directory
-  file:
-    path: "{{apphome}}/var/pgp_pubkeys"
+    path: "/var/briefkasten/{{item}}"
     state: directory
     owner: "{{appuser}}"
     mode: "700"
+  with_items:
+    - log
+    - drops
+    - themes
+    - pgp_pubkeys
 
 - name: ensure middleware directory
   file:
