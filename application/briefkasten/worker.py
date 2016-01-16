@@ -1,6 +1,7 @@
 import click
 from os import path
 from .dropbox import DropboxContainer
+from .notifications import setup_smtp_factory
 
 
 def get_settings(fs_config):
@@ -33,6 +34,8 @@ def get_settings(fs_config):
 )
 def main(config, drop_id=None):     # pragma: no cover
     settings = get_settings(path.abspath(config))
+    if 'smtp' not in settings:
+        settings['smtp'] = setup_smtp_factory(**settings)
     drop_root = DropboxContainer(settings=settings)
 
     if drop_id is not None:
@@ -41,4 +44,5 @@ def main(config, drop_id=None):     # pragma: no cover
         drops = drop_root
 
     for drop in drops:
+        drop.process()
         print(drop)
