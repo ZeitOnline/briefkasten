@@ -306,7 +306,7 @@ feature: asynchronous workers
 
 - runs in separate jail with mapped dropbox container file system
 
-- reads identical confguration on init
+x reads identical confguration on init
 
 - watches for appearance of new dropboxes and reacts to according to their status
 
@@ -314,10 +314,10 @@ feature: asynchronous workers
 
 TODOS:
 
- - create `worker` entry point
+ x create `worker` entry point
 
  - create supervisord config for worker
 
- - create configuration reader (hardcode python dict for now)
+ x create configuration reader (hardcode python dict for now)
 
- - factor rendering of email text out of pyramid view into separate dropbox subtask
+ x factor rendering of email text out of pyramid view into separate dropbox subtask

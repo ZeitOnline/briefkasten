@@ -39,7 +39,6 @@ def upload_theme():
 @task
 def upload_pgp_keys():
     """ upload and/or update the PGP keys for editors, import them into PGP"""
-    # TODO: use env vars instead:
     get_vars()
     upload_target = '/tmp/pgp_pubkeys.tmp'
     with fab.settings(fab.hide('running')):
