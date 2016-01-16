@@ -1,6 +1,6 @@
 [supervisord]
 user={{appuser}}
-logfile={{apphome}}/var/supervisord.log
+logfile=/var/briefkasten/supervisord.log
 
 [program:briefkasten]
 command={{apphome}}/bin/pserve {{apphome}}/briefkasten.ini

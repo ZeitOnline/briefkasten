@@ -26,23 +26,17 @@
     owner: "{{appuser}}"
     mode: "775"
 
-- name: ensure log & var directory
+- name: ensure data directories
   file:
-    path: "{{apphome}}/{{item}}"
-    state: directory
-    owner: "{{appuser}}"
-    mode: "775"
-  with_items:
-    - log
-    - var
-    - themes
-
-- name: ensure key directory
-  file:
-    path: "{{apphome}}/var/pgp_pubkeys"
+    path: "/var/briefkasten/{{item}}"
     state: directory
     owner: "{{appuser}}"
     mode: "700"
+  with_items:
+    - log
+    - drops
+    - themes
+    - pgp_pubkeys
 
 - name: ensure middleware directory
   file:
@@ -73,7 +67,7 @@
 - name: ssh config for the the cleanser script
   template:
     src: briefkasten_ssh_config.j2
-    dest: "{{apphome}}/var/briefkasten_ssh_config"
+    dest: "/var/briefkasten/cleanser_ssh_config"
     owner: "{{appuser}}"
     mode: "600"
 

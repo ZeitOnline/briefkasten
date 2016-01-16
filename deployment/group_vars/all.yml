@@ -3,7 +3,7 @@
 ansible_python_interpreter: /usr/local/bin/python2.7
 apphome: /usr/local/briefkasten
 appuser: pyramid
-themes_dir: "/usr/local/briefkasten/themes"
+themes_dir: "/var/briefkasten/themes"
 geli_passphrase_location: /tmp/geli_passphrase
 jails_dir: /usr/jails
 zpool_name: tank

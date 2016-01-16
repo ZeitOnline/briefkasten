@@ -45,7 +45,7 @@ def upload_pgp_keys():
         fab.run('rm -rf %s' % upload_target)
         fab.run('mkdir %s' % upload_target)
         local_key_path = path.join(fab.env['config_base'], fab.env.instance.config['local_pgpkey_path'])
-        remote_key_path = '{apphome}/var/pgp_pubkeys/'.format(**AV)
+        remote_key_path = '/var/briefkasten/pgp_pubkeys/'.format(**AV)
         rsync('-av', local_key_path, '{host_string}:%s' % upload_target)
         fab.run('chown -R %s %s' % (AV['appuser'], remote_key_path))
         fab.run('chmod 700 %s' % remote_key_path)
