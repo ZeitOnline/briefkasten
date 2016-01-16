@@ -4,8 +4,8 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound, HTTPGone
 from pyramid.i18n import TranslationStringFactory
 from itsdangerous import SignatureExpired
-from dropbox import DropboxContainer
-from smtplib import SMTP
+from .dropbox import DropboxContainer
+from .notifications import setup_smtp_factory
 
 dropbox_container = DropboxContainer()
 _ = TranslationStringFactory('briefkasten')
@@ -60,33 +60,6 @@ def dropbox_editor_factory(request):
 def german_locale(request):
     """ a 'negotiator' that always returns german"""
     return 'de'
-
-
-class CustomSMTP(SMTP):
-
-    def __init__(self, *args, **kwargs):
-        self.host = kwargs.pop('host', 'localhost')
-        self.port = kwargs.pop('port', 25)
-        self.user = kwargs.pop('user', '')
-        self.password = kwargs.pop('password', '')
-        SMTP.__init__(self, *args, **kwargs)
-
-    def begin(self):
-        """ connects and optionally authenticates a connection."""
-        self.connect(self.host, self.port)
-        if self.user:
-            self.starttls()
-            self.login(self.user, self.password)
-
-
-def setup_smtp_factory(**settings):
-    """ expects a dictionary with 'mail.' keys to create an appropriate smtplib.SMTP instance"""
-    return CustomSMTP(
-        host=settings.get('mail.host', 'localhost'),
-        port=settings.get('mail.port', 25),
-        user=settings.get('mail.user'),
-        password=settings.get('mail.password'),
-    )
 
 
 def configure(global_config, **settings):

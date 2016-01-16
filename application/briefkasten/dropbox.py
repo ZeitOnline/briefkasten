@@ -3,19 +3,16 @@ import gnupg
 import shutil
 import tarfile
 from cStringIO import StringIO as BIO
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email.Utils import formatdate
 from glob import glob
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, listdir, environ, remove, stat
-from os.path import exists, isfile, isdir, join, splitext, basename
-from subprocess import call
+from os import mkdir, chmod, environ, listdir, remove, stat
+from os.path import exists, isdir, isfile, join, splitext
 from pyramid.settings import asbool, aslist
 from random import SystemRandom
+from subprocess import call
 
+from .notifications import checkRecipient, sendMultiPart
 
 from jinja2 import Environment, PackageLoader
 jinja_env = Environment(loader=PackageLoader('briefkasten', 'templates'))
@@ -84,50 +81,6 @@ class DropboxContainer(object):
         for candidate in listdir(self.fs_path):
             if isdir(join(self.fs_path, candidate)):
                 yield self.get_dropbox(candidate)
-
-
-def checkRecipient(gpg_context, r):
-    uid = '<' + r + '>'
-    valid_keys = [k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-']
-    return bool(valid_keys)
-
-
-def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachments):
-    """ a helper method that composes and sends an email with attachments
-    requires a pre-configured smtplib.SMTP instance"""
-    sent = 0
-    for to in recipients:
-        if not checkRecipient(gpg_context, to):
-            continue
-
-        msg = MIMEMultipart()
-
-        msg['From'] = sender
-        msg['To'] = to
-        msg['Subject'] = subject
-        msg["Date"] = formatdate(localtime=True)
-        msg.preamble = u'This is an email in encrypted multipart format.'
-
-        with open(text, 'r') as text_message:
-            attach = MIMEText(str(gpg_context.encrypt_file(text_message, to, always_trust=True)))
-            attach.set_charset('UTF-8')
-            msg.attach(attach)
-
-        for attachment in attachments:
-            with open(attachment, 'rb') as fp:
-                attach = MIMEBase('application', 'octet-stream')
-                attach.set_payload(str(gpg_context.encrypt_file(fp, to, always_trust=True)))
-            attach.add_header('Content-Disposition', 'attachment', filename=basename('%s.pgp' % attachment))
-            msg.attach(attach)
-
-        # TODO: need to catch exception?
-        # yes :-) we need to adjust the status accordingly (>500 so it will be destroyed)
-        smtp.begin()
-        smtp.sendmail(sender, to, msg.as_string())
-        smtp.quit()
-        sent += 1
-
-    return sent
 
 
 class Dropbox(object):
