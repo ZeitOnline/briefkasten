@@ -172,46 +172,46 @@ class Dropbox(object):
                 output=join(self.fs_path, 'backup.tar.pgp')
             )
 
+    def _notify_editors(self):
+        attachments_cleaned = []
+        cleaned = join(self.fs_path, 'clean')
+        if exists(cleaned):
+            attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
+        return sendMultiPart(
+            self.settings['smtp'],
+            self.gpg_context,
+            self.settings['mail.default_sender'],
+            self.editors,
+            u'Drop %s' % self.drop_id,
+            self._notification_text,
+            attachments_cleaned
+        )
+
+    def _process_attachments(self, testing):
+        fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
+        fs_config = join(
+            self.settings['fs_bin_path'],
+            'briefkasten%s.conf' % ('_test' if testing else ''))
+        shellenv = environ.copy()
+        shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
+        call(
+            "%s -d %s -c %s" % (fs_process, self.fs_path, fs_config),
+            shell=True,
+            env=shellenv)
+
     def process(self, purge_meta_data=True, testing=False):
         """ Calls the external cleanser scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
         """
         self.status = u'020 submitted'
 
-        # create initial backup in case we can't clean
-        self._create_backup()
-
-        self.status = u'100 processor running'
-
-        # process attachments
         if self.num_attachments > 0:
-            fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
-            fs_config = join(
-                self.settings['fs_bin_path'],
-                'briefkasten%s.conf' % ('_test' if testing else ''))
-            shellenv = environ.copy()
-            shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
-            call(
-                "%s -d %s -c %s" % (fs_process, self.fs_path, fs_config),
-                shell=True,
-                env=shellenv)
-
-        attachments_cleaned = []
-        cleaned = join(self.fs_path, 'clean')
-        if exists(cleaned):
-            attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
+            self.status = u'100 processor running'
+            self._create_backup()
+            self._process_attachments(testing=testing)
 
         try:
-            sent = sendMultiPart(
-                self.settings['smtp'],
-                self.gpg_context,
-                self.settings['mail.default_sender'],
-                self.editors,
-                u'Drop %s' % self.drop_id,
-                self._notification_text,
-                attachments_cleaned
-            )
-            if sent > 0:
+            if self._notify_editors() > 0:
                 self.status = '090 success'
             else:
                 self.status = '505 smtp failure'
