@@ -3,7 +3,6 @@ import pkg_resources
 import colander
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
-from pyramid.renderers import render
 from pyramid.view import view_config
 from briefkasten import is_equal, _
 
@@ -88,6 +87,10 @@ def dropbox_submission(dropbox, request):
         data = DropboxSchema().deserialize(request.POST)
     except Exception:
         return HTTPFound(location=request.route_url('dropbox_form'))
+
+    # set the message
+    dropbox.update_message(data['message'])
+
     # recognize submissions from the watchdog:
     is_test_submission = is_equal(
         request.registry.settings.get('test_submission_secret', ''),

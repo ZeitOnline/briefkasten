@@ -208,7 +208,7 @@ class Dropbox(object):
                 self.settings['mail.default_sender'],
                 self.editors,
                 u'Drop %s' % self.drop_id,
-                join(self.fs_path, 'message'),
+                self._notification_text,
                 attachments_cleaned
             )
             if sent > 0:
