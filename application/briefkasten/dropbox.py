@@ -262,8 +262,8 @@ class Dropbox(object):
                 self.status = '090 success'
             else:
                 self.status = '505 smtp failure'
-        except:
-            self.status = '510 smtp error'
+        except Exception as exc:
+            self.status = '510 smtp error (%s)' % exc
 
         self.cleanup()
         return self.status
