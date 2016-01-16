@@ -310,6 +310,8 @@ feature: asynchronous workers
 
 - watches for appearance of new dropboxes and reacts to according to their status
 
+- keep dropbox specific settings in settings.json file inside container directory, only keep pyramid specific settings in .ini file (including path to dropbox container)
+
 TODOS:
 
  - create `worker` entry point
