@@ -95,14 +95,15 @@ def dropbox_submission(dropbox, request):
     is_test_submission = is_equal(
         request.registry.settings.get('test_submission_secret', ''),
         data.pop('testing_secret', ''))
+
     # a non-js client might have uploaded an attachment via the form's fileupload field:
     if data.get('upload') is not None:
         dropbox.add_attachment(data['upload'])
 
-    drop_url = request.route_url('dropbox_view', drop_id=dropbox.drop_id)
     # now we can call the process method
     dropbox.process(testing=is_test_submission)
-    print("Created dropbox %s / %s" % (drop_url, editor_url))
+    drop_url = request.route_url('dropbox_view', drop_id=dropbox.drop_id)
+    print("Created dropbox %s" % drop_url)
     return HTTPFound(location=drop_url)
 
 
