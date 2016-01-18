@@ -234,7 +234,7 @@ general bugs
 
 X fix claim mechanism
 
-- investigate 'heisenbug'
+X investigate 'heisenbug'
 
 - update docs re: `source bin/activate`
 
