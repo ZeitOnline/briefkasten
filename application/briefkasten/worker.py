@@ -45,6 +45,11 @@ class MyHandler(FileSystemEventHandler):
         self.main_loop_cond.release()
         print "directory modified"
 
+def run_watchdog():
+    # once a day we should scan for old drop boxes
+    # at noon we should test pgp keys
+    pass
+
 def process_drop(drop):
     drop.process()
     # todo: ensure it is in the right directory
@@ -69,8 +74,11 @@ def main(config):     # pragma: no cover
     while True:
         for drop in drop_root:
             print(drop)
-            if( drop.status_int == 200 ):
+            if(drop.status_int == 200):
                 workers.map_async(process_drop, [drop])
 
-        condition.wait()
+        # Wait for directory to change or timeout to occur
+        if(condition.wait(43200) == False):
+            self.run_watchdog()
+
     condition.release()
