@@ -19,7 +19,7 @@ def test_dropbox_is_created_if_it_does_not_exist():
     # to be created
     assert not exists(dropbox_root)
     from briefkasten.dropbox import DropboxContainer
-    DropboxContainer(dict(fs_dropbox_root=dropbox_root))
+    DropboxContainer(dict(fs_dropbox_root=dropbox_root, fs_pgp_pubkeys=None))
     assert exists(dropbox_root)
     # clean up after ourselves
     rmtree(dropbox_root)

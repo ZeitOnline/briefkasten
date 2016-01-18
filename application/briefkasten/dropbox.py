@@ -62,6 +62,7 @@ class DropboxContainer(object):
         from os import makedirs
         if not exists(self.fs_path):
             makedirs(self.fs_path)
+        self.gpg_context = gnupg.GPG(gnupghome=settings['fs_pgp_pubkeys'])
 
     def add_dropbox(self, drop_id, message=None, attachments=None):
         return Dropbox(self, drop_id, message=message, attachments=attachments)
@@ -97,7 +98,7 @@ class Dropbox(object):
         self.paths_created = []
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
         self.fs_replies_path = join(self.fs_path, 'replies')
-        self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
+        self.gpg_context = self.container.gpg_context
         self.editors = aslist(self.settings['editors'])
         self.admins = aslist(self.settings['admins'])
 
