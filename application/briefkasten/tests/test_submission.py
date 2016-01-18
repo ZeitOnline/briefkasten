@@ -26,6 +26,15 @@ def form(testing, browser):
     return browser.get(testing.route_url('dropbox_form')).forms[0]
 
 
+def test_submission_with_out_attachment_post(testing, dropbox_container, form):
+    assert len(listdir(dropbox_container.fs_path)) == 0
+    form['message'] = u'Hellø there'
+    form.submit()
+    assert len(listdir(dropbox_container.fs_path)) == 1
+    fs_dropbox_status = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0], 'status')
+    assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
+
+
 def test_submission_with_one_attachment_post(testing, dropbox_container, form):
     fs_attachment = testing.asset_path('attachment.txt')
     assert len(listdir(dropbox_container.fs_path)) == 0
@@ -38,6 +47,9 @@ def test_submission_with_one_attachment_post(testing, dropbox_container, form):
         index=0)
     form['message'] = 'Hello there'
     form.submit()
+    assert len(listdir(dropbox_container.fs_path)) == 1
+    fs_dropbox_status = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0], 'status')
+    assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
 
 
 def test_upload_attachment_directly(testing, dropbox_container, browser, upload_url, submit_url):
@@ -54,11 +66,13 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
         ),
     )
     fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
+    # we have one attachment:
     assert len(listdir(join(fs_dropbox, 'attach'))) == 1
     fs_attachments = join(
         dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'attach')
     fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
+    # its contents is still unencrypted:
     assert open(fs_attachment).read().decode('utf-8') == \
         open(fs_attachment, 'r').read().decode('utf-8')
 

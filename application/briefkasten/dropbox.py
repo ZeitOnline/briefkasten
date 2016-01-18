@@ -204,7 +204,6 @@ class Dropbox(object):
         """ Calls the external cleanser scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
         """
-        self.status = u'020 submitted'
 
         if self.num_attachments > 0:
             self.status = u'100 processor running'
