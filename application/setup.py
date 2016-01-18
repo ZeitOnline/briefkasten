@@ -42,6 +42,7 @@ setup(
         'python-gnupg',
         'repoze.xmliter',
         'Paste',
+        'watchdog',
     ],
     extras_require={
         'development': [
