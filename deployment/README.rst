@@ -10,6 +10,23 @@ An instance of the briefkasten is deployed by running scripts on a *control host
 During this process the *target host* will boot from a FreeBSD installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
 
 
+tl;dr
+-----
+
+The short version is:
+
+    1. *populate `etc`* with a custom `ploy.conf`, some `pgp_pubkeys` and a certificate and key for the webserver `briefkasten.crt` and `briefkasten.key`
+
+    2. *make sure the host is booted into mfsBSD* (if you're using virtualbox, run ``ploy start briefkasten-vbox``).
+
+    3. `make bootstrap`
+
+    4. `make configure-host`
+
+    5. `make start-jails`
+
+    6. `make configure-jails`
+
 Obtaining the sources
 ---------------------
 
