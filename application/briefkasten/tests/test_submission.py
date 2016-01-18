@@ -77,6 +77,34 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
         open(fs_attachment, 'r').read().decode('utf-8')
 
 
+@fixture
+def post_token_dropbox(dropbox_container, config, post_token):
+    """ returns a dropbox instance matching the given post_token"""
+    from briefkasten.dropbox import parse_post_token
+    return dropbox_container.get_dropbox(
+        parse_post_token(
+            post_token,
+            secret=config.registry.settings['post_secret']
+        )
+    )
+
+
+def test_upload_attachment_directly_fails_post_submission(testing, dropbox_container, browser, post_token_dropbox, upload_url):
+    """clients cannot upload files directly once a dropbox has been submitted. """
+    post_token_dropbox.status = u'020 submitted'
+    fs_attachment = testing.asset_path('attachment.txt')
+    browser.post(
+        upload_url,
+        params=dict(
+            attachment=Upload(
+                'attachment.txt',
+                open(fs_attachment, 'r').read(),
+                'text/plain'),
+        ),
+        status=410,
+    )
+
+
 def test_submission_with_multiple_attachments(dropbox_container, form):
     form.set(
         'upload',

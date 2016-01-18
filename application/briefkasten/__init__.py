@@ -23,7 +23,10 @@ def dropbox_post_factory(request):
         raise HTTPGone('dropbox expired')
     except Exception:  # don't be too specific on the reason for the error
         raise HTTPNotFound('no such dropbox')
-    return dropbox_container.get_dropbox(drop_id)
+    dropbox = dropbox_container.get_dropbox(drop_id)
+    if dropbox.status_int >= 20:
+        raise HTTPGone('dropbox already in processing, no longer accepts data')
+    return dropbox
 
 
 def dropbox_factory(request):
