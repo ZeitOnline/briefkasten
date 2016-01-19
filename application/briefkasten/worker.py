@@ -50,6 +50,23 @@ def process_drop(drop):
     # todo: ensure it is in the right directory
 
 
+@click.command(help='debug a single drop')
+@click.option(
+    '--root',
+    '-r',
+    default='var/drops/',
+    help='''location of the dropbox container directory''')
+@click.argument(
+    'drop_id',
+    required=False,
+    default=None,
+)
+def debug(root, drop_id=None):     # pragma: no cover
+    root = DropboxContainer(root=root)
+    for drop in root:
+        print(drop)
+
+
 @click.command(help='Scans dropbox directory for unprocessed drops and processes them')
 @click.option(
     '--config',
