@@ -49,7 +49,7 @@ class DropboxContainer(object):
         self.fs_root = root
         self.fs_path = join(root, 'drops')
         self.fs_submission_queue = join(root, 'submissions')
-        self.fs_scratchdir = join(root, 'scratch')
+        self.fs_scratchdir = join(root, 'scratchdir')
 
         # ensure directories exist
         for directory in [self.fs_root, self.fs_path, self.fs_submission_queue]:
