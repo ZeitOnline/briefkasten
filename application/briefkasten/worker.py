@@ -1,12 +1,11 @@
 import click
-from os import path, listdir, rename
+from os import path, listdir, rename, remove
 from multiprocessing import Pool
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from threading import Condition
 
 from .dropbox import DropboxContainer
-from .notifications import setup_smtp_factory
 
 
 def get_settings(fs_config):
@@ -85,11 +84,8 @@ def debug(root, drop_id=None):     # pragma: no cover
     default='var/drops/',
     help='''location of the dropbox container directory''')
 def main(root):     # pragma: no cover
-    root = DropboxContainer(root=root)
-    settings = root.settings
-    if 'smtp' not in settings:
-        settings['smtp'] = setup_smtp_factory(**settings)
-    drop_root = DropboxContainer(settings=settings)
+    drop_root = DropboxContainer(root=root)
+    settings = drop_root.settings
 
     workers = Pool(processes=settings.get('num_workers', 1))
 
@@ -97,14 +93,14 @@ def main(root):     # pragma: no cover
     event_handler = MyHandler(condition)
 
     observer = Observer()
-    observer.schedule(event_handler, root.fs_submission_queue, recursive=False)
+    observer.schedule(event_handler, drop_root.fs_submission_queue, recursive=False)
     observer.start()
 
     condition.acquire()
     while True:
-        for drop_id in listdir(root.fs_submission_queue):
+        for drop_id in listdir(drop_root.fs_submission_queue):
             print(drop_id)
-            drop = drop_root.get_drop(drop_id)
+            drop = drop_root.get_dropbox(drop_id)
             if(drop.status_int == 20):
                 if drop.num_attachments > 0:
                     workers.map_async(process_drop, [drop])
