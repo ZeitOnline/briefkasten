@@ -10,10 +10,6 @@ title = "ZEIT ONLINE Briefkasten"
 version = pkg_resources.get_distribution("briefkasten").version
 
 
-attachments_min_len = 1
-attachments_max_len = 10
-
-
 class _FieldStorage(colander.SchemaType):
     def deserialize(self, node, cstruct):
         if cstruct in (colander.null, None, ''):
