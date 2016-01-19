@@ -36,7 +36,7 @@ def dropbox_container(request, tmpdir):
 def settings(dropbox_container):
     return {
         'appserver_root_url': '/briefkasten/',
-        'fs_dropbox_root': dropbox_container.fs_path,
+        'fs_dropbox_root': dropbox_container.fs_root,
         'fs_pgp_pubkeys': asset_path('gpghome'),
         'fs_bin_path': asset_path('bin'),
         'post_secret': u's3cr3t',

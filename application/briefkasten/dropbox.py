@@ -54,12 +54,14 @@ def sanitize_filename(filename):
 class DropboxContainer(object):
 
     def __init__(self, root=None, settings=None):
-        self.fs_path = root
+        self.fs_root = root
+        self.fs_path = join(root, 'drops')
 
         # ensure directories exist
         from os import makedirs
-        if not exists(self.fs_path):
-            makedirs(self.fs_path)
+        for directory in [self.fs_root, self.fs_path]:
+            if not exists(directory):
+                makedirs(directory)
 
         # initialise settings from disk and parameters
         # settings provided as init parameter take precedence over values on-disk
@@ -83,7 +85,7 @@ class DropboxContainer(object):
         self.settings['attachment_size_threshold'] = parse_size(self.settings['attachment_size_threshold'])
 
     def parse_settings(self):
-        fs_settings = join(self.fs_path, 'settings.yaml')
+        fs_settings = join(self.fs_root, 'settings.yaml')
         if exists(fs_settings):
             with open(fs_settings, 'r') as settings:
                 return yaml.load(settings)
@@ -99,7 +101,7 @@ class DropboxContainer(object):
         return Dropbox(self, drop_id=drop_id)
 
     def destroy(self):
-        shutil.rmtree(self.fs_path)
+        shutil.rmtree(self.fs_root)
 
     def __contains__(self, drop_id):
         return exists(join(self.fs_path, drop_id))
