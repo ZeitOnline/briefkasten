@@ -34,7 +34,7 @@
     mode: "700"
   with_items:
     - log
-    - drops
+    - drop_root
     - themes
     - pgp_pubkeys
 
@@ -104,6 +104,18 @@
   tags:
     - app-config
     - update-app
+
+  # TODO: needs to be configured outside of appserver context
+- name: configure drop root
+  template:
+    src: settings.yaml.j2
+    dest: "/var/briefkasten/drop_root/settings.yaml"
+  notify: restart application
+  tags:
+    - app-config
+    - update-app
+
+# TODO: configure drop root via settings.yaml
 
 - name: install python eggs
   pip:
