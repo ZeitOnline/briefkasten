@@ -1,6 +1,8 @@
 import click
 from os import path, listdir, rename, remove
+from sys import exit
 from multiprocessing import Pool
+from signal import signal, SIGINT
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from threading import Condition
@@ -37,6 +39,10 @@ class MyHandler(FileSystemEventHandler):
         self.main_loop_cond.release()
         print "directory modified"
 
+
+def keyboard_interrupt_handler(signal, frame):
+    print 'Caught keyboard interrupt. Exit.'
+    exit(0)
 
 def run_watchdog():
     # once a day we should scan for old drop boxes
@@ -87,21 +93,32 @@ def main(root):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
+    # Setup multiprocessing pool with that amount of workers as
+    # implied by the amount of worker jails
     workers = Pool(processes=settings.get('num_workers', 1))
 
+    # Setup the condition object that we will wait for, it
+    # signals changes in the directory
     condition = Condition()
-    event_handler = MyHandler(condition)
 
+    # Setup and run the actual file system event watcher
+    event_handler = MyHandler(condition)
     observer = Observer()
     observer.schedule(event_handler, drop_root.fs_submission_queue, recursive=False)
     observer.start()
 
+    signal( SIGINT, keyboard_interrupt_handler )
+
+    # grab lock, scan submission dir for jobs and process them
     condition.acquire()
     while True:
         for drop_id in listdir(drop_root.fs_submission_queue):
             print(drop_id)
             drop = drop_root.get_dropbox(drop_id)
+
+            # Only look at drops that actually are for us
             if(drop.status_int == 20):
+                # process drops without attachments synchronously
                 if drop.num_attachments > 0:
                     workers.map_async(process_drop, [drop])
                 else:
