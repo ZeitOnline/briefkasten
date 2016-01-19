@@ -1,16 +1,24 @@
 from py.test import fixture
 
-sizes = {
+size_values = {
     '200': 200,
     '20M': 20971520,
     '1Gb': 1073741824
 }
 
 
-@fixture(params=sizes.keys())
-def settings(request, settings):
-    return dict(settings, attachment_size_threshold=request.param)
+@fixture(params=size_values.items())
+def sizes(request, tmpdir):
+    return request.param
 
 
-def test_attachment_size_threshold_humanfriendly(app, settings):
-    assert app.registry.settings['attachment_size_threshold'] == sizes[settings['attachment_size_threshold']]
+def test_attachment_size_threshold_humanfriendly(sizes, tmpdir):
+    human_size, byte_size = sizes
+    from briefkasten.dropbox import DropboxContainer
+    dropbox_container = DropboxContainer(
+        root=tmpdir.strpath,
+        settings=dict(
+            attachment_size_threshold=human_size,
+            fs_pgp_pubkeys=None)
+    )
+    assert (dropbox_container.settings['attachment_size_threshold'] == byte_size)

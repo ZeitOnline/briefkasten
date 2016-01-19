@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+import shutil
 from cgi import FieldStorage
 from os.path import abspath, dirname, join
 from mock import Mock
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pytest import fixture
-from tempfile import mkdtemp
 from urllib import unquote
 from webtest import TestApp
 
@@ -13,21 +13,33 @@ def asset_path(*parts):
     return abspath(join(dirname(__file__), 'tests', *parts))
 
 
+@fixture(scope="function")
+def dropbox_container(request, tmpdir):
+    from briefkasten.dropbox import DropboxContainer
+    # initialize empty directory with settings from template:
+    shutil.copy(
+        join(asset_path('drop_root_template', 'settings.yaml')),
+        tmpdir.strpath,
+    )
+    dropbox_container = DropboxContainer(
+        root=tmpdir.strpath,
+        settings=dict(
+            smtp=Mock(),
+            fs_bin_path=asset_path('bin'),
+        ),
+    )
+    request.addfinalizer(dropbox_container.destroy)
+    return dropbox_container
+
+
 @fixture
-def settings():
+def settings(dropbox_container):
     return {
-        'smtp': Mock(),
-        'fs_pgp_pubkeys': asset_path('gpghome'),
-        'editors': ['editor@briefkasten.dtfh.de'],
-        'admins': ['admin@briefkasten.dtfh.de'],
         'appserver_root_url': '/briefkasten/',
-        'fs_dropbox_root': mkdtemp(),
+        'fs_dropbox_root': dropbox_container.fs_path,
+        'fs_pgp_pubkeys': asset_path('gpghome'),
         'fs_bin_path': asset_path('bin'),
-        'mail.default_sender': 'noreply@briefkasten.dtfh.de',
         'post_secret': u's3cr3t',
-        'attachment_size_threshold': '200',
-        'dropbox_view_url_format': 'http://example.com/briefkasten/dropbox/%s',
-        'dropbox_editor_url_format': 'http://example.com/briefkasten/dropbox/%s/%s',
     }
 
 

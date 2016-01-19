@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from pytest import fixture
-from briefkasten import dropbox_container
 
 
 def test_incorrect_token_raises_not_found(testing, browser, dropbox):
@@ -23,7 +22,7 @@ def form(testing, browser, editor_url):
     return browser.get(editor_url).forms[0]
 
 
-def test_editor_posts_reply(form, dropbox):
+def test_editor_posts_reply(form, dropbox, dropbox_container):
     reply = u'How do you do?'
     author = u'John Doe'
     form['reply'] = reply

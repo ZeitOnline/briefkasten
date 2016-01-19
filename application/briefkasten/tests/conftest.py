@@ -14,14 +14,6 @@ def drop_id(dropbox_container):
     return generate_drop_id()
 
 
-@fixture(scope="function")
-def dropbox_container(request, config):
-    from briefkasten.dropbox import DropboxContainer
-    dropbox_container = DropboxContainer(config.registry.settings)
-    request.addfinalizer(dropbox_container.destroy)
-    return dropbox_container
-
-
 @fixture
 def dropbox_without_attachment(dropbox_container, drop_id):
     return dropbox_container.add_dropbox(drop_id, message=u'Schönen guten Tag!')

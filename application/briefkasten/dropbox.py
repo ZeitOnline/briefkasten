@@ -2,8 +2,10 @@
 import gnupg
 import shutil
 import tarfile
+import yaml
 from cStringIO import StringIO as BIO
 from glob import glob
+from humanfriendly import parse_size
 from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
 from os import mkdir, chmod, environ, listdir, remove, stat
@@ -13,6 +15,7 @@ from random import SystemRandom
 from subprocess import call
 
 from .notifications import checkRecipient, sendMultiPart
+from .notifications import setup_smtp_factory
 
 from jinja2 import Environment, PackageLoader
 jinja_env = Environment(loader=PackageLoader('briefkasten', 'templates'))
@@ -50,19 +53,42 @@ def sanitize_filename(filename):
 
 class DropboxContainer(object):
 
-    settings = None
+    def __init__(self, root=None, settings=None):
+        self.fs_path = root
 
-    def __init__(self, settings=None):
-        if settings is not None:
-            self.init(settings)
-
-    def init(self, settings):
-        self.settings = settings
-        self.fs_path = settings['fs_dropbox_root']
+        # ensure directories exist
         from os import makedirs
         if not exists(self.fs_path):
             makedirs(self.fs_path)
-        self.gpg_context = gnupg.GPG(gnupghome=settings['fs_pgp_pubkeys'])
+
+        # initialise settings from disk and parameters
+        # settings provided as init parameter take precedence over values on-disk
+        # which in turn take precedence over default values
+        self.settings = dict(
+            attachment_size_threshold=u'2Mb',
+        )
+
+        self.settings.update(**self.parse_settings())
+        if settings is not None:
+            self.settings.update(**settings)
+
+        # set smtp instance defensively, to not overwrite mocked version from test settings:
+        if 'smtp' not in self.settings:
+            self.settings['smtp'] = setup_smtp_factory(**self.settings)
+
+        # setup GPG
+        self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
+
+        # convert human readable size to bytes
+        self.settings['attachment_size_threshold'] = parse_size(self.settings['attachment_size_threshold'])
+
+    def parse_settings(self):
+        fs_settings = join(self.fs_path, 'settings.yaml')
+        if exists(fs_settings):
+            with open(fs_settings, 'r') as settings:
+                return yaml.load(settings)
+        else:
+            return dict()
 
     def add_dropbox(self, drop_id, message=None, attachments=None):
         return Dropbox(self, drop_id, message=message, attachments=attachments)

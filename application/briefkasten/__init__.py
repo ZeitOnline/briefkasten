@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-from humanfriendly import parse_size
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound, HTTPGone
 from pyramid.i18n import TranslationStringFactory
 from itsdangerous import SignatureExpired
 from .dropbox import DropboxContainer
-from .notifications import setup_smtp_factory
 
-dropbox_container = DropboxContainer()
 _ = TranslationStringFactory('briefkasten')
 
 
@@ -23,7 +20,7 @@ def dropbox_post_factory(request):
         raise HTTPGone('dropbox expired')
     except Exception:  # don't be too specific on the reason for the error
         raise HTTPNotFound('no such dropbox')
-    dropbox = dropbox_container.get_dropbox(drop_id)
+    dropbox = request.registry.settings['dropbox_container'].get_dropbox(drop_id)
     if dropbox.status_int >= 20:
         raise HTTPGone('dropbox already in processing, no longer accepts data')
     return dropbox
@@ -32,7 +29,7 @@ def dropbox_post_factory(request):
 def dropbox_factory(request):
     """ expects the id of an existing dropbox and returns its instance"""
     try:
-        return dropbox_container.get_dropbox(request.matchdict['drop_id'])
+        return request.registry.settings['dropbox_container'].get_dropbox(request.matchdict['drop_id'])
     except KeyError:
         raise HTTPNotFound('no such dropbox')
 
@@ -79,12 +76,7 @@ def configure(global_config, **settings):
     config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
     config.add_route('dropbox_form', app_route)
     config.scan(ignore=['.testing'])
-    # set smtp instance defensively, to not overwrite mocked version from test settings:
-    if 'smtp' not in config.registry.settings:
-        config.registry.settings['smtp'] = setup_smtp_factory(**settings)
-    # convert human readable size to bytes
-    config.registry.settings['attachment_size_threshold'] = parse_size(config.registry.settings['attachment_size_threshold'])
-    dropbox_container.init(config.registry.settings)
+    config.registry.settings['dropbox_container'] = DropboxContainer(root=config.registry.settings['fs_dropbox_root'])
     config.commit()
     return config
 
