@@ -73,11 +73,23 @@ esac; done; shift $(( ${OPTIND} - 1 ))
 
 unset my_dispatcher
 if [ "${the_jdispatcher_dir}" ]; then
-  my_dispatcher=$( "${the_jdispatcher_dir}"/claim )
+
+  # Try to grab a cleanser
+  # This normally should not fail, because there's
+  # never more workers than jails. So wait, only then fail.
+  unset retries
+  while [ -z ${my_dispatcher} -a ${#retries} -lt 3]; do
+    retries=${retries}X
+    my_dispatcher=$( "${the_jdispatcher_dir}"/claim )
+    if [ $? -ne 0 ]; then
+      unset my_dispatcher
+      sleep 10
+    fi
+  done
 
   # If we can not allocate a dispatcher here, return an error
   # TODO: report, what went wrong, maybe wait
-  [ $? -eq 0 -a "${my_dispatcher}" ] || exnerr 502 "No remote cleanser available"
+  [ "${my_dispatcher}" ] || exnerr 502 "No remote cleanser available"
 
   cleanser_ippport=read < "${my_dispatcher}"/ip
   [ "${cleanser_ippport}" ] || exnerr 503 "Cleanser config error"
