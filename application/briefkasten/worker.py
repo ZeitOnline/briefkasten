@@ -1,5 +1,5 @@
 import click
-from os import path
+from os import path, listdir, rename
 from multiprocessing import Pool
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -42,12 +42,23 @@ class MyHandler(FileSystemEventHandler):
 def run_watchdog():
     # once a day we should scan for old drop boxes
     # at noon we should test pgp keys
+    # also: scan for and clean up watchdog entries
     pass
 
 
 def process_drop(drop):
+    try:
+        rename(
+            path.join(drop.container.fs_submission_queue, drop.drop_id),
+            path.join(drop.container.fs_scratchdir, drop.drop_id)
+        )
+    except:
+        return
+
     drop.process()
-    # todo: ensure it is in the right directory
+
+    # remove token from scratch dir, we're done
+    remove(path.join(drop.container.fs_scratchdir, drop.drop_id))
 
 
 @click.command(help='debug a single drop')
@@ -69,42 +80,38 @@ def debug(root, drop_id=None):     # pragma: no cover
 
 @click.command(help='Scans dropbox directory for unprocessed drops and processes them')
 @click.option(
-    '--config',
-    '-c',
-    default='development.ini',
-    help='''location of the configuration file. Must be a .ini file with a section named 'app:briefkasten'.''')
-@click.argument(
-    'drop_id',
-    required=False,
-    default=None,
-)
-def main(config):     # pragma: no cover
-    settings = get_settings(path.abspath(config))
+    '--root',
+    '-r',
+    default='var/drops/',
+    help='''location of the dropbox container directory''')
+def main(root):     # pragma: no cover
+    root = DropboxContainer(root=root)
+    settings = root.settings
     if 'smtp' not in settings:
         settings['smtp'] = setup_smtp_factory(**settings)
     drop_root = DropboxContainer(settings=settings)
 
-    # Should point to the todo-directory, or drop dir
-    fs_path = '.'
-
-    workers = Pool(processes=settings.workers)
+    workers = Pool(processes=settings.get('num_workers', 1))
 
     condition = Condition()
     event_handler = MyHandler(condition)
 
     observer = Observer()
-    observer.schedule(event_handler, fs_path, recursive=False)
+    observer.schedule(event_handler, root.fs_submission_queue, recursive=False)
     observer.start()
 
     condition.acquire()
     while True:
-        for drop in drop_root:
-            print(drop)
-            if(drop.status_int == 200):
-                workers.map_async(process_drop, [drop])
+        for drop_id in listdir(root.fs_submission_queue):
+            print(drop_id)
+            drop = drop_root.get_drop(drop_id)
+            if(drop.status_int == 20):
+                if drop.num_attachments > 0:
+                    workers.map_async(process_drop, [drop])
+                else:
+                    process_drop(drop)
 
-        # Wait for directory to change or timeout to occur
-        if not condition.wait(43200):
-            run_watchdog()
+        # Wait for directory content to change
+        condition.wait()
 
     condition.release()

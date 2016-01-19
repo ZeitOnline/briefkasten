@@ -48,9 +48,11 @@ class DropboxContainer(object):
     def __init__(self, root=None, settings=None):
         self.fs_root = root
         self.fs_path = join(root, 'drops')
+        self.fs_submission_queue = join(root, 'submissions')
+        self.fs_scratchdir = join(root, 'scratch')
 
         # ensure directories exist
-        for directory in [self.fs_root, self.fs_path]:
+        for directory in [self.fs_root, self.fs_path, self.fs_submission_queue]:
             if not exists(directory):
                 makedirs(directory)
 
