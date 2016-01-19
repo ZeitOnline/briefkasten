@@ -61,7 +61,7 @@ def upload_backend(index='dev', user=None):
     Build the backend and upload it to the remote server at the given index
     """
     get_vars()
-    login_devpi(user=user, index=index)
+    use_devpi(index=index)
     with fab.lcd('../application'):
         fab.local('make upload')
 
@@ -99,17 +99,21 @@ def update_backend(index='dev', build=True, user=None, version=None):
 
 
 @task
-def login_devpi(index='dev', user=None):
+def use_devpi(index='dev'):
     get_vars()
-    if user is None:
-        user = fab.env['user']
     publish_devpi = AV.get('ploy_default_publish_devpi')
-    login = fab.local(
+    return fab.local(
         'bin/devpi use {base_url}/briefkasten/{index}'.format(
             index=index,
             base_url=publish_devpi,
         ),
         capture=True
     )
-    if not login.splitlines()[0].endswith('(logged in as {user})'.format(user=user)):
-        fab.local('bin/devpi login {user}'.format(user=user))
+
+
+@task
+def login_devpi(index='dev', user=None):
+    use_devpi(index=index)
+    if user is None:
+        user = fab.env['user']
+    fab.local('bin/devpi login {user}'.format(user=user))
