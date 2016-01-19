@@ -50,7 +50,7 @@ def test_dropbox_status_submitted_without_attachment(dropbox_without_attachment)
     """a dropbox without an attachment won't be cleansed and will be set to 'success' directly
        after processing"""
     dropbox_without_attachment.process()
-    assert dropbox_without_attachment.status == u'090 success'
+    assert dropbox_without_attachment.status == u'900 success'
 
 
 def test_dropbox_status_submitted(dropbox):
@@ -58,7 +58,7 @@ def test_dropbox_status_submitted(dropbox):
     however, in our test setup this always succeeds immediately.
     """
     dropbox.process()
-    assert dropbox.status == u'090 success'
+    assert dropbox.status == u'900 success'
 
 
 def test_dropbox_process_failure(dropbox):

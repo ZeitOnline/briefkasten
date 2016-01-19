@@ -231,7 +231,7 @@ class Dropbox(object):
 
         try:
             if self._notify_editors() > 0:
-                self.status = '090 success'
+                self.status = '900 success'
             else:
                 self.status = '505 smtp failure'
         except Exception as exc:
