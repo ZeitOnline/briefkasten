@@ -6,6 +6,7 @@ import yaml
 from cStringIO import StringIO as BIO
 from glob import glob
 from humanfriendly import parse_size
+from jinja2 import Environment, PackageLoader
 from json import load, dumps
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, isfile, join, splitext
@@ -13,12 +14,13 @@ from pyramid.settings import asbool, aslist
 from random import SystemRandom
 from subprocess import call
 
-from .notifications import checkRecipient, sendMultiPart
-from .notifications import setup_smtp_factory
+from .notifications import (
+    checkRecipient,
+    sendMultiPart,
+    setup_smtp_factory
+)
 
-from jinja2 import Environment, PackageLoader
 jinja_env = Environment(loader=PackageLoader('briefkasten', 'templates'))
-
 allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
 
 
