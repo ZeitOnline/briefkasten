@@ -6,9 +6,8 @@ import yaml
 from cStringIO import StringIO as BIO
 from glob import glob
 from humanfriendly import parse_size
-from itsdangerous import URLSafeTimedSerializer
 from json import load, dumps
-from os import mkdir, chmod, environ, listdir, remove, stat
+from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, isfile, join, splitext
 from pyramid.settings import asbool, aslist
 from random import SystemRandom
@@ -31,15 +30,6 @@ def generate_drop_id(length=8):
     return drop_id
 
 
-def generate_post_token(secret):
-    """ returns a URL safe, signed token that contains a UUID"""
-    return URLSafeTimedSerializer(secret, salt=u'post').dumps(generate_drop_id())
-
-
-def parse_post_token(token, secret, max_age=300):
-    return URLSafeTimedSerializer(secret, salt=u'post').loads(token, max_age=max_age)
-
-
 def sanitize_filename(filename):
     """preserve the file ending, but replace the name with a random token """
     # TODO: fix broken splitext (it reveals everything of the filename after the first `.` - doh!)
@@ -58,7 +48,6 @@ class DropboxContainer(object):
         self.fs_path = join(root, 'drops')
 
         # ensure directories exist
-        from os import makedirs
         for directory in [self.fs_root, self.fs_path]:
             if not exists(directory):
                 makedirs(directory)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pytest import fixture
 from os.path import dirname, join
-from briefkasten.dropbox import generate_post_token, generate_drop_id
+from briefkasten import generate_post_token, generate_drop_id
 
 
 @fixture

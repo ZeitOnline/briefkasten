@@ -80,7 +80,7 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
 @fixture
 def post_token_dropbox(dropbox_container, config, post_token):
     """ returns a dropbox instance matching the given post_token"""
-    from briefkasten.dropbox import parse_post_token
+    from briefkasten import parse_post_token
     return dropbox_container.get_dropbox(
         parse_post_token(
             post_token,

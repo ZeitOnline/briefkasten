@@ -2,16 +2,24 @@
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPNotFound, HTTPGone
 from pyramid.i18n import TranslationStringFactory
-from itsdangerous import SignatureExpired
-from .dropbox import DropboxContainer
+from itsdangerous import SignatureExpired, URLSafeTimedSerializer
+from .dropbox import DropboxContainer, generate_drop_id
 
 _ = TranslationStringFactory('briefkasten')
+
+
+def generate_post_token(secret):
+    """ returns a URL safe, signed token that contains a UUID"""
+    return URLSafeTimedSerializer(secret, salt=u'post').dumps(generate_drop_id())
+
+
+def parse_post_token(token, secret, max_age=300):
+    return URLSafeTimedSerializer(secret, salt=u'post').loads(token, max_age=max_age)
 
 
 def dropbox_post_factory(request):
     """receives a UUID via the request and returns either a fresh or an existing dropbox
     for it"""
-    from .dropbox import parse_post_token
     try:
         drop_id = parse_post_token(
             token=request.matchdict['token'],
