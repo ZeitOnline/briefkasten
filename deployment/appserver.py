@@ -22,12 +22,6 @@ def get_vars():
 
 
 @task
-def application(action="restart"):
-    get_vars()
-    fab.run("supervisorctl %s briefkasten" % action)
-
-
-@task
 def upload_theme():
     """ upload and/or update the theme with the current git state"""
     get_vars()
@@ -66,10 +60,13 @@ def upload_backend(index='dev', user=None):
         fab.local('make upload')
 
 
+@task
 def briefkasten_ctl(action='restart'):
     get_vars()
-    fab.sudo('supervisorctl {action} briefkasten'.format(
+    what = env.host_string.split('-')[-1]
+    fab.sudo('supervisorctl {action} briefkasten_{what}'.format(
         action=action,
+        what=what,
         **AV), warn_only=True)
 
 

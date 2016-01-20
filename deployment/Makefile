@@ -12,6 +12,7 @@ configure-host:
 	bin/ploy configure briefkasten
 
 start-jails:
+	bin/ploy start worker
 	bin/ploy start webserver
 	bin/ploy start appserver
 	bin/ploy start cleanser

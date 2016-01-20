@@ -1,0 +1,7 @@
+---
+appuser: pyramid
+appuserid: 1001
+ploy_mail_sender: noreply@briefkasten
+ploy_mail_host: localhost
+ploy_mail_port: 25
+

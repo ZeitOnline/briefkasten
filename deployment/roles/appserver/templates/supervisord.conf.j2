@@ -1,22 +1,9 @@
-[supervisord]
-user={{appuser}}
-logfile=/var/briefkasten/supervisord.log
-
-[program:briefkasten]
+[program:briefkasten_frontend]
 command={{apphome}}/bin/pserve {{apphome}}/briefkasten.ini
 user={{appuser}}
 autostart=true
 autorestart=true
-startsecs=5
+startsecs=2
 environment=PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 stdout_logfile=NONE
 stderr_logfile=NONE
-
-[rpcinterface:supervisor]
-supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-
-[unix_http_server]
-file = /tmp/supervisor.sock
-
-[supervisorctl]
-serverurl = unix:///tmp/supervisor.sock

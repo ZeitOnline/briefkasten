@@ -7,6 +7,7 @@
       args:
         creates: "/usr/jails/{{item}}"
       with_items:
+      - worker
       - webserver
       - appserver
       - cleanser
@@ -17,10 +18,21 @@
   roles:
     - { role: common, tags: ['common', 'webserver'] }
     - { role: webserver, tags: ['webserver'] }
+
+- hosts: briefkasten-worker
+  user: root
+  roles:
+    - { role: common, tags: ['common'] }
+    - { role: briefkasten, tags: ['briefkasten'] }
+    - { role: supervisord, tags: ['supervisord'] }
+    - { role: worker, tags: ['worker'] }
+
 - hosts: briefkasten-appserver
   user: root
   roles:
     - { role: common, tags: ['common', 'appserver'] }
+    - { role: briefkasten, tags: ['briefkasten'] }
+    - { role: supervisord, tags: ['supervisord'] }
     - { role: appserver, tags: ['appserver'] }
 
 - hosts: briefkasten-cleanser

@@ -19,4 +19,4 @@ venusian==1.0
 WebOb==1.5.1
 zope.deprecation==4.1.2
 zope.interface==4.1.3
-briefkasten==0.2.0.dev3
+briefkasten

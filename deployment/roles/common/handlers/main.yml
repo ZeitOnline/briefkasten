@@ -11,7 +11,11 @@
   service: name=nginx state=reloaded
 - name: restart supervisord
   service: name=supervisord state=restarted
+- name: restart worker
+  supervisorctl:
+    name: briefkasten_worker
+    state: restarted
 - name: restart application
   supervisorctl:
-    name: briefkasten
+    name: briefkasten_frontend
     state: restarted

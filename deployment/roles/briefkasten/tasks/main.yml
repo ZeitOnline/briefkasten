@@ -1,0 +1,56 @@
+---
+- name: install packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - py27-supervisor
+    - py27-virtualenv
+    - rsync
+    - libxslt
+    - sudo
+    - gnupg
+
+- name: create application user
+  # this creates /home/pyramid/.ssh/id_rsa{.pub}
+  user:
+    name: "{{appuser}}"
+    uid: "{{appuserid}}"
+    createhome: yes
+    generate_ssh_key: yes
+
+- name: ensure application directory
+  file:
+    path: "{{apphome}}"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "775"
+
+- name: init virtualenv in application directory
+  command: virtualenv .
+  args:
+    chdir: "{{apphome}}"
+    creates: "{{apphome}}/bin/python"
+
+- name: upload requirements
+  copy:
+    src: requirements.txt
+    dest: "{{apphome}}/"
+    owner: "root"
+    mode: "644"
+  tags: update-briefkasten
+
+- name: update pip & co
+  pip:
+    name: "{{item}}"
+    virtualenv: "{{apphome}}"
+    extra_args: "--upgrade"
+  with_items:
+    - pip
+    - setuptools
+
+- name: install python eggs
+  pip:
+    virtualenv: "{{apphome}}"
+    requirements: "{{apphome}}/requirements.txt"
+  tags: update-briefkasten

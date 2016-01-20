@@ -1,0 +1,16 @@
+[supervisord]
+user={{appuser}}
+logfile=/var/briefkasten/supervisord.log
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[unix_http_server]
+file = /tmp/supervisor.sock
+
+[supervisorctl]
+serverurl = unix:///tmp/supervisor.sock
+
+[include]
+files = /usr/local/etc/supervisor.d/*.conf
+
