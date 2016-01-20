@@ -64,6 +64,8 @@ def upload_backend(index='dev', user=None):
 def briefkasten_ctl(action='restart'):
     get_vars()
     what = env.host_string.split('-')[-1]
+    if what == 'appserver':
+        what = 'frontend'
     fab.sudo('supervisorctl {action} briefkasten_{what}'.format(
         action=action,
         what=what,
