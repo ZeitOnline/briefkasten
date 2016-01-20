@@ -55,7 +55,7 @@ def process_drop(drop):
     try:
         rename(
             path.join(drop.container.fs_submission_queue, drop.drop_id),
-            path.join(drop.container.fs_scratchdir, drop.drop_id)
+            path.join(drop.container.fs_scratch, drop.drop_id)
         )
     except:
         return
@@ -63,7 +63,7 @@ def process_drop(drop):
     drop.process()
 
     # remove token from scratch dir, we're done
-    remove(path.join(drop.container.fs_scratchdir, drop.drop_id))
+    remove(path.join(drop.container.fs_scratch, drop.drop_id))
 
 
 @click.command(help='debug a single drop')
