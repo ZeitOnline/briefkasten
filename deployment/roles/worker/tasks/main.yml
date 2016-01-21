@@ -79,6 +79,7 @@
   tags:
     - app-config
     - update-app
+    - update-config
 
 - name: disable periodic emails
   copy:
