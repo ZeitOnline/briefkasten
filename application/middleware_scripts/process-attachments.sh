@@ -96,7 +96,7 @@ if [ "${the_jdispatcher_dir}" ]; then
 
   # Setup cleanser ip and port
   the_cleanser=${cleanser_ippport%%:*}
-  the_ssh_conf="-p ${cleanser_ippport##*:}"
+  the_ssh_conf="-o Port=${cleanser_ippport##*:} -o User=cleanser"
 
   # If we were asked to use jdispatch but can not deduct how
   # to connect, return an error
