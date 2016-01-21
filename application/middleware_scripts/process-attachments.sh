@@ -91,7 +91,7 @@ if [ "${the_jdispatcher_dir}" ]; then
   # TODO: report, what went wrong, maybe wait
   [ "${my_dispatcher}" ] || exnerr 502 "No remote cleanser available"
 
-  cleanser_ippport=read < "${my_dispatcher}"/ip
+  read cleanser_ippport < "${my_dispatcher}"/ip
   [ "${cleanser_ippport}" ] || exnerr 503 "Cleanser config error"
 
   # Setup cleanser ip and port
