@@ -121,7 +121,7 @@ def worker(root, debug=False):     # pragma: no cover
             drop = drop_root.get_dropbox(drop_id)
 
             # Only look at drops that actually are for us
-            if(drop.status_int == 20):
+            if drop.status_int == 20:
                 # process drops without attachments synchronously
                 if not debug and drop.num_attachments > 0:
                     workers.map_async(process_drop, [drop])
