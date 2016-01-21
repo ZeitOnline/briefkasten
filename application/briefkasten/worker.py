@@ -69,7 +69,7 @@ def process_drop(drop):
 @click.option(
     '--root',
     '-r',
-    default='var/drops/',
+    default='var/drop_root/',
     help='''location of the dropbox container directory''')
 @click.argument(
     'drop_id',
@@ -86,10 +86,10 @@ def debug(root, drop_id=None):     # pragma: no cover
 @click.option(
     '--root',
     '-r',
-    default='var/drops/',
+    default='var/drop_root/',
     help='''location of the dropbox container directory''')
 @click.option(
-    '--debug',
+    '--debug/--no-debug',
     default=False,
     help='''process synchronously, allowing to set break points etc.''')
 def main(root, debug=False):     # pragma: no cover
