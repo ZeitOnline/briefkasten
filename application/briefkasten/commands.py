@@ -92,7 +92,7 @@ def debug(root, drop_id=None):     # pragma: no cover
     '--debug/--no-debug',
     default=False,
     help='''process synchronously, allowing to set break points etc.''')
-def main(root, debug=False):     # pragma: no cover
+def worker(root, debug=False):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
