@@ -37,7 +37,6 @@ class MyHandler(FileSystemEventHandler):
         self.main_loop_cond.acquire()
         self.main_loop_cond.notify()
         self.main_loop_cond.release()
-        print "directory modified"
 
 
 def keyboard_interrupt_handler(signal, frame):
@@ -123,6 +122,8 @@ def main(root):     # pragma: no cover
                     workers.map_async(process_drop, [drop])
                 else:
                     process_drop(drop)
+            else:
+                print('Not processing drop with status %d ' % drop.status_int)
 
         # Wait for directory content to change
         condition.wait()
