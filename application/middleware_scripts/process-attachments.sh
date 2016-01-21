@@ -78,7 +78,7 @@ if [ "${the_jdispatcher_dir}" ]; then
   # This normally should not fail, because there's
   # never more workers than jails. So wait, only then fail.
   unset retries
-  while [ -z ${my_dispatcher} -a ${#retries} -lt 3]; do
+  while [ -z ${my_dispatcher} -a ${#retries} -lt 3 ]; do
     retries=${retries}X
     my_dispatcher=$( "${the_jdispatcher_dir}"/claim )
     if [ $? -ne 0 ]; then
