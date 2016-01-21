@@ -65,11 +65,11 @@ def process_drop(drop):
     remove(path.join(drop.container.fs_scratch, drop.drop_id))
 
 
-@click.command(help='debug a single drop')
+@click.command(help='debug processing of drops')
 @click.option(
     '--root',
     '-r',
-    default='var/drops/',
+    default='var/drop_root/',
     help='''location of the dropbox container directory''')
 @click.argument(
     'drop_id',
@@ -77,24 +77,35 @@ def process_drop(drop):
     default=None,
 )
 def debug(root, drop_id=None):     # pragma: no cover
-    root = DropboxContainer(root=root)
-    for drop in root:
-        print(drop)
+    drop_root = root = DropboxContainer(root=root)
+    if drop_id is not None:
+        drops = [drop_root.get_dropbox(drop_id)]
+    else:
+        drops = drop_root
+    for drop in drops:
+        print('debugging %s' % drop)
+        if drop.status_int == 20:
+            drop.process()
 
 
 @click.command(help='Scans dropbox directory for unprocessed drops and processes them')
 @click.option(
     '--root',
     '-r',
-    default='var/drops/',
+    default='var/drop_root/',
     help='''location of the dropbox container directory''')
-def main(root):     # pragma: no cover
+@click.option(
+    '--debug/--no-debug',
+    default=False,
+    help='''process synchronously, allowing to set break points etc.''')
+def worker(root, debug=False):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
     # Setup multiprocessing pool with that amount of workers as
     # implied by the amount of worker jails
-    workers = Pool(processes=settings.get('num_workers', 1))
+    if not debug:
+        workers = Pool(processes=settings.get('num_workers', 1))
 
     # Setup the condition object that we will wait for, it
     # signals changes in the directory
@@ -116,9 +127,9 @@ def main(root):     # pragma: no cover
             drop = drop_root.get_dropbox(drop_id)
 
             # Only look at drops that actually are for us
-            if(drop.status_int == 20):
+            if drop.status_int == 20:
                 # process drops without attachments synchronously
-                if drop.num_attachments > 0:
+                if not debug and drop.num_attachments > 0:
                     workers.map_async(process_drop, [drop])
                 else:
                     process_drop(drop)

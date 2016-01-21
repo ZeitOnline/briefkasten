@@ -72,8 +72,8 @@ setup(
         [pytest11]
         briefkasten = briefkasten.testing
         [console_scripts]
-        debug = briefkasten.worker:debug
-        worker = briefkasten.worker:main
+        debug = briefkasten.commands:debug
+        worker = briefkasten.commands:worker
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),
