@@ -97,7 +97,7 @@ def dropbox_submission(dropbox, request):
         dropbox.add_attachment(data['upload'])
 
     # now we can call the process method
-    dropbox.status = u'020 submitted'
+    dropbox.submit()
     drop_url = request.route_url('dropbox_view', drop_id=dropbox.drop_id)
     print("Created dropbox %s" % drop_url)
     return HTTPFound(location=drop_url)

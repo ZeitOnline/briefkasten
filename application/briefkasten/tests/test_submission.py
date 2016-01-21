@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from os import listdir
-from os.path import join, dirname
+from os.path import join, dirname, exists
 from pytest import fixture
 from webtest import Upload
 
@@ -31,8 +31,11 @@ def test_submission_with_out_attachment_post(testing, dropbox_container, form):
     form['message'] = u'Hellø there'
     form.submit()
     assert len(listdir(dropbox_container.fs_path)) == 1
-    fs_dropbox_status = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0], 'status')
+    created_drop_id = listdir(dropbox_container.fs_path)[0]
+    fs_dropbox_status = join(dropbox_container.fs_path, created_drop_id, 'status')
     assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
+    fs_dropbox_submission = join(dropbox_container.fs_root, 'submissions', created_drop_id)
+    assert exists(fs_dropbox_submission)
 
 
 def test_submission_with_one_attachment_post(testing, dropbox_container, form):

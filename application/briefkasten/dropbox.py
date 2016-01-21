@@ -221,6 +221,11 @@ class Dropbox(object):
             shell=True,
             env=shellenv)
 
+    def submit(self):
+        with open(join(self.container.fs_submission_queue, self.drop_id), 'w'):
+            pass
+        self.status = u'020 submitted'
+
     def process(self, purge_meta_data=True, testing=False):
         """ Calls the external cleanser scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
