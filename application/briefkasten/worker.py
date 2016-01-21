@@ -106,7 +106,7 @@ def main(root):     # pragma: no cover
     observer.schedule(event_handler, drop_root.fs_submission_queue, recursive=False)
     observer.start()
 
-    signal( SIGINT, keyboard_interrupt_handler )
+    signal(SIGINT, keyboard_interrupt_handler)
 
     # grab lock, scan submission dir for jobs and process them
     condition.acquire()
