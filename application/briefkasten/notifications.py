@@ -34,7 +34,7 @@ def setup_smtp_factory(**settings):
 
 
 def checkRecipient(gpg_context, recipient):
-    uid = '< %s >' % recipient
+    uid = '<%s>' % recipient
     valid_key = bool([k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-'])
     if not valid_key:
         print('Invalid recipient %s' % recipient)
