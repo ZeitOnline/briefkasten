@@ -65,7 +65,7 @@ def process_drop(drop):
     remove(path.join(drop.container.fs_scratch, drop.drop_id))
 
 
-@click.command(help='debug a single drop')
+@click.command(help='debug processing of drops')
 @click.option(
     '--root',
     '-r',
@@ -77,9 +77,15 @@ def process_drop(drop):
     default=None,
 )
 def debug(root, drop_id=None):     # pragma: no cover
-    root = DropboxContainer(root=root)
-    for drop in root:
-        print(drop)
+    drop_root = root = DropboxContainer(root=root)
+    if drop_id is not None:
+        drops = [drop_root.get_dropbox(drop_id)]
+    else:
+        drops = drop_root
+    for drop in drops:
+        print('debugging %s' % drop)
+        if drop.status_int == 20:
+            drop.process()
 
 
 @click.command(help='Scans dropbox directory for unprocessed drops and processes them')
