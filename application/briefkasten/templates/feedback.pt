@@ -6,7 +6,7 @@
   metal:use-macro="master">
 
   <tal:content  metal:fill-slot="content">
-    <h1 i18n:translate="">Status der Einrichung <span i18n:name="drop_id">"${drop_id}"</span></h1>
+    <h1 i18n:translate="">Status der Einreichung <span i18n:name="drop_id">"${drop_id}"</span></h1>
     <tal:status tal:condition="status[:3] != '000'">
         <p tal:condition="status_code=='0'">Your submission has been received and is awaiting processing</p>
         <p tal:condition="status_code=='1'">Your submission is being moved into quarantine, where it will be stripped of meta data before being sent on.</p>
