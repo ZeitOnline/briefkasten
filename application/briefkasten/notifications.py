@@ -33,10 +33,12 @@ def setup_smtp_factory(**settings):
     )
 
 
-def checkRecipient(gpg_context, r):
-    uid = '<' + r + '>'
-    valid_keys = [k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-']
-    return bool(valid_keys)
+def checkRecipient(gpg_context, recipient):
+    uid = '< %s >' % recipient
+    valid_key = bool([k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-'])
+    if not valid_key:
+        print('Invalid recipient %s' % recipient)
+    return valid_key
 
 
 def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachments):
@@ -44,8 +46,9 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
     requires a pre-configured smtplib.SMTP instance"""
     sent = 0
     for to in recipients:
-        # if not checkRecipient(gpg_context, to):
-        #     continue
+
+        if not checkRecipient(gpg_context, to):
+            continue
 
         msg = MIMEMultipart()
 
