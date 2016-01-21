@@ -109,7 +109,10 @@ EOF
     fi
 
     # If jail's not running (anymore), restart
-    is_ezjail_alive "${worker}" || /usr/local/bin/ezjail-admin start "${worker}" || continue
+    if ! is_ezjail_alive "${worker}"; then
+        # if we can not start jail, do not provide claim script
+        /usr/local/bin/ezjail-admin start "${worker}" || continue
+    fi
 
     # Re-cyle the worker by cleaning it's work dir
     /bin/mkdir -p "${worker_dir}" || continue
