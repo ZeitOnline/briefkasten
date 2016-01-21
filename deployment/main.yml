@@ -166,3 +166,10 @@
         enabled: true
       tags:
       - jdispatch
+    - name: enable cronjob for jdispatch (as 'reaper')
+      cron:
+        name: "make sure long-running cleanser jails are reaped"
+        job: "/usr/local/bin/jdispatch"
+        minute: "*/3"
+      tags:
+      - jdispatch
