@@ -115,7 +115,7 @@ def worker(root, debug=False):     # pragma: no cover
                 else:
                     process_drop(drop)
             else:
-                print('Not processing drop with status %d ' % drop.status_int)
+                print('Not processing drop %s with status %d ' % (drop.drop_id, drop.status_int))
 
         # Wait for directory content to change
         condition.wait()
