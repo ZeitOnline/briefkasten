@@ -30,7 +30,7 @@ def reset_cleansers(confirm=True):
     """destroys all cleanser slaves and their rollback snapshots, as well as the initial master
     snapshot - this allows re-running the jailhost deployment to recreate fresh cleansers."""
 
-    if value_asbool(confirm) and yesno("""\nObacht!
+    if value_asbool(confirm) and not yesno("""\nObacht!
             This will destroy any existing and or currently running cleanser jails.
             Are you sure that you want to continue?"""):
         exit("Glad I asked...")
