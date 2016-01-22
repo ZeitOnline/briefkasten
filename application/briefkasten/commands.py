@@ -70,7 +70,29 @@ def debug(root, drop_id=None):     # pragma: no cover
             drop.process()
 
 
-@click.command(help='Scans dropbox directory for unprocessed drops and processes them')
+@click.command(help='Scans dropbox submission directory for unprocessed drops and processes them')
+@click.option(
+    '--root',
+    '-r',
+    default='var/drop_root/',
+    help='''location of the dropbox container directory''')
+def worker(root, debug=False):     # pragma: no cover
+    drop_root = DropboxContainer(root=root)
+
+    while True:
+        for drop_id in listdir(drop_root.fs_submission_queue):
+            print(drop_id)
+            drop = drop_root.get_dropbox(drop_id)
+
+            # Only look at drops that actually are for us
+            if drop.status_int == 20:
+                process_drop(drop)
+            else:
+                print('Not processing drop %s with status %d ' % (drop.drop_id, drop.status_int))
+
+
+
+@click.command(help='listens for changes to submission directory and processes them asynchronously')
 @click.option(
     '--root',
     '-r',
@@ -80,7 +102,7 @@ def debug(root, drop_id=None):     # pragma: no cover
     '--debug/--no-debug',
     default=False,
     help='''process synchronously, allowing to set break points etc.''')
-def worker(root, debug=False):     # pragma: no cover
+def async_worker(root, debug=False):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
