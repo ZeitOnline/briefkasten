@@ -2,7 +2,7 @@
 - hosts: briefkasten
   user: root
   tasks:
-    - name: create jails
+    - name: ensure jails are running
       command: "ezjail-admin start {{item}}"
       args:
         creates: "/usr/jails/{{item}}"
@@ -39,7 +39,9 @@
   user: root
   tasks:
     - name: install packages
-      pkgng: name={{ item }} state=present
+      pkgng:
+        name: "{{ item }}"
+        state: present
       with_items:
       - zip
       - netpbm
@@ -69,31 +71,41 @@
         enabled: true
         state: started
       tags: cleanser_clones
-    # grant appserver's pyramid user ssh access
+    # grant worker's pyramid user ssh access
     - name: copy keyfile
-      command: cp {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      command: cp {{ jails_dir }}/worker/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
       args:
         creates: "{{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys"
+      tags: cleanser_clones
     - name: copy ssh pub host key
-      shell: sed -E -e 's:^:{{hostvars['briefkasten-cleanser']['ploy_ip']}} :' -e 's:[^ ]+$::' {{ jails_dir }}/cleanser/etc/ssh/ssh_host_rsa_key.pub > {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/known_hosts creates={{ jails_dir }}/appserver/usr/home/pyramid/.ssh/known_hosts
+      shell: sed -E -e 's:^:{{hostvars['briefkasten-cleanser']['ploy_ip']}} :' -e 's:[^ ]+$::' {{ jails_dir }}/cleanser/etc/ssh/ssh_host_rsa_key.pub > {{ jails_dir }}/worker/usr/home/pyramid/.ssh/known_hosts creates={{ jails_dir }}/worker/usr/home/pyramid/.ssh/known_hosts
+      tags: cleanser_clones
     - name: fix permissions on keyfile
       command: chmod 600 {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      tags: cleanser_clones
     - name: fix permissions on known_hosts
       command: chmod 600 {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/known_hosts
+      tags: cleanser_clones
 
-- hosts: briefkasten-appserver
+- hosts: briefkasten-worker
   user: root
   tasks:
     - name: fix ownership of known_hosts
       command: chown pyramid /usr/home/pyramid/.ssh/known_hosts
+      tags: cleanser_clones
 
 - hosts: briefkasten-cleanser
   user: root
   tasks:
     - name: ensure ownership of scripts
       command: chown -R cleanser /usr/home/cleanser
+      tags: cleanser_clones
     - name: Upload cleanser scripts
-      copy: src=../application/middleware_scripts/ dest=/usr/local/bin/
+      copy:
+        src: ../application/middleware_scripts/
+        dest: /usr/local/bin/
+        mode: '0755'
+      tags: cleanser_clones
 
 # the cleanser jail is now ready to be snapshotted and cloned
 - hosts: briefkasten
