@@ -10,24 +10,6 @@ from threading import Condition
 from .dropbox import DropboxContainer
 
 
-def get_settings(fs_config):
-
-    import ConfigParser
-
-    class MyParser(ConfigParser.SafeConfigParser):
-
-        def as_dict(self):
-            d = dict(self._sections)
-            for k in d:
-                d[k] = dict(self._defaults, **d[k])
-                d[k].pop('__name__', None)
-            return d
-
-    parser = MyParser()
-    parser.read(fs_config)
-    return parser.as_dict()['app:briefkasten']
-
-
 class MyHandler(FileSystemEventHandler):
 
     def __init__(self, main_loop_cond):
@@ -100,7 +82,6 @@ def debug(root, drop_id=None):     # pragma: no cover
     help='''process synchronously, allowing to set break points etc.''')
 def worker(root, debug=False):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
-    settings = drop_root.settings
 
     # Setup multiprocessing pool with that amount of workers as
     # implied by the amount of worker jails
