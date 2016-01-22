@@ -82,6 +82,7 @@ def debug(root, drop_id=None):     # pragma: no cover
     help='''process synchronously, allowing to set break points etc.''')
 def worker(root, debug=False):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
+    settings = drop_root.settings
 
     # Setup multiprocessing pool with that amount of workers as
     # implied by the amount of worker jails
