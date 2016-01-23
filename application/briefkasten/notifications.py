@@ -33,11 +33,10 @@ def setup_smtp_factory(**settings):
     )
 
 
-def checkRecipient(gpg_context, recipient):
-    uid = '<%s>' % recipient
+def checkRecipient(gpg_context, uid):
     valid_key = bool([k for k in gpg_context.list_keys() if uid in ', '.join(k['uids']) and k['trust'] in 'ofqmu-'])
     if not valid_key:
-        print('Invalid recipient %s' % recipient)
+        print('Invalid recipient %s' % uid)
     return valid_key
 
 
@@ -46,8 +45,12 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
     requires a pre-configured smtplib.SMTP instance"""
     sent = 0
     for to in recipients:
+        if not to.startswith('<'):
+            uid = '<%s>' % to
+        else:
+            uid = to
 
-        if not checkRecipient(gpg_context, to):
+        if not checkRecipient(gpg_context, uid):
             continue
 
         msg = MIMEMultipart()
@@ -58,14 +61,14 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
         msg["Date"] = formatdate(localtime=True)
         msg.preamble = u'This is an email in encrypted multipart format.'
 
-        attach = MIMEText(str(gpg_context.encrypt(text, to, always_trust=True)))
+        attach = MIMEText(str(gpg_context.encrypt(text, uid, always_trust=True)))
         attach.set_charset('UTF-8')
         msg.attach(attach)
 
         for attachment in attachments:
             with open(attachment, 'rb') as fp:
                 attach = MIMEBase('application', 'octet-stream')
-                attach.set_payload(str(gpg_context.encrypt_file(fp, to, always_trust=True)))
+                attach.set_payload(str(gpg_context.encrypt_file(fp, uid, always_trust=True)))
             attach.add_header('Content-Disposition', 'attachment', filename=basename('%s.pgp' % attachment))
             msg.attach(attach)
 
