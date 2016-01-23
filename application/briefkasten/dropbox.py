@@ -307,7 +307,7 @@ class Dropbox(object):
         """
         try:
             with open(join(self.fs_path, u'message')) as message_file:
-                return ''.join(message_file.readlines())
+                return u''.join(message_file.readlines()).decode('utf-8')
         except IOError:
             return u''
 
