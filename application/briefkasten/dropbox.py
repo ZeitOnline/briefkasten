@@ -243,7 +243,7 @@ class Dropbox(object):
                 self.status = '900 success'
             else:
                 self.status = '505 smtp failure'
-        except Exception as exc:
+        except Exception:
             import traceback
             tb = traceback.format_exc()
             self.status = '510 smtp error (%s)' % tb
