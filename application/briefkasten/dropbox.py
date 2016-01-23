@@ -182,6 +182,7 @@ class Dropbox(object):
             return self.status
 
         if asbool(self.settings.get('debug', False)):
+            self.status = u'101 creating initial encrypted backup'
             file_out = BIO()
             with tarfile.open(mode='w|', fileobj=file_out) as tar:
                 tar.add(join(self.fs_path, 'message'))
@@ -195,6 +196,7 @@ class Dropbox(object):
             )
 
     def _notify_editors(self):
+        self.status = '110 sending mails to the editor(s)'
         attachments_cleaned = []
         cleaned = join(self.fs_path, 'clean')
         if exists(cleaned):
@@ -210,6 +212,7 @@ class Dropbox(object):
         )
 
     def _process_attachments(self, testing):
+        self.status = u'105 processing attachments'
         fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
         fs_config = join(
             self.settings['fs_bin_path'],
