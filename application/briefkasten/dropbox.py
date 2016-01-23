@@ -137,7 +137,6 @@ class Dropbox(object):
         if message is not None:
             # write the message into a file
             self._write_message(fs_dropbox_path, 'message', message)
-            self.message = message
 
         # write the attachment into a file
         if attachments is not None:
@@ -301,6 +300,16 @@ class Dropbox(object):
             return [load(open(fs_reply_path, 'r'))]
         else:
             return []
+
+    @property
+    def message(self):
+        """ returns the user submitted text
+        """
+        try:
+            with open(join(self.fs_path, u'message')) as message_file:
+                return message_file.readlines()
+        except IOError:
+            return u''
 
     @property
     def status(self):
