@@ -102,7 +102,7 @@ def debug_worker(root):     # pragma: no cover
     '--async/--no-async',
     default=False,
     help='''process asynchronously''')
-def worker(root, async=False):     # pragma: no cover
+def worker(root, async=True):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
