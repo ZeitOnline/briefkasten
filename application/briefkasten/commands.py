@@ -100,7 +100,7 @@ def debug_worker(root):     # pragma: no cover
     help='''location of the dropbox container directory''')
 @click.option(
     '--async/--no-async',
-    default=False,
+    default=True,
     help='''process asynchronously''')
 def worker(root, async=True):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
