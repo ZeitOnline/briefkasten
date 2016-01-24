@@ -136,7 +136,6 @@ class Dropbox(object):
         if message is not None:
             # write the message into a file
             self._write_message(fs_dropbox_path, 'message', message)
-            self.message = message
 
         # write the attachment into a file
         if attachments is not None:
@@ -181,6 +180,7 @@ class Dropbox(object):
             return self.status
 
         if asbool(self.settings.get('debug', False)):
+            self.status = u'101 creating initial encrypted backup'
             with ZipFile('backup.zip', 'w', ZIP_STORED) as backup:
                 backup.write( 'message')
                 attachdir = join(self.fs_path, 'attach')
@@ -199,6 +199,7 @@ class Dropbox(object):
             remove('backup.zip')
 
     def _notify_editors(self):
+        self.status = '110 sending mails to the editor(s)'
         attachments_cleaned = []
         cleaned = join(self.fs_path, 'clean')
         if exists(cleaned):
@@ -214,6 +215,7 @@ class Dropbox(object):
         )
 
     def _process_attachments(self, testing):
+        self.status = u'105 processing attachments'
         fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
         fs_config = join(
             self.settings['fs_bin_path'],
@@ -245,8 +247,10 @@ class Dropbox(object):
                 self.status = '900 success'
             else:
                 self.status = '505 smtp failure'
-        except Exception as exc:
-            self.status = '510 smtp error (%s)' % exc
+        except Exception:
+            import traceback
+            tb = traceback.format_exc()
+            self.status = '510 smtp error (%s)' % tb
 
         self.cleanup()
         return self.status
@@ -300,6 +304,16 @@ class Dropbox(object):
             return [load(open(fs_reply_path, 'r'))]
         else:
             return []
+
+    @property
+    def message(self):
+        """ returns the user submitted text
+        """
+        try:
+            with open(join(self.fs_path, u'message')) as message_file:
+                return u''.join(message_file.readlines().decode('utf-8'))
+        except IOError:
+            return u''
 
     @property
     def status(self):

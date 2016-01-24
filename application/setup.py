@@ -74,6 +74,7 @@ setup(
         [console_scripts]
         debug = briefkasten.commands:debug
         worker = briefkasten.commands:worker
+        janitor = briefkasten.commands:janitor
     """,
     message_extractors={'briefkasten': [
         ('**.py', 'lingua_python', None),

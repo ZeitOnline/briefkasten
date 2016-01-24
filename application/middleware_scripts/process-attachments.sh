@@ -130,7 +130,7 @@ if [ "${the_cleanser}" ]; then
   # remove remote dir or release jail to jdispatcher
   if [ "${my_dispatcher}" ]; then
     # If the jail has been wiped from the outside, we assume a timeout
-    [ -f "${my_dispatcher}"/taken ] || exnerr 520 "cleanser timeout failure."
+    [ -f "${my_dispatcher}"/token/taken ] || exnerr 520 "cleanser timeout failure."
 
     ${my_dispatcher}/release
   else

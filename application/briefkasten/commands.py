@@ -47,6 +47,20 @@ def process_drop(drop):
     remove(path.join(drop.container.fs_scratch, drop.drop_id))
 
 
+@click.command(help='performs sanity and config checks and cleans up old drops')
+@click.option(
+    '--root',
+    '-r',
+    default='var/drop_root/',
+    help='''location of the dropbox container directory''')
+def janitor(root):     # pragma: no cover
+    drop_root = root = DropboxContainer(root=root)
+    settings = drop_root.settings
+    for drop in drop_root:
+        print('debugging %s' % drop)
+
+
+
 @click.command(help='debug processing of drops')
 @click.option(
     '--root',
@@ -100,9 +114,9 @@ def debug_worker(root):     # pragma: no cover
     help='''location of the dropbox container directory''')
 @click.option(
     '--async/--no-async',
-    default=False,
+    default=True,
     help='''process asynchronously''')
-def worker(root, async=False):     # pragma: no cover
+def worker(root, async=True):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
