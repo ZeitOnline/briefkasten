@@ -181,22 +181,26 @@ class Dropbox(object):
 
         if asbool(self.settings.get('debug', False)):
             self.status = u'101 creating initial encrypted backup'
-            with ZipFile('backup.zip', 'w', ZIP_STORED) as backup:
-                backup.write( 'message')
+            fs_backup = join(self.fs_path, 'backup.zip')
+            fs_backup_pgp = join(self.fs_path, 'backup.zip.pgp')
+            with ZipFile(fs_backup, 'w', ZIP_STORED) as backup:
+                if exists('message'):
+                    backup.write('message')
                 attachdir = join(self.fs_path, 'attach')
                 if exists(attachdir):
                     for f in listdir(attachdir):
-                        backup.write(join(attachdir,f))
+                        backup.write(join(attachdir, f))
 
-            with open(filename, "rb") as backup:
+            with open(fs_backup, "rb") as backup:
                 self.gpg_context.encrypt_file(
-                    backup
+                    backup,
                     backup_recipients,
                     always_trust=True,
-                    output=join(self.fs_path, 'backup.zip.pgp')
+                    output=fs_backup_pgp
                 )
 
-            remove('backup.zip')
+            remove(fs_backup)
+            return fs_backup_pgp
 
     def _notify_editors(self):
         self.status = '110 sending mails to the editor(s)'
