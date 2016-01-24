@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import gnupg
 import shutil
-import tarfile
 import yaml
-from cStringIO import StringIO as BIO
 from glob import glob
 from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
@@ -12,6 +10,7 @@ from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, isfile, join, splitext
 from pyramid.settings import asbool, aslist
 from random import SystemRandom
+from zipfile import ZipFile, ZIP_STORED
 from subprocess import call
 
 from .notifications import (
@@ -182,17 +181,22 @@ class Dropbox(object):
             return self.status
 
         if asbool(self.settings.get('debug', False)):
-            file_out = BIO()
-            with tarfile.open(mode='w|', fileobj=file_out) as tar:
-                tar.add(join(self.fs_path, 'message'))
-                if exists(join(self.fs_path, 'attach')):
-                    tar.add(join(self.fs_path, 'attach'))
-            self.gpg_context.encrypt(
-                file_out.getvalue(),
-                backup_recipients,
-                always_trust=True,
-                output=join(self.fs_path, 'backup.tar.pgp')
-            )
+            with ZipFile('backup.zip', 'w', ZIP_STORED) as backup:
+                backup.write( 'message')
+                attachdir = join(self.fs_path, 'attach')
+                if exists(attachdir):
+                    for f in listdir(attachdir):
+                        backup.write(join(attachdir,f))
+
+            with open(filename, "rb") as backup:
+                self.gpg_context.encrypt_file(
+                    backup
+                    backup_recipients,
+                    always_trust=True,
+                    output=join(self.fs_path, 'backup.zip.pgp')
+                )
+
+            remove('backup.zip')
 
     def _notify_editors(self):
         attachments_cleaned = []
@@ -329,7 +333,7 @@ class Dropbox(object):
         shutil.rmtree(join(self.fs_path, u'attach'), ignore_errors=True)
         try:
             remove(join(self.fs_path, u'message'))
-            remove(join(self.fs_path, u'backup.tar.pgp'))
+            remove(join(self.fs_path, u'backup.zip.pgp'))
         except OSError:
             pass
 
@@ -338,7 +342,7 @@ class Dropbox(object):
         self.sanitize()
         shutil.rmtree(join(self.fs_path, u'clean'), ignore_errors=True)
         try:
-            remove(join(self.fs_path, u'backup.tar.pgp'))
+            remove(join(self.fs_path, u'backup.zip.pgp'))
         except OSError:
             pass
 
