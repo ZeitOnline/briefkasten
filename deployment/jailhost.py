@@ -50,12 +50,32 @@ def reset_cleansers(confirm=True):
             fab.run('umount -f /usr/jails/cleanser_{cindex}'.format(cindex=cindex))
             fab.run('rm -rf /usr/jails/cleanser_{cindex}'.format(cindex=cindex))
 
-    # remove master snapshot
     with fab.warn_only():
+        # remove master snapshot
         fab.run('zfs destroy -R tank/jails/cleanser@clonesource')
 
-    # restart worker and cleanser to prepare for subsequent ansible configuration runs
-    fab.run('ezjail-admin start worker')
-    fab.run('ezjail-admin stop cleanser')
-    fab.run('ezjail-admin start cleanser')
+        # restart worker and cleanser to prepare for subsequent ansible configuration runs
+        fab.run('ezjail-admin start worker')
+        fab.run('ezjail-admin stop cleanser')
+        fab.run('ezjail-admin start cleanser')
 
+
+@task
+def reset_jails(confirm=True, keep_cleanser_master=True):
+    """ stops, deletes and re-creates all jails.
+    since the cleanser master is rather large, that one is omitted by default.
+    """
+    if value_asbool(confirm) and not yesno("""\nObacht!
+            This will destroy all existing and or currently running jails on the host.
+            Are you sure that you want to continue?"""):
+        exit("Glad I asked...")
+
+    reset_cleansers(confirm=False)
+
+    jails = ['appserver', 'webserver', 'worker']
+    if not value_asbool(keep_cleanser_master):
+        jails.append('cleanser')
+
+    for jail in jails:
+        with fab.warn_only():
+            fab.run('ezjail-admin delete -fw {jail}'.format(jail=jail))

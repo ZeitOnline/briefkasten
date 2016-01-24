@@ -23,6 +23,13 @@ configure-jails:
 upload-pgp-keys:
 	bin/ploy do appserver upload_pgp_keys
 
+reset-host:
+	bin/ploy do briefkasten reset_jails
+
+update-app:
+	bin/ploy do worker update_backend
+	bin/ploy do appserver update_backend build=false
+
 clean:
 	git clean -fXd
 
