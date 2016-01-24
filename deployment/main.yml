@@ -84,8 +84,7 @@
       command: chmod 600 {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
       tags: cleanser_clones
     - name: fix permissions on known_hosts
-      command: chmod 600 {{ jails_dir }}/appserver/usr/home/pyramid/.ssh/known_hosts
-      ignore_errors: yes
+      command: chmod 600 {{ jails_dir }}/worker/usr/home/pyramid/.ssh/known_hosts
       tags: cleanser_clones
 
 - hosts: briefkasten-worker
