@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import shutil
 from cgi import FieldStorage
+from jinja2 import Environment, PackageLoader
 from os.path import abspath, dirname, join
 from mock import Mock
 from pyramid.testing import DummyRequest, setUp, tearDown
@@ -9,20 +10,33 @@ from urllib import unquote
 from webtest import TestApp
 
 
+jinja_env = Environment(loader=PackageLoader('briefkasten', 'tests'))
+
+
 def asset_path(*parts):
     return abspath(join(dirname(__file__), 'tests', *parts))
 
 
 @fixture(scope="function")
-def dropbox_container(request, tmpdir):
+def gpghome(tmpdir):
+    fs_gpghome = join(tmpdir.strpath, 'gpghome')
+    shutil.copytree(asset_path('gpghome'), fs_gpghome)
+    return fs_gpghome
+
+
+@fixture(scope="function")
+def dropbox_container(request, tmpdir, gpghome):
     from briefkasten.dropbox import DropboxContainer
     # initialize empty directory with settings from template:
-    shutil.copy(
-        join(asset_path('drop_root_template', 'settings.yaml')),
-        tmpdir.strpath,
-    )
+    fs_drop_root = tmpdir.strpath
+    with open(join(fs_drop_root, 'settings.yaml'), 'w') as fs_settings:
+        fs_settings.write(
+            jinja_env.get_template('drop_root_template/settings.yaml').render(
+                fs_pgp_pubkeys=gpghome
+            )
+        )
     dropbox_container = DropboxContainer(
-        root=tmpdir.strpath,
+        root=fs_drop_root,
         settings=dict(
             smtp=Mock(),
             fs_bin_path=asset_path('bin'),
@@ -33,11 +47,10 @@ def dropbox_container(request, tmpdir):
 
 
 @fixture
-def settings(dropbox_container):
+def settings(dropbox_container, gpghome):
     return {
         'appserver_root_url': '/briefkasten/',
         'fs_dropbox_root': dropbox_container.fs_root,
-        'fs_pgp_pubkeys': asset_path('gpghome'),
         'fs_bin_path': asset_path('bin'),
         'post_secret': u's3cr3t',
     }
