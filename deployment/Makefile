@@ -1,3 +1,5 @@
+build = true
+
 bin/devpi bin/ploy: bin/pip
 	bin/pip install -r requirements.txt
 
@@ -27,7 +29,7 @@ reset-host:
 	bin/ploy do briefkasten reset_jails
 
 update-app:
-	bin/ploy do worker update_backend
+	bin/ploy do worker update_backend build=$(build)
 	bin/ploy do appserver update_backend build=false
 
 clean:
