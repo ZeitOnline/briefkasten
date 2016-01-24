@@ -231,6 +231,12 @@ def test_editor_url(dropbox, app, testing):
         editor_token=dropbox.editor_token)
 
 
+def test_notification_text_message(dropbox_without_attachment):
+    message = u'Sätz mit Ümlœuten'
+    dropbox_without_attachment.update_message(message)
+    assert message in dropbox_without_attachment._notification_text
+
+
 def test_notification_text_zero(dropbox_without_attachment):
     assert u'Die Einreichung enthielt keine Anhänge.' in dropbox_without_attachment._notification_text
 

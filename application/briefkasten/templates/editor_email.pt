@@ -13,7 +13,7 @@ Die Einreichung enthielt einen Anhang.
 Die Einreichung enthielt keine Anhänge.
 {% endif %}
 
-----
+Die vom Absender hinterlegte Nachricht lautet:
 
 {{dropbox.message}}
 
