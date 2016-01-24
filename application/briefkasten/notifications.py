@@ -62,7 +62,7 @@ def sendMultiPart(smtp, gpg_context, sender, recipients, subject, text, attachme
         msg["Date"] = formatdate(localtime=True)
         msg.preamble = u'This is an email in encrypted multipart format.'
 
-        attach = MIMEText(str(gpg_context.encrypt(text, uid, always_trust=True)))
+        attach = MIMEText(str(gpg_context.encrypt(text.encode('utf-8'), uid, always_trust=True)))
         attach.set_charset('UTF-8')
         msg.attach(attach)
 
