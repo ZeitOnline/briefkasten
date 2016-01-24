@@ -25,6 +25,7 @@ def keyboard_interrupt_handler(signal, frame):
     print 'Caught keyboard interrupt. Exit.'
     exit(0)
 
+
 def run_watchdog():
     # once a day we should scan for old drop boxes
     # at noon we should test pgp keys
@@ -55,10 +56,8 @@ def process_drop(drop):
     help='''location of the dropbox container directory''')
 def janitor(root):     # pragma: no cover
     drop_root = root = DropboxContainer(root=root)
-    settings = drop_root.settings
     for drop in drop_root:
         print('debugging %s' % drop)
-
 
 
 @click.command(help='debug processing of drops')
@@ -103,7 +102,6 @@ def debug_worker(root):     # pragma: no cover
                 process_drop(drop)
             else:
                 print('Not processing drop %s with status %d ' % (drop.drop_id, drop.status_int))
-
 
 
 @click.command(help='listens for changes to submission directory and processes them asynchronously')
