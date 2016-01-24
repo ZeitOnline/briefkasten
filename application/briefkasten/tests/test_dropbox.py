@@ -4,8 +4,6 @@ import os
 import stat
 from os.path import dirname, exists, join
 
-from pytest import raises
-
 
 def test_dropbox_is_created_if_it_does_not_exist():
     from shutil import rmtree
@@ -69,9 +67,7 @@ def test_dropbox_process_failure(dropbox):
 def test_dropbox_retrieval(dropbox_container, dropbox):
     assert dropbox.drop_id == dropbox_container.get_dropbox(dropbox.drop_id).drop_id
     assert dropbox.editor_token == dropbox_container.get_dropbox(dropbox.drop_id).editor_token
-    # the message itself is not stored on the fs!
-    with raises(AttributeError):
-        assert dropbox.message == dropbox_container.get_dropbox(dropbox.drop_id).message
+    assert dropbox.message == dropbox_container.get_dropbox(dropbox.drop_id).message
 
 
 def test_dropbox_permissions(dropbox):
