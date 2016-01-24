@@ -4,7 +4,7 @@ Die unten angefügte Nachricht wurde für Sie hinterlassen. Zum
 Beantworten schreiben Sie nicht an die Absenderadresse, sondern
 benutzen das Webformular unter der Adresse:
 
-{{dropbox.drop_url}}
+{{dropbox.editor_url}}
 {% if num_attachments > 1 %}
 Die Einreichung enthielt {{num_attachments}} Anhänge.
 {% elif num_attachments == 1 %}
