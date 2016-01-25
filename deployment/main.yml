@@ -77,23 +77,19 @@
       args:
         creates: "{{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys"
       tags: cleanser_clones
+    - name: fix permissions on keyfile
+      command: chmod 600 {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      tags: cleanser_clones
     - name: read ssh pub host key
       shell: sed -E -e 's:[^ ]+$::' {{ jails_dir }}/cleanser/etc/ssh/ssh_host_rsa_key.pub
       register: cleanser_ssh_fingerprint
-      tags:
-        - cleanser_clones
-        - debugx
+      tags: cleanser_clones
     - name: configure known_hosts for cleanser jails
       template:
         src: templates/worker_known_hosts
-        dest: "{{ jails_dir }}/worker/usr/home/pyramid/.ssh/known_hosts"
+        dest: "{{ jails_dir }}/worker/usr/home/{{appuser}}/.ssh/known_hosts"
         owner: "{{appuserid}}"
         mode: "0600"
-      tags:
-        - cleanser_clones
-        - debugx
-    - name: fix permissions on keyfile
-      command: chmod 600 {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
       tags: cleanser_clones
 
 - hosts: briefkasten-worker
