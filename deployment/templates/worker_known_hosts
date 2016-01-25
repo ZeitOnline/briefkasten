@@ -1,0 +1,3 @@
+{% for id in range(1, ploy_cleanser_count + 1) %}
+[{{hostvars['briefkasten-cleanser']['ploy_ip']}}]:{{ploy_cleanser_ssh_baseport * 100 + id}} {{cleanser_ssh_fingerprint.stdout}}
+{% endfor %}
