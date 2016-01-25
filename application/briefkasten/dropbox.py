@@ -143,13 +143,8 @@ class Dropbox(object):
                     continue
                 self.add_attachment(attachment)
 
-    @property
-    def settings(self):
-        return self.container.settings
-
-    @property
-    def fs_attachment_container(self):
-        return join(self.fs_path, 'attach')
+    #
+    # top level methods that govern the life cycle of a dropbox:
 
     def add_attachment(self, attachment):
         fs_attachment_container = self.fs_attachment_container
@@ -165,6 +160,70 @@ class Dropbox(object):
         chmod(fs_attachment_path, 0660)
         self.paths_created.append(fs_attachment_path)
         return sanitized_filename
+
+    def submit(self):
+        with open(join(self.container.fs_submission_queue, self.drop_id), 'w'):
+            pass
+        self.status = u'020 submitted'
+
+    def process(self, purge_meta_data=True, testing=False):
+        """ Calls the external cleanser scripts to (optionally) purge the meta data and then
+            send the contents of the dropbox via email.
+        """
+
+        if self.num_attachments > 0:
+            self.status = u'100 processor running'
+            self._create_backup()
+            self._process_attachments(testing=testing)
+
+        try:
+            if self._notify_editors() > 0:
+                self.status = '900 success'
+            else:
+                self.status = '505 smtp failure'
+        except Exception:
+            import traceback
+            tb = traceback.format_exc()
+            self.status = '510 smtp error (%s)' % tb
+
+        self.cleanup()
+        return self.status
+
+    def cleanup(self):
+        """ ensures that no data leaks from drop after processing """
+        if self.status_int >= 500:
+            self.wipe()
+        else:
+            self.sanitize()
+
+    def sanitize(self):
+        """ removes all unencrypted user input """
+        shutil.rmtree(join(self.fs_path, u'attach'), ignore_errors=True)
+        try:
+            remove(join(self.fs_path, u'message'))
+            remove(join(self.fs_path, u'backup.zip.pgp'))
+        except OSError:
+            pass
+
+    def wipe(self):
+        """ removes all data except the status file"""
+        self.sanitize()
+        shutil.rmtree(join(self.fs_path, u'clean'), ignore_errors=True)
+        try:
+            remove(join(self.fs_path, u'backup.zip.pgp'))
+        except OSError:
+            pass
+
+    def add_reply(self, reply):
+        """ Add an editorial reply to the drop box.
+
+            :param reply: the message, must conform to  :class:`views.DropboxReplySchema`
+
+        """
+        self._write_message(self.fs_replies_path, 'message_001.txt', dumps(reply))
+
+    #
+    # "private" helper methods for processing a drop
 
     def _create_backup(self):
         backup_recipients = [r for r in self.editors + self.admins if checkRecipient(self.gpg_context, r)]
@@ -226,57 +285,8 @@ class Dropbox(object):
             shell=True,
             env=shellenv)
 
-    def submit(self):
-        with open(join(self.container.fs_submission_queue, self.drop_id), 'w'):
-            pass
-        self.status = u'020 submitted'
-
-    def process(self, purge_meta_data=True, testing=False):
-        """ Calls the external cleanser scripts to (optionally) purge the meta data and then
-            send the contents of the dropbox via email.
-        """
-
-        if self.num_attachments > 0:
-            self.status = u'100 processor running'
-            self._create_backup()
-            self._process_attachments(testing=testing)
-
-        try:
-            if self._notify_editors() > 0:
-                self.status = '900 success'
-            else:
-                self.status = '505 smtp failure'
-        except Exception:
-            import traceback
-            tb = traceback.format_exc()
-            self.status = '510 smtp error (%s)' % tb
-
-        self.cleanup()
-        return self.status
-
-    def add_reply(self, reply):
-        """ Add an editorial reply to the drop box.
-
-            :param reply: the message, must conform to  :class:`views.DropboxReplySchema`
-
-        """
-        self._write_message(self.fs_replies_path, 'message_001.txt', dumps(reply))
-
-    def _write_message(self, fs_container, fs_name, message):
-        if not exists(fs_container):
-            mkdir(fs_container)
-            chmod(fs_container, 0770)
-        fs_reply_path = join(fs_container, fs_name)
-        with open(fs_reply_path, 'w') as fs_reply:
-            fs_reply.write(message.encode('utf-8'))
-        chmod(fs_reply_path, 0660)
-        self.paths_created.append(fs_reply_path)
-
-    @property
-    def _notification_text(self):
-        return jinja_env.get_template('editor_email.j2').render(
-            num_attachments=self.num_attachments,
-            dropbox=self)
+    #
+    # helper properties:
 
     @property
     def num_attachments(self):
@@ -339,37 +349,29 @@ class Dropbox(object):
         with open(join(self.fs_path, u'status'), 'w') as status_file:
             status_file.write(state)
 
-    def cleanup(self):
-        """ ensures that no data leaks from drop after processing """
-        if self.status_int >= 500:
-            self.wipe()
-        else:
-            self.sanitize()
+    def _write_message(self, fs_container, fs_name, message):
+        if not exists(fs_container):
+            mkdir(fs_container)
+            chmod(fs_container, 0770)
+        fs_reply_path = join(fs_container, fs_name)
+        with open(fs_reply_path, 'w') as fs_reply:
+            fs_reply.write(message.encode('utf-8'))
+        chmod(fs_reply_path, 0660)
+        self.paths_created.append(fs_reply_path)
 
-    def sanitize(self):
-        """ removes all unencrypted user input """
-        shutil.rmtree(join(self.fs_path, u'attach'), ignore_errors=True)
-        try:
-            remove(join(self.fs_path, u'message'))
-            remove(join(self.fs_path, u'backup.zip.pgp'))
-        except OSError:
-            pass
+    @property
+    def _notification_text(self):
+        return jinja_env.get_template('editor_email.j2').render(
+            num_attachments=self.num_attachments,
+            dropbox=self)
 
-    def wipe(self):
-        """ removes all data except the status file"""
-        self.sanitize()
-        shutil.rmtree(join(self.fs_path, u'clean'), ignore_errors=True)
-        try:
-            remove(join(self.fs_path, u'backup.zip.pgp'))
-        except OSError:
-            pass
+    @property
+    def settings(self):
+        return self.container.settings
 
-    def __repr__(self):
-        return u'Dropbox %s (%s) at %s' % (
-            self.drop_id,
-            self.status,
-            self.fs_path,
-        )
+    @property
+    def fs_attachment_container(self):
+        return join(self.fs_path, 'attach')
 
     @property
     def drop_url(self):
@@ -380,3 +382,10 @@ class Dropbox(object):
         return self.settings['dropbox_editor_url_format'] % (
             self.drop_id,
             self.editor_token)
+
+    def __repr__(self):
+        return u'Dropbox %s (%s) at %s' % (
+            self.drop_id,
+            self.status,
+            self.fs_path,
+        )
