@@ -1,5 +1,7 @@
 [run]
-omit = briefkasten/tests/*
+omit =
+    briefkasten/tests/*
+    briefkasten/testing.py
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =
