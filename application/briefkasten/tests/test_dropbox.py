@@ -229,7 +229,7 @@ def test_editor_url(dropbox, app, testing):
 
 def test_notification_text_message(dropbox_without_attachment):
     message = u'Sätz mit Ümlœuten'
-    dropbox_without_attachment.update_message(message)
+    dropbox_without_attachment.message = message
     assert message in dropbox_without_attachment._notification_text
 
 

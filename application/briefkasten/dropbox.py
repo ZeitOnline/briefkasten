@@ -151,10 +151,6 @@ class Dropbox(object):
     def fs_attachment_container(self):
         return join(self.fs_path, 'attach')
 
-    def update_message(self, newtext):
-        """ overwrite the message text. this also updates the corresponding file. """
-        self._write_message(self.fs_path, 'message', newtext)
-
     def add_attachment(self, attachment):
         fs_attachment_container = self.fs_attachment_container
         if not exists(fs_attachment_container):
@@ -317,6 +313,11 @@ class Dropbox(object):
                 return u''.join([line.decode('utf-8') for line in message_file.readlines()])
         except IOError:
             return u''
+
+    @message.setter
+    def message(self, newtext):
+        """ overwrite the message text. this also updates the corresponding file. """
+        self._write_message(self.fs_path, 'message', newtext)
 
     @property
     def status(self):

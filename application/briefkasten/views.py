@@ -85,7 +85,7 @@ def dropbox_submission(dropbox, request):
         return HTTPFound(location=request.route_url('dropbox_form'))
 
     # set the message
-    dropbox.update_message(data['message'])
+    dropbox.message = data['message']
 
     # TODO: recognize submissions from the watchdog:
     # is_test_submission = is_equal(
