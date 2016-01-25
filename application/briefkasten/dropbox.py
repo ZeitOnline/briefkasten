@@ -278,7 +278,7 @@ class Dropbox(object):
 
     @property
     def _notification_text(self):
-        return jinja_env.get_template('editor_email.pt').render(
+        return jinja_env.get_template('editor_email.j2').render(
             num_attachments=self.num_attachments,
             dropbox=self)
 
