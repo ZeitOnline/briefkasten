@@ -8,7 +8,6 @@ from jinja2 import Environment, PackageLoader
 from json import load, dumps
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, isfile, join, splitext
-from pyramid.settings import asbool, aslist
 from random import SystemRandom
 from zipfile import ZipFile, ZIP_STORED
 from subprocess import call
@@ -119,8 +118,8 @@ class Dropbox(object):
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
         self.fs_replies_path = join(self.fs_path, 'replies')
         self.gpg_context = self.container.gpg_context
-        self.editors = aslist(self.settings['editors'])
-        self.admins = aslist(self.settings['admins'])
+        self.editors = self.settings['editors']
+        self.admins = self.settings['admins']
 
         if not exists(fs_dropbox_path):
             mkdir(fs_dropbox_path)
@@ -179,7 +178,7 @@ class Dropbox(object):
             self.status = u'500 no valid keys at all'
             return self.status
 
-        if asbool(self.settings.get('debug', False)):
+        if self.settings.get('debug', False):
             self.status = u'101 creating initial encrypted backup'
             fs_backup = join(self.fs_path, 'backup.zip')
             fs_backup_pgp = join(self.fs_path, 'backup.zip.pgp')
