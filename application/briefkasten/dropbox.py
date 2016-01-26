@@ -47,10 +47,22 @@ class DropboxContainer(object):
         self.fs_root = root
         self.fs_path = join(root, 'drops')
         self.fs_submission_queue = join(root, 'submissions')
+        self.fs_archive_cleansed = join(root, 'archive_cleansed')
+        self.fs_archive_failed = join(root, 'archive_failed')
+        self.fs_archive = dict(
+            clean=self.fs_archive_cleansed,
+            dirty=self.fs_archive_failed,
+        )
         self.fs_scratch = join(root, 'scratch')
 
         # ensure directories exist
-        for directory in [self.fs_root, self.fs_path, self.fs_submission_queue, self.fs_scratch]:
+        for directory in [
+                self.fs_root,
+                self.fs_path,
+                self.fs_submission_queue,
+                self.fs_archive_cleansed,
+                self.fs_archive_failed,
+                self.fs_scratch]:
             if not exists(directory):
                 makedirs(directory)
 
@@ -116,6 +128,8 @@ class Dropbox(object):
         self.container = container
         self.paths_created = []
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
+        self.fs_attachment_container = join(self.fs_path, 'attach')
+        self.fs_cleaned_attachment_container = join(self.fs_path, 'clean')
         self.fs_replies_path = join(self.fs_path, 'replies')
         self.gpg_context = self.container.gpg_context
         self.editors = self.settings['editors']
@@ -180,39 +194,25 @@ class Dropbox(object):
             if self._notify_editors() > 0:
                 self.status = '900 success'
             else:
-                self.status = '505 smtp failure'
+                self.status = '605 smtp failure'
         except Exception:
             import traceback
             tb = traceback.format_exc()
-            self.status = '510 smtp error (%s)' % tb
+            self.status = '610 smtp error (%s)' % tb
 
         self.cleanup()
         return self.status
 
     def cleanup(self):
-        """ ensures that no data leaks from drop after processing """
-        if self.status_int >= 500:
-            self.wipe()
-        else:
-            self.sanitize()
-
-    def sanitize(self):
-        """ removes all unencrypted user input """
-        shutil.rmtree(join(self.fs_path, u'attach'), ignore_errors=True)
+        """ ensures that no data leaks from drop after processing by
+        removing all data except the status file"""
         try:
             remove(join(self.fs_path, u'message'))
-            remove(join(self.fs_path, u'backup.zip.pgp'))
+            remove(join(self.fs_path, 'dirty.zip.pgp'))
         except OSError:
             pass
-
-    def wipe(self):
-        """ removes all data except the status file"""
-        self.sanitize()
         shutil.rmtree(join(self.fs_path, u'clean'), ignore_errors=True)
-        try:
-            remove(join(self.fs_path, u'backup.zip.pgp'))
-        except OSError:
-            pass
+        shutil.rmtree(join(self.fs_path, u'attach'), ignore_errors=True)
 
     def add_reply(self, reply):
         """ Add an editorial reply to the drop box.
@@ -225,7 +225,7 @@ class Dropbox(object):
     #
     # "private" helper methods for processing a drop
 
-    def _create_backup(self):
+    def _create_encrypted_zip(self, source='dirty'):
         backup_recipients = [r for r in self.editors if checkRecipient(self.gpg_context, r)]
 
         # this will be handled by watchdog, no need to send for each drop
@@ -233,13 +233,16 @@ class Dropbox(object):
             self.status = u'500 no valid keys at all'
             return self.status
 
-        self.status = u'101 creating initial encrypted backup'
-        fs_backup = join(self.fs_path, 'backup.zip')
-        fs_backup_pgp = join(self.fs_path, 'backup.zip.pgp')
+        fs_backup = join(self.fs_path, '%s.zip' % source)
+        fs_backup_pgp = join(self.fs_path, '%s.zip.pgp' % source)
+        fs_source = dict(
+            dirty=self.fs_dirty_attachments,
+            clean=self.fs_attachment_container
+        )
         with ZipFile(fs_backup, 'w', ZIP_STORED) as backup:
             if exists('message'):
                 backup.write('message')
-                for fs_attachment in self.fs_dirty_attachments:
+                for fs_attachment in fs_source[source]:
                     backup.write(fs_attachment)
 
         with open(fs_backup, "rb") as backup:
@@ -252,6 +255,24 @@ class Dropbox(object):
 
         remove(fs_backup)
         return fs_backup_pgp
+
+    def _create_backup(self):
+        self.status = u'101 creating initial encrypted backup'
+        return self._create_encrypted_zip(source='dirty')
+
+    def _process_attachments(self, testing):
+        self.status = u'105 processing attachments'
+        fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
+        fs_config = join(
+            self.settings['fs_bin_path'],
+            'briefkasten%s.conf' % ('_test' if testing else ''))
+        shellenv = environ.copy()
+        shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
+        call(
+            "%s -d %s -c %s" % (fs_process, self.fs_path, fs_config),
+            shell=True,
+            env=shellenv)
+        # status is now < 500 if cleansing was successful or >= 500 && < 600 if cleansing failed
 
     def _notify_editors(self):
         self.status = '110 sending mails to the editor(s)'
@@ -269,18 +290,9 @@ class Dropbox(object):
             attachments_cleaned
         )
 
-    def _process_attachments(self, testing):
-        self.status = u'105 processing attachments'
-        fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
-        fs_config = join(
-            self.settings['fs_bin_path'],
-            'briefkasten%s.conf' % ('_test' if testing else ''))
-        shellenv = environ.copy()
-        shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
-        call(
-            "%s -d %s -c %s" % (fs_process, self.fs_path, fs_config),
-            shell=True,
-            env=shellenv)
+    def _create_archive(self):
+        self.status = u'700 creating final encrypted backup of cleansed attachments'
+        return self._create_encrypted_zip(source='clean')
 
     #
     # helper properties:
@@ -367,8 +379,22 @@ class Dropbox(object):
         return self.container.settings
 
     @property
-    def fs_attachment_container(self):
-        return join(self.fs_path, 'attach')
+    def fs_dirty_attachments(self):
+        """ returns a list of absolute paths to the attachements"""
+        if exists(self.fs_attachment_container):
+            return [join(self.fs_attachment_container, attachment)
+                    for attachment in listdir(self.fs_attachment_container)]
+        else:
+            return []
+
+    @property
+    def fs_clean_attachments(self):
+        """ returns a list of absolute paths to the cleansed attachements"""
+        if exists(self.fs_cleaned_attachment_container):
+            return [join(self.fs_cleansed_attachment_container, attachment)
+                    for attachment in listdir(self.fs_cleansed_attachment_container)]
+        else:
+            return []
 
     @property
     def drop_url(self):
