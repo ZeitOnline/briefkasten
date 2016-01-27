@@ -180,7 +180,7 @@ class Dropbox(object):
             pass
         self.status = u'020 submitted'
 
-    def process(self, purge_meta_data=True, testing=False):
+    def process(self):
         """ Calls the external cleanser scripts to (optionally) purge the meta data and then
             send the contents of the dropbox via email.
         """
@@ -188,7 +188,7 @@ class Dropbox(object):
         if self.num_attachments > 0:
             self.status = u'100 processor running'
             self._create_backup()
-            self._process_attachments(testing=testing)
+            self._process_attachments()
 
         try:
             if self._notify_editors() > 0:
@@ -260,12 +260,10 @@ class Dropbox(object):
         self.status = u'101 creating initial encrypted backup'
         return self._create_encrypted_zip(source='dirty')
 
-    def _process_attachments(self, testing):
+    def _process_attachments(self):
         self.status = u'105 processing attachments'
         fs_process = join(self.settings['fs_bin_path'], 'process-attachments.sh')
-        fs_config = join(
-            self.settings['fs_bin_path'],
-            'briefkasten%s.conf' % ('_test' if testing else ''))
+        fs_config = join(self.settings['fs_bin_path'], 'briefkasten.conf')
         shellenv = environ.copy()
         shellenv['PATH'] = '%s:%s:/usr/local/bin/:/usr/local/sbin/' % (shellenv['PATH'], self.settings['fs_bin_path'])
         call(
