@@ -338,8 +338,6 @@ class Dropbox(object):
 
     @property
     def status(self):
-        """ returns either 'created', 'quarantined', 'success' or 'failure'
-        """
         try:
             with open(join(self.fs_path, u'status')) as status_file:
                 return status_file.readline()
