@@ -2,7 +2,6 @@
 import gnupg
 import shutil
 import yaml
-from glob import glob
 from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
 from json import load, dumps
@@ -313,10 +312,9 @@ class Dropbox(object):
 
     @property
     def size_attachments(self):
-        """returns the number of bytes that the attachments take up on disk"""
+        """returns the number of bytes that the cleansed attachments take up on disk"""
         total_size = 0
-        if exists(self.fs_attachment_container):
-            for attachment in glob('%s/*.*' % self.fs_attachment_container):
+        for attachment in self.fs_cleansed_attachments:
                 total_size += stat(attachment).st_size
         return total_size
 

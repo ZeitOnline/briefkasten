@@ -60,3 +60,16 @@ def test_create_archive(dropbox_container, cleansed_dropbox):
     assert listdir(dropbox_container.fs_archive_cleansed) == []
     cleansed_dropbox._create_archive()
     assert listdir(dropbox_container.fs_archive_cleansed) == ['%s.zip.pgp' % cleansed_dropbox.drop_id]
+
+
+def test_attachment_size_zero(dropbox):
+    assert dropbox.size_attachments == 0
+
+
+def test_attachment_size_one(cleansed_dropbox):
+    assert cleansed_dropbox.size_attachments == 19
+
+
+def test_attachment_size_two(cleansed_dropbox, testing):
+    shutil.copy2(testing.asset_path('unicode.txt'), join(cleansed_dropbox.fs_path, 'clean'))
+    assert cleansed_dropbox.size_attachments == 57

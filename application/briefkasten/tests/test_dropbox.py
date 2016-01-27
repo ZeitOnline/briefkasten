@@ -153,26 +153,6 @@ def test_attachment_is_unicode(dropbox_container, drop_id, testing):
     dropbox_container.add_dropbox(drop_id, message=u'Überraschung!', attachments=[attachment])
 
 
-def test_attachment_size_zero(dropbox_without_attachment):
-    assert dropbox_without_attachment.size_attachments == 0
-
-
-def test_attachment_size_one(dropbox):
-    assert dropbox.size_attachments == 19
-
-
-def test_attachment_size_two(dropbox, testing):
-    attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('unicode.txt'), 'r'),
-        'mimetype': 'text/plain',
-        'uid': 'foobar',
-        'preview_url': None,
-        'filename': u'unicode.txt',
-        'size': -1})
-    dropbox.add_attachment(attachment)
-    assert dropbox.size_attachments == 57
-
-
 def test_non_existent_drop_id_creates_dropbox_ad_hoc(dropbox_container):
     assert 'foobar' not in dropbox_container
     newbox = dropbox_container.get_dropbox('foobar')
