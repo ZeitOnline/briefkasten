@@ -189,6 +189,7 @@ class Dropbox(object):
             self.status = u'100 processor running'
             self._create_backup()
             self._process_attachments()
+            self._create_archive()
 
         try:
             if self._notify_editors() > 0:
@@ -225,7 +226,7 @@ class Dropbox(object):
     #
     # "private" helper methods for processing a drop
 
-    def _create_encrypted_zip(self, source='dirty'):
+    def _create_encrypted_zip(self, source='dirty', fs_target_dir=None):
         backup_recipients = [r for r in self.editors if checkRecipient(self.gpg_context, r)]
 
         # this will be handled by watchdog, no need to send for each drop
@@ -234,7 +235,10 @@ class Dropbox(object):
             return self.status
 
         fs_backup = join(self.fs_path, '%s.zip' % source)
-        fs_backup_pgp = join(self.fs_path, '%s.zip.pgp' % source)
+        if fs_target_dir is None:
+            fs_backup_pgp = join(self.fs_path, '%s.zip.pgp' % source)
+        else:
+            fs_backup_pgp = join(fs_target_dir, '%s.zip.pgp' % self.drop_id)
         fs_source = dict(
             dirty=self.fs_dirty_attachments,
             clean=self.fs_attachment_container
@@ -272,6 +276,14 @@ class Dropbox(object):
             env=shellenv)
         # status is now < 500 if cleansing was successful or >= 500 && < 600 if cleansing failed
 
+    def _create_archive(self):
+        """ creates an encrypted archive of the dropbox outside of the drop directory.
+        """
+        # TODO: here would be the place to move the backup of the dirty attachments, depending
+        # on the current state of the dropbox
+        self.status = u'700 creating final encrypted backup of cleansed attachments'
+        return self._create_encrypted_zip(source='clean', fs_target_dir=self.container.fs_archive_cleansed)
+
     def _notify_editors(self):
         self.status = '110 sending mails to the editor(s)'
         attachments_cleaned = []
@@ -287,10 +299,6 @@ class Dropbox(object):
             self._notification_text,
             attachments_cleaned
         )
-
-    def _create_archive(self):
-        self.status = u'700 creating final encrypted backup of cleansed attachments'
-        return self._create_encrypted_zip(source='clean')
 
     #
     # helper properties:
