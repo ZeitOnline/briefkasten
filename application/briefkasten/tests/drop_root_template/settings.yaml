@@ -11,3 +11,4 @@ admins:
 mail.host: localhost
 mail.port: 8025
 mail.default_sender: noreply@briefkasten
+attachment_size_threshold: 25b

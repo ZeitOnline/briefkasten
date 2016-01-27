@@ -188,7 +188,8 @@ class Dropbox(object):
             self.status = u'100 processor running'
             self._create_backup()
             self._process_attachments()
-            self._create_archive()
+            if self.size_attachments > self.settings.get('attachment_size_threshold', 0):
+                self._create_archive()
 
         try:
             if self._notify_editors() > 0:

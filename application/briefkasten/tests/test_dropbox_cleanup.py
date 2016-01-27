@@ -70,6 +70,23 @@ def test_attachment_size_one(cleansed_dropbox):
     assert cleansed_dropbox.size_attachments == 19
 
 
-def test_attachment_size_two(cleansed_dropbox, testing):
+@fixture
+def second_cleansed(cleansed_dropbox, testing):
     shutil.copy2(testing.asset_path('unicode.txt'), join(cleansed_dropbox.fs_path, 'clean'))
+    return join(cleansed_dropbox.fs_path, 'clean', 'unicode.txt')
+
+
+def test_attachment_size_two(cleansed_dropbox, second_cleansed):
     assert cleansed_dropbox.size_attachments == 57
+
+
+def test_archive_is_not_created_for_small_attachments(dropbox_container, cleansed_dropbox):
+    assert listdir(dropbox_container.fs_archive_cleansed) == []
+    cleansed_dropbox.process()
+    assert listdir(dropbox_container.fs_archive_cleansed) == []
+
+
+def test_archive_is_created_for_large_attachments(dropbox_container, cleansed_dropbox, second_cleansed):
+    assert listdir(dropbox_container.fs_archive_cleansed) == []
+    cleansed_dropbox.process()
+    assert listdir(dropbox_container.fs_archive_cleansed) == ['%s.zip.pgp' % cleansed_dropbox.drop_id]
