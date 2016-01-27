@@ -129,7 +129,7 @@ class Dropbox(object):
         self.paths_created = []
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
         self.fs_attachment_container = join(self.fs_path, 'attach')
-        self.fs_cleaned_attachment_container = join(self.fs_path, 'clean')
+        self.fs_cleansed_attachment_container = join(self.fs_path, 'clean')
         self.fs_replies_path = join(self.fs_path, 'replies')
         self.gpg_context = self.container.gpg_context
         self.editors = self.settings['editors']
@@ -386,9 +386,9 @@ class Dropbox(object):
             return []
 
     @property
-    def fs_clean_attachments(self):
+    def fs_cleansed_attachments(self):
         """ returns a list of absolute paths to the cleansed attachements"""
-        if exists(self.fs_cleaned_attachment_container):
+        if exists(self.fs_cleansed_attachment_container):
             return [join(self.fs_cleansed_attachment_container, attachment)
                     for attachment in listdir(self.fs_cleansed_attachment_container)]
         else:
