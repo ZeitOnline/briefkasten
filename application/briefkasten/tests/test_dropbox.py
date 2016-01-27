@@ -87,7 +87,7 @@ def test_editor_token_created(dropbox_container, dropbox):
 
 def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(os.path.join(os.path.dirname(__file__), 'attachment.txt'), 'r'),
+        'file': open(testing.asset_path('attachment.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -106,7 +106,7 @@ def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing
 
 def test_attachment_creation_outside_container(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(os.path.join(os.path.dirname(__file__), 'attachment.txt'), 'r'),
+        'file': open(testing.asset_path('attachment.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -127,7 +127,7 @@ def md5sum(f):
 
 def test_attachment_is_image(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(os.path.join(os.path.dirname(__file__), 'attachment.png'), 'rb'),
+        'file': open(testing.asset_path('attachment.png'), 'rb'),
         'mimetype': 'image/jpeg',
         'uid': 'foobar',
         'preview_url': None,
@@ -143,7 +143,7 @@ def test_attachment_is_image(dropbox_container, drop_id, testing):
 
 def test_attachment_is_unicode(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(os.path.join(os.path.dirname(__file__), 'unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -163,7 +163,7 @@ def test_attachment_size_one(dropbox):
 
 def test_attachment_size_two(dropbox, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(os.path.join(os.path.dirname(__file__), 'unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -243,7 +243,7 @@ def test_notification_text_one(dropbox):
 
 def test_notification_text_two(dropbox, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(os.path.join(os.path.dirname(__file__), 'unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'r'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
