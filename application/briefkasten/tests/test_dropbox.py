@@ -59,6 +59,19 @@ def test_dropbox_status_submitted(dropbox):
     assert dropbox.status == u'900 success'
 
 
+def test_mocked_attachment_processor_status(dropbox):
+    dropbox._process_attachments()
+    assert dropbox.status == u'299 Cleansed'
+
+
+def test_mocked_attachment_processor_cleansed(dropbox):
+    fs_dirty = dropbox.fs_dirty_attachments[0]
+    dirty_lines = open(fs_dirty, 'r').readlines()
+    dropbox._process_attachments()
+    fs_cleansed = dropbox.fs_cleansed_attachments[0]
+    assert open(fs_cleansed, 'r').readlines() == dirty_lines
+
+
 def test_dropbox_process_failure(dropbox):
     # TODO
     pass
