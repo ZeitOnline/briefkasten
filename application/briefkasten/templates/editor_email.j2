@@ -13,7 +13,16 @@ Die Einreichung enthielt einen Anhang.
 Die Einreichung enthielt keine Anhänge.
 {% endif %}
 
+{% if not dropbox.send_attachments %}
+Aufgrund der Groesse der Anhaenge wurden diese nicht an diese Email angehaengt, sondern koennen hier aberufen werden:
+
+{{dropbox.cleansed_archive_url}}
+
+{% endif %}
+
 Die vom Absender hinterlegte Nachricht lautet:
 
 {{dropbox.message}}
+
+
 

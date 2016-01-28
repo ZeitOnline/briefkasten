@@ -6,7 +6,7 @@ from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
 from json import load, dumps
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
-from os.path import exists, isdir, isfile, join, splitext
+from os.path import exists, isdir, join, splitext
 from random import SystemRandom
 from zipfile import ZipFile, ZIP_STORED
 from subprocess import call
@@ -70,6 +70,7 @@ class DropboxContainer(object):
         # which in turn take precedence over default values
         self.settings = dict(
             attachment_size_threshold=u'2Mb',
+            dropbox_cleansed_archive_url_format=self.fs_archive_cleansed + '/%s.zip.pgp',
         )
 
         self.settings.update(**self.parse_settings())
@@ -126,6 +127,7 @@ class Dropbox(object):
         self.drop_id = drop_id
         self.container = container
         self.paths_created = []
+        self.send_attachments = False
         self.fs_path = fs_dropbox_path = join(container.fs_path, drop_id)
         self.fs_attachment_container = join(self.fs_path, 'attach')
         self.fs_cleansed_attachment_container = join(self.fs_path, 'clean')
@@ -187,8 +189,9 @@ class Dropbox(object):
         if self.num_attachments > 0:
             self.status = u'100 processor running'
             self._create_backup()
+            # calling _process_attachments has the side-effect of updating `send_attachments`
             self._process_attachments()
-            if self.size_attachments > self.settings.get('attachment_size_threshold', 0):
+            if not self.send_attachments:
                 self._create_archive()
 
         try:
@@ -275,6 +278,8 @@ class Dropbox(object):
             shell=True,
             env=shellenv)
         # status is now < 500 if cleansing was successful or >= 500 && < 600 if cleansing failed
+        # update the decision whether to include attachments in email or not based on size of cleansed attachments:
+        self.send_attachments = self.size_attachments < self.settings.get('attachment_size_threshold', 0)
 
     def _create_archive(self):
         """ creates an encrypted archive of the dropbox outside of the drop directory.
@@ -286,10 +291,10 @@ class Dropbox(object):
 
     def _notify_editors(self):
         self.status = '110 sending mails to the editor(s)'
-        attachments_cleaned = []
-        cleaned = join(self.fs_path, 'clean')
-        if exists(cleaned):
-            attachments_cleaned = [join(cleaned, f) for f in listdir(cleaned) if isfile(join(cleaned, f))]
+        if self.send_attachments:
+            attachments = self.fs_cleansed_attachments
+        else:
+            attachments = []
         return sendMultiPart(
             self.settings['smtp'],
             self.gpg_context,
@@ -297,7 +302,7 @@ class Dropbox(object):
             self.editors,
             u'Drop %s' % self.drop_id,
             self._notification_text,
-            attachments_cleaned
+            attachments
         )
 
     #
@@ -398,6 +403,10 @@ class Dropbox(object):
                     for attachment in listdir(self.fs_cleansed_attachment_container)]
         else:
             return []
+
+    @property
+    def cleansed_archive_url(self):
+        return self.settings['dropbox_cleansed_archive_url_format'] % self.drop_id
 
     @property
     def drop_url(self):
