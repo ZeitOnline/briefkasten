@@ -4,6 +4,9 @@ fs_bin_path: {{apphome}}/middleware_scripts/
 
 dropbox_view_url_format: 'https://{{ploy_fqdn}}/{{ploy_approot_url}}/dropbox/%s'
 dropbox_editor_url_format: 'https://{{ploy_fqdn}}/{{ploy_approot_url}}/dropbox/%s/%s'
+{% if ploy_dropbox_cleansed_archive_url_format is defined %}
+dropbox_cleansed_archive_url_format={{ ploy_dropbox_cleansed_archive_url_format }}
+{% endif %}
 editors:
 {% for recipient in ploy_editors.split() %}
     - {{ recipient }}
