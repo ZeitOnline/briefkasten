@@ -6,7 +6,8 @@ from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
 from json import load, dumps
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
-from os.path import exists, isdir, join, splitext
+from os.path import exists, isdir, join, splitext, getmtime
+from datetime import datetime
 from random import SystemRandom
 from zipfile import ZipFile, ZIP_STORED
 from subprocess import call
@@ -417,6 +418,16 @@ class Dropbox(object):
         return self.settings['dropbox_editor_url_format'] % (
             self.drop_id,
             self.editor_token)
+
+    def last_changed(self):
+        # TODO: maybe use last reply from editor
+        if exists(join(self.fs_path, u'status')):
+            mtime = getmtime(join(self.fs_path, u'status'))
+            return datetime.utcfromtimestamp(mtime)
+        return datetime.utcfromtimestamp(0)
+
+    def destroy(self):
+        shutil.rmtree(self.fs_path)
 
     def __repr__(self):
         return u'Dropbox %s (%s) at %s' % (
