@@ -64,7 +64,7 @@ def janitor(root):     # pragma: no cover
     report = ''
 
     for editor in drop_root.settings['editors']:
-        key = [k for k in allkeys if uid in ', '.join(k['uids'])]
+        key = [k for k in allkeys if k in ', '.join(k['uids'])]
         if not bool(key):
             report = report + 'Editor %s does not have a public key in keyring.\n' % editor
             continue
