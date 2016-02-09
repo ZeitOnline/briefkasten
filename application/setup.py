@@ -43,6 +43,7 @@ setup(
         'repoze.xmliter',
         'Paste',
         'watchdog',
+        'PyYAML',
     ],
     extras_require={
         'development': [
