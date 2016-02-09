@@ -96,8 +96,8 @@ class DropboxContainer(object):
         else:
             return dict()
 
-    def add_dropbox(self, drop_id, message=None, attachments=None):
-        return Dropbox(self, drop_id, message=message, attachments=attachments)
+    def add_dropbox(self, drop_id, message=None, attachments=None, from_watchdog=False):
+        return Dropbox(self, drop_id, message=message, attachments=attachments, from_watchdog=from_watchdog)
 
     def get_dropbox(self, drop_id):
         """ returns the dropbox with the given id, if it does not exist an empty dropbox
@@ -118,7 +118,7 @@ class DropboxContainer(object):
 
 class Dropbox(object):
 
-    def __init__(self, container, drop_id, message=None, attachments=None):
+    def __init__(self, container, drop_id, message=None, attachments=None, from_watchdog=False):
         """
         the attachments are expected to conform to what the webob library uses for file uploads,
         namely an instance of `cgi.FieldStorage` with the following attributes:
@@ -158,6 +158,10 @@ class Dropbox(object):
                 if attachment is None:
                     continue
                 self.add_attachment(attachment)
+
+        # persist watchdog flag
+        if from_watchdog:
+            self._write_message(self.fs_path, 'from_watchdog', 'True')
 
     #
     # top level methods that govern the life cycle of a dropbox:
@@ -348,6 +352,14 @@ class Dropbox(object):
     def message(self, newtext):
         """ overwrite the message text. this also updates the corresponding file. """
         self._write_message(self.fs_path, 'message', newtext)
+
+    @property
+    def from_watchdog(self):
+        try:
+            with open(join(self.fs_path, u'from_watchdog')):
+                return True
+        except IOError:
+            return False
 
     @property
     def status(self):
