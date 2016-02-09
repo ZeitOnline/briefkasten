@@ -90,11 +90,3 @@ def test_archive_is_created_for_large_attachments(dropbox_container, cleansed_dr
     assert listdir(dropbox_container.fs_archive_cleansed) == []
     cleansed_dropbox.process()
     assert listdir(dropbox_container.fs_archive_cleansed) == ['%s.zip.pgp' % cleansed_dropbox.drop_id]
-
-
-def test_dropbox_is_marked_as_not_watchdog_submission(dropbox):
-    assert not dropbox.from_watchdog
-
-
-def test_dropbox_is_marked_as_watchdog_submission(watchdog_dropbox):
-    assert watchdog_dropbox.from_watchdog
