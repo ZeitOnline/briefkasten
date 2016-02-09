@@ -321,3 +321,21 @@ TODOS:
  x create configuration reader (hardcode python dict for now)
 
  x factor rendering of email text out of pyramid view into separate dropbox subtask
+
+
+feature: re-activate watchdog feature
+-------------------------------------
+
+ - set recipients to configured watchdog address instead of editors
+
+ - integrate watchdog setup into makefile and base.conf
+
+ - configure watchdog with notification email addresses
+
+
+feature: local janitor (in python)
+----------------------------------
+
+ - create cronjob (in worker jail)
+
+ - write tests for erdgeist's python code :)
