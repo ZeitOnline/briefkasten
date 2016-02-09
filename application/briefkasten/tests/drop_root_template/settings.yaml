@@ -8,6 +8,7 @@ editors:
   - editor@briefkasten.dtfh.de
 admins:
   - admin@briefkasten.dtfh.de
+watchdog_imap_recipient: admin@briefkasten.dtfh.de
 mail.host: localhost
 mail.port: 8025
 mail.default_sender: noreply@briefkasten

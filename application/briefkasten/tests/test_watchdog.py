@@ -11,6 +11,14 @@ def test_dropbox_is_marked_as_watchdog_submission(watchdog_dropbox):
     assert watchdog_dropbox.from_watchdog
 
 
+def test_non_watchdog_dropbox_editors(dropbox, dropbox_container):
+    assert dropbox.editors == dropbox_container.settings['editors']
+
+
+def test_watchdog_dropbox_editors(watchdog_dropbox, dropbox_container):
+    assert watchdog_dropbox.editors == [dropbox_container.settings['watchdog_imap_recipient']]
+
+
 def test_dropbox_is_marked_as_watchdog_submission_post_init(dropbox_container, dropbox):
     dropbox.from_watchdog = True
     # refetch and check

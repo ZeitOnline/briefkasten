@@ -134,7 +134,6 @@ class Dropbox(object):
         self.fs_cleansed_attachment_container = join(self.fs_path, 'clean')
         self.fs_replies_path = join(self.fs_path, 'replies')
         self.gpg_context = self.container.gpg_context
-        self.editors = self.settings['editors']
         self.admins = self.settings['admins']
 
         if not exists(fs_dropbox_path):
@@ -148,6 +147,12 @@ class Dropbox(object):
             self.from_watchdog = from_watchdog
         else:
             self.editor_token = open(join(self.fs_path, 'editor_token')).readline()
+
+        # set recipients of email depending on watchdog status
+        if self.from_watchdog:
+            self.editors = [self.settings['watchdog_imap_recipient']]
+        else:
+            self.editors = self.settings['editors']
 
         if message is not None:
             # write the message into a file
