@@ -145,6 +145,7 @@ class Dropbox(object):
             # create an editor token
             self.editor_token = editor_token = generate_drop_id()
             self._write_message(fs_dropbox_path, 'editor_token', editor_token)
+            self.from_watchdog = from_watchdog
         else:
             self.editor_token = open(join(self.fs_path, 'editor_token')).readline()
 
@@ -158,10 +159,6 @@ class Dropbox(object):
                 if attachment is None:
                     continue
                 self.add_attachment(attachment)
-
-        # persist watchdog flag
-        if from_watchdog:
-            self._write_message(self.fs_path, 'from_watchdog', 'True')
 
     #
     # top level methods that govern the life cycle of a dropbox:
@@ -360,6 +357,16 @@ class Dropbox(object):
                 return True
         except IOError:
             return False
+
+    @from_watchdog.setter
+    def from_watchdog(self, value):
+        fs_path = join(self.fs_path, u'from_watchdog')
+        if value:
+            with open(fs_path, 'w') as status_file:
+                status_file.write('True')
+        else:
+            if exists(fs_path):
+                remove(fs_path)
 
     @property
     def status(self):

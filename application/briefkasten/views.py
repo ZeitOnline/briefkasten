@@ -4,7 +4,7 @@ import colander
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
 from pyramid.view import view_config
-from briefkasten import _
+from briefkasten import _, is_equal
 
 title = "ZEIT ONLINE Briefkasten"
 version = pkg_resources.get_distribution("briefkasten").version
@@ -87,10 +87,10 @@ def dropbox_submission(dropbox, request):
     # set the message
     dropbox.message = data['message']
 
-    # TODO: recognize submissions from the watchdog:
-    # is_test_submission = is_equal(
-    #     request.registry.settings.get('test_submission_secret', ''),
-    #     data.pop('testing_secret', ''))
+    # recognize submission from watchdog
+    dropbox.from_watchdog = is_equal(
+        unicode(dropbox.settings.get('test_submission_secret', '')),
+        data.pop('testing_secret', u''))
 
     # a non-js client might have uploaded an attachment via the form's fileupload field:
     if data.get('upload') is not None:
