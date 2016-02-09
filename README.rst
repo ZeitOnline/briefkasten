@@ -326,11 +326,11 @@ TODOS:
 feature: re-activate watchdog feature
 -------------------------------------
 
- - set recipients to configured watchdog address instead of editors
+ x set recipients to configured watchdog address instead of editors
 
  - integrate watchdog setup into makefile and base.conf
 
- - configure watchdog with notification email addresses
+ - configure watchdog without buildout and from ploy.conf values
 
 
 feature: local janitor (in python)
