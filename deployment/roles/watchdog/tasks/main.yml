@@ -8,30 +8,31 @@
     - libxslt
     - ca_root_nss
 
-- name: activate root certificates
-  file:
-    state: link
-    src: /usr/local/share/certs/ca-root-nss.crt
-    force: yes
-    owner: root
-    path: /etc/ssl/cert.pem
-
 - name: create application user
-  user: name={{watchdog_app_user}}
+  user:
+    name: "{{watchdog_app_user}}"
 
 - name: ensure application directory
-  file: path={{watchdog_app_dir}} state=directory owner={{watchdog_app_user}} mode=770
+  file:
+    path: "{{watchdog_app_dir}}"
+    state: directory
+    owner: "{{watchdog_app_user}}"
+    mode: 770
 
 - name: ensure log directory
-  file: path={{watchdog_app_dir}}/var state=directory owner={{watchdog_app_user}} mode=770
-
-- name: ensure upload directory
-  file: path={{watchdog_app_dir}}/upload state=directory owner={{watchdog_app_user}} mode=770
+  file:
+    path: "{{watchdog_app_dir}}/var"
+    state: directory
+    owner: "{{watchdog_app_user}}"
+    mode: 770
 
 - name: init virtualenv in application directory
   sudo: yes
   sudo_user: "{{watchdog_app_user}}"
-  command: virtualenv --system-site-packages . chdir={{watchdog_app_dir}} creates={{watchdog_app_dir}}/bin/python
+  command: virtualenv . --system-site-packages
+  args:
+    chdir: "{{watchdog_app_dir}}"
+    creates: "{{watchdog_app_dir}}/bin/python"
 
 - name: upload requirements
   copy:

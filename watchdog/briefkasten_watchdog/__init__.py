@@ -115,12 +115,12 @@ def main():
     errors = []
     fs_history = path.abspath(path.join(path.dirname(fs_config), 'var', 'watchdog-history.json'))
     if path.exists(fs_history):
-        history = json.load(open(fs_history, 'r'))
+        previous_history = json.load(open(fs_history, 'r'))
     else:
-        history = dict()
+        previous_history = dict()
 
     # fetch submissions from mail server
-    history = fetch_test_submissions(previous_history=history, config=config)
+    history = fetch_test_submissions(previous_history=previous_history, config=config)
 
     # check for failed test submissions
     max_process_secs = int(config.get('max_process_secs', 600))
@@ -128,9 +128,10 @@ def main():
     for token, timestamp_str in history.items():
         timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
         age = now - timestamp
-        if age.seconds > max_process_secs:
+        if age.seconds > max_process_secs and token not in previous_history:
             errors.append(WatchdogError(subject="Submission '%s' not received" % token,
-                message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (token, timestamp, max_process_secs)))
+                message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
+                    token, timestamp, max_process_secs)))
 
     # perform test submission
     token, submission_errors = perform_submission(app_url=config['app_url'],
