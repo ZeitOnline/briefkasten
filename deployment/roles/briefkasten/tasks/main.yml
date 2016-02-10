@@ -52,5 +52,6 @@
 - name: install python eggs
   pip:
     virtualenv: "{{apphome}}"
+    extra_args: "--upgrade"
     requirements: "{{apphome}}/requirements.txt"
   tags: update-briefkasten
