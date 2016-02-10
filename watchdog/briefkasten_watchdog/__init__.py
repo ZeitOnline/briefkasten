@@ -1,7 +1,7 @@
 import re
 import time
 import json
-from imapclient import IMAPClient
+from imapclient import IMAPClient, create_default_context
 from datetime import datetime
 from calendar import timegm
 from os import path
@@ -76,7 +76,10 @@ def fetch_test_submissions(previous_history, config):
         is removed from the history.
         any entries left in the history are returned
     """
-    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True)
+    context = create_default_context()
+    context.check_hostname = False
+    context.verify_mode = False
+    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True, ssl_context=context)
     server.login(config['imap_user'], config['imap_passwd'])
     server.select_folder('INBOX')
     history = previous_history.copy()
