@@ -45,7 +45,13 @@ def perform_submission(app_url, testing_secret):
     errors = []
     browser = Browser()
     browser.mech_browser.set_handle_robots(False)
-    browser.open(app_url)
+    try:
+        browser.open(app_url)
+    except Exception as exc:
+        errors.append(WatchdogError(
+            subject="Couldn't open submission page",
+            message=u"The attempt to access the submission form resulted in an exception (%s)" % exc))
+        return token, errors
     try:
         submit_form = browser.getForm(id='briefkasten-form')
     except LookupError:
