@@ -137,12 +137,14 @@ def main():
         timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
         age = now - timestamp
         if age.seconds > max_process_secs and token not in previous_history:
-            errors.append(WatchdogError(subject="Submission '%s' not received" % token,
+            errors.append(WatchdogError(
+                subject="Submission '%s' not received" % token,
                 message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
                     token, timestamp, max_process_secs)))
 
     # perform test submission
-    token, submission_errors = perform_submission(app_url=config['app_url'],
+    token, submission_errors = perform_submission(
+        app_url=config['app_url'],
         testing_secret=config['testing_secret'])
     history[token] = datetime.now().isoformat()
     errors += submission_errors
