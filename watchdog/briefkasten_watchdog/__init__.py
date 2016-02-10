@@ -146,7 +146,8 @@ def main():
     token, submission_errors = perform_submission(
         app_url=config['app_url'],
         testing_secret=config['testing_secret'])
-    history[token] = datetime.now().isoformat()
+    if token:
+        history[token] = datetime.now().isoformat()
     errors += submission_errors
 
     # record updated history
