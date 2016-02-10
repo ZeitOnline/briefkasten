@@ -34,3 +34,13 @@ def dropbox(dropbox_container, drop_id, attachment):
         message=u'Schönen guten Tag!',
         attachments=[attachment],
     )
+
+
+@fixture
+def watchdog_dropbox(dropbox_container, drop_id, attachment):
+    return dropbox_container.add_dropbox(
+        drop_id,
+        message=u'Schönen guten Tag!',
+        attachments=[attachment],
+        from_watchdog=True,
+    )

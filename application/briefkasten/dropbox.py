@@ -96,8 +96,8 @@ class DropboxContainer(object):
         else:
             return dict()
 
-    def add_dropbox(self, drop_id, message=None, attachments=None):
-        return Dropbox(self, drop_id, message=message, attachments=attachments)
+    def add_dropbox(self, drop_id, message=None, attachments=None, from_watchdog=False):
+        return Dropbox(self, drop_id, message=message, attachments=attachments, from_watchdog=from_watchdog)
 
     def get_dropbox(self, drop_id):
         """ returns the dropbox with the given id, if it does not exist an empty dropbox
@@ -118,7 +118,7 @@ class DropboxContainer(object):
 
 class Dropbox(object):
 
-    def __init__(self, container, drop_id, message=None, attachments=None):
+    def __init__(self, container, drop_id, message=None, attachments=None, from_watchdog=False):
         """
         the attachments are expected to conform to what the webob library uses for file uploads,
         namely an instance of `cgi.FieldStorage` with the following attributes:
@@ -134,7 +134,6 @@ class Dropbox(object):
         self.fs_cleansed_attachment_container = join(self.fs_path, 'clean')
         self.fs_replies_path = join(self.fs_path, 'replies')
         self.gpg_context = self.container.gpg_context
-        self.editors = self.settings['editors']
         self.admins = self.settings['admins']
 
         if not exists(fs_dropbox_path):
@@ -145,8 +144,15 @@ class Dropbox(object):
             # create an editor token
             self.editor_token = editor_token = generate_drop_id()
             self._write_message(fs_dropbox_path, 'editor_token', editor_token)
+            self.from_watchdog = from_watchdog
         else:
             self.editor_token = open(join(self.fs_path, 'editor_token')).readline()
+
+        # set recipients of email depending on watchdog status
+        if self.from_watchdog:
+            self.editors = [self.settings['watchdog_imap_recipient']]
+        else:
+            self.editors = self.settings['editors']
 
         if message is not None:
             # write the message into a file
@@ -348,6 +354,24 @@ class Dropbox(object):
     def message(self, newtext):
         """ overwrite the message text. this also updates the corresponding file. """
         self._write_message(self.fs_path, 'message', newtext)
+
+    @property
+    def from_watchdog(self):
+        try:
+            with open(join(self.fs_path, u'from_watchdog')):
+                return True
+        except IOError:
+            return False
+
+    @from_watchdog.setter
+    def from_watchdog(self, value):
+        fs_path = join(self.fs_path, u'from_watchdog')
+        if value:
+            with open(fs_path, 'w') as status_file:
+                status_file.write('True')
+        else:
+            if exists(fs_path):
+                remove(fs_path)
 
     @property
     def status(self):

@@ -1,14 +1,15 @@
 from setuptools import setup
 
-version = '0.1.10'
+version = '0.2.0.dev'
 
-
-setup(name='briefkasten_watchdog',
+setup(
+    name='briefkasten_watchdog',
     version=version,
     description='Perform functional testing of a Briefkasten instance',
-    long_description="""Part of the `ZeitOnline Briefkasten <https://github.com/ZeitOnline/briefkasten>`_ project,
-    this allows administrators to perform a fully functional test of their running instances.
-    See the `documentation <https://github.com/ZeitOnline/briefkasten#monitoring>`_ for details.""",
+    long_description="""
+        Part of the `ZeitOnline Briefkasten <https://github.com/ZeitOnline/briefkasten>`_ project,
+        this allows administrators to perform a fully functional test of their running instances.
+        See the `documentation <https://github.com/ZeitOnline/briefkasten#monitoring>`_ for details.""",
     classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -26,11 +27,10 @@ setup(name='briefkasten_watchdog',
         'pyramid_mailer',
     ],
     extras_require={
-        "tests": [
-            'wsgi_intercept',
-            'zope.testbrowser'],
+        'development': [
+            'devpi-client',
+        ],
     },
-    test_suite="briefkasten",
     entry_points="""
         [console_scripts]
         watchdog = briefkasten_watchdog:main

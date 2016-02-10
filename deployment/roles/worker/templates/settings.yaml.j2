@@ -15,6 +15,8 @@ admins:
 {% for recipient in ploy_admins.split() %}
     - {{ recipient }}
 {% endfor %}
+watchdog_imap_recipient: {{ploy_watchdog_imap_recipient}}
+test_submission_secret: {{ploy_test_submission_secret}}
 mail.host: {{ploy_mail_host}}
 mail.port: {{ploy_mail_port}}
 mail.default_sender: {{ploy_mail_sender}}
