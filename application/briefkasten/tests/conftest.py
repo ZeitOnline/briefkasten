@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from pytest import fixture
 from os.path import dirname, join
-from briefkasten import generate_post_token, generate_drop_id
 
 
 @fixture
 def post_token(dropbox_container, config):
+    from briefkasten import generate_post_token
     return generate_post_token(secret=config.registry.settings['post_secret'])
 
 
 @fixture
 def drop_id(dropbox_container):
+    from briefkasten import generate_drop_id
     return generate_drop_id()
 
 
