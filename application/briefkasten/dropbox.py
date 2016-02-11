@@ -198,18 +198,20 @@ class Dropbox(object):
             self._create_backup()
             # calling _process_attachments has the side-effect of updating `send_attachments`
             self._process_attachments()
-            if not self.send_attachments:
-                self._create_archive()
+            if self.status_int < 500:
+                if not self.send_attachments:
+                    self._create_archive()
 
-        try:
-            if self._notify_editors() > 0:
-                self.status = '900 success'
-            else:
-                self.status = '605 smtp failure'
-        except Exception:
-            import traceback
-            tb = traceback.format_exc()
-            self.status = '610 smtp error (%s)' % tb
+        if self.status_int < 500:
+            try:
+                if self._notify_editors() > 0:
+                    self.status = '900 success'
+                else:
+                    self.status = '605 smtp failure'
+            except Exception:
+                import traceback
+                tb = traceback.format_exc()
+                self.status = '610 smtp error (%s)' % tb
 
         self.cleanup()
         return self.status
