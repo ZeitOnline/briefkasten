@@ -163,7 +163,7 @@ def main():
     from urlparse import urlparse
     mailer = mailer_factory_from_settings(config, prefix='smtp_')
     hostname = urlparse(config['app_url']).hostname
-    recipients = [recipient for recipient in config['notify_email'].split('\n') if recipient]
+    recipients = [recipient for recipient in config['notify_email'].split() if recipient]
     message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
         sender=config['the_sender'],
         recipients=recipients,
