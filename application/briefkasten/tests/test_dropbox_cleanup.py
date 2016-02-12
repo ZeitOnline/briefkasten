@@ -1,4 +1,4 @@
-from os import listdir, mkdir
+from os import listdir, mkdir, rename
 from os.path import join
 from pytest import fixture
 import shutil
@@ -36,8 +36,8 @@ def cleansed_file_src(testing):
 
 @fixture
 def cleansed_dropbox(dropbox_container, dropbox, cleansed_file_src):
-    mkdir(join(dropbox.fs_path, 'clean'))
-    shutil.copy2(cleansed_file_src, join(dropbox.fs_path, 'clean'))
+    rename(join(dropbox.fs_path, 'attach'), join(dropbox.fs_path, 'clean'))
+    mkdir(join(dropbox.fs_path, 'attach'))
     return dropbox
 
 
@@ -71,22 +71,18 @@ def test_attachment_size_one(cleansed_dropbox):
 
 
 @fixture
-def second_cleansed(cleansed_dropbox, testing):
-    shutil.copy2(testing.asset_path('unicode.txt'), join(cleansed_dropbox.fs_path, 'clean'))
-    return join(cleansed_dropbox.fs_path, 'clean', 'unicode.txt')
+def second_attachment(dropbox, testing):
+    shutil.copy2(testing.asset_path('unicode.txt'), join(dropbox.fs_path, 'attach'))
+    return join(dropbox.fs_path, 'attach', 'unicode.txt')
 
 
-def test_attachment_size_two(cleansed_dropbox, second_cleansed):
-    assert cleansed_dropbox.size_attachments == 57
-
-
-def test_archive_is_not_created_for_small_attachments(dropbox_container, cleansed_dropbox):
+def test_archive_is_not_created_for_small_attachments(dropbox_container, dropbox):
     assert listdir(dropbox_container.fs_archive_cleansed) == []
-    cleansed_dropbox.process()
+    dropbox.process()
     assert listdir(dropbox_container.fs_archive_cleansed) == []
 
 
-def test_archive_is_created_for_large_attachments(dropbox_container, cleansed_dropbox, second_cleansed):
+def test_archive_is_created_for_large_attachments(dropbox_container, dropbox, second_attachment):
     assert listdir(dropbox_container.fs_archive_cleansed) == []
-    cleansed_dropbox.process()
-    assert listdir(dropbox_container.fs_archive_cleansed) == ['%s.zip.pgp' % cleansed_dropbox.drop_id]
+    dropbox.process()
+    assert listdir(dropbox_container.fs_archive_cleansed) == ['%s.zip.pgp' % dropbox.drop_id]
