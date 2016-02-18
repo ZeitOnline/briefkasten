@@ -80,7 +80,7 @@ def dropbox_fileupload(dropbox, request):
 def dropbox_submission(dropbox, request):
     """ handles the form submission, redirects to the dropbox's status page."""
     try:
-        data = DropboxSchema().deserialize(request.POST)
+        data = dropbox_schema.deserialize(request.POST)
     except Exception:
         return HTTPFound(location=request.route_url('dropbox_form'))
 
