@@ -406,6 +406,8 @@ class Dropbox(object):
             status_file.write(state)
 
     def _write_message(self, fs_container, fs_name, message):
+        if message is None:
+            return
         if not exists(fs_container):
             mkdir(fs_container)
             chmod(fs_container, 0770)

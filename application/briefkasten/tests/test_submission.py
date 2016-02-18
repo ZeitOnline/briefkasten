@@ -26,7 +26,11 @@ def form(testing, browser):
     return browser.get(testing.route_url('dropbox_form')).forms[0]
 
 
-def test_submission_with_out_attachment_post(testing, dropbox_container, form):
+def test_submission_without_attachment_or_message(testing, dropbox_container, form):
+    response = form.submit()
+
+
+def test_submission_without_attachment_post(testing, dropbox_container, form):
     assert len(listdir(dropbox_container.fs_path)) == 0
     form['message'] = u'Hellø there'
     form.submit()

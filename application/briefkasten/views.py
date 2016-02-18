@@ -85,7 +85,7 @@ def dropbox_submission(dropbox, request):
         return HTTPFound(location=request.route_url('dropbox_form'))
 
     # set the message
-    dropbox.message = data['message']
+    dropbox.message = data.get('message')
 
     # recognize submission from watchdog
     if 'testing_secret' in dropbox.settings:
