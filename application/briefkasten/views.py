@@ -88,9 +88,10 @@ def dropbox_submission(dropbox, request):
     dropbox.message = data['message']
 
     # recognize submission from watchdog
-    dropbox.from_watchdog = is_equal(
-        unicode(dropbox.settings.get('test_submission_secret', '')),
-        data.pop('testing_secret', u''))
+    if 'testing_secret' in dropbox.settings:
+        dropbox.from_watchdog = is_equal(
+            unicode(dropbox.settings['test_submission_secret']),
+            data.pop('testing_secret', u''))
 
     # a non-js client might have uploaded an attachment via the form's fileupload field:
     if data.get('upload') is not None:
