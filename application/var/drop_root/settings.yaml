@@ -8,10 +8,10 @@ dropbox_cleansed_archive_url_format: 'blubber/clean/%s.zip.pgp'
 dropbox_dirty_archive_url_format: 'blubber/dirt/%s.zip.pgp'
 editors:
   - tom@tomster.org
-  - erdgeist@erdgeist.org
+  # - erdgeist@erdgeist.org
 admins:
  - tom@tomster.org
- - erdgeist@erdgeist.org
+ # - erdgeist@erdgeist.org
 mail.host: localhost
 mail.port: 8025
 mail.default_sender: noreply@briefkasten
