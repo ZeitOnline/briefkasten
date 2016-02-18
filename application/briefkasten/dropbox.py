@@ -195,12 +195,25 @@ class Dropbox(object):
 
         if self.num_attachments > 0:
             self.status = u'100 processor running'
-            self._create_backup()
+            fs_dirty_archive = self._create_backup()
             # calling _process_attachments has the side-effect of updating `send_attachments`
             self._process_attachments()
             if self.status_int < 500:
                 if not self.send_attachments:
                     self._create_archive()
+
+        if self.status_int >= 500 and self.status_int < 600:
+            # cleansing failed
+            # if configured, we need to move the uncleansed archive to
+            # the appropriate folder and notify the editors
+            if 'dropbox_dirty_archive_url_format' in self.settings:
+                # create_archive
+                shutil.move(
+                    fs_dirty_archive,
+                    '%s/%s.zip.pgp' % (self.container.fs_archive_failed, self.drop_id))
+                # update status
+                # it's now considered 'successful-ish' again
+                self.status = '490 cleanser failure but notify success'
 
         if self.status_int < 500:
             try:
@@ -299,7 +312,6 @@ class Dropbox(object):
         return self._create_encrypted_zip(source='clean', fs_target_dir=self.container.fs_archive_cleansed)
 
     def _notify_editors(self):
-        self.status = '110 sending mails to the editor(s)'
         if self.send_attachments:
             attachments = self.fs_cleansed_attachments
         else:
