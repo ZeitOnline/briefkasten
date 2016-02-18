@@ -1,10 +1,14 @@
 Dies ist eine Nachricht des elektronischen Briefkastenservers.
 
-Die unten angefügte Nachricht wurde für Sie hinterlassen. Zum
-Beantworten schreiben Sie nicht an die Absenderadresse, sondern
+Die unten angefügte Nachricht wurde für Sie hinterlassen.
+
+{{dropbox.message}}
+
+Zum Beantworten schreiben Sie nicht an die Absenderadresse, sondern
 benutzen das Webformular unter der Adresse:
 
 {{dropbox.editor_url}}
+
 {% if num_attachments > 1 %}
 Die Einreichung enthielt {{num_attachments}} Anhänge.
 {% elif num_attachments == 1 %}
@@ -13,16 +17,18 @@ Die Einreichung enthielt einen Anhang.
 Die Einreichung enthielt keine Anhänge.
 {% endif %}
 
-{% if not dropbox.send_attachments %}
+{% if dropbox.status_int == 490 %}
+Der Bereinigungsvorgang ist leider fehlgeschlagen.
+
+Die unbereinigten Originaldatein koennen aber hier abgerufen werden:
+
+{{dropbox.dirty_archive_url}}
+
+{% elif not dropbox.send_attachments %}
 Aufgrund der Groesse der Anhaenge wurden diese nicht an diese Email angehaengt, sondern koennen hier aberufen werden:
 
 {{dropbox.cleansed_archive_url}}
 
 {% endif %}
-
-Die vom Absender hinterlegte Nachricht lautet:
-
-{{dropbox.message}}
-
 
 
