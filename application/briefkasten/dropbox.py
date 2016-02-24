@@ -47,13 +47,36 @@ class DropboxContainer(object):
         self.fs_root = root
         self.fs_path = join(root, 'drops')
         self.fs_submission_queue = join(root, 'submissions')
-        self.fs_archive_cleansed = join(root, 'archive_cleansed')
-        self.fs_archive_failed = join(root, 'archive_failed')
+        self.fs_scratch = join(root, 'scratch')
+
+        # initialise settings from disk and parameters
+        # settings provided as init parameter take precedence over values on-disk
+        # which in turn take precedence over default values
+        self.settings = dict(
+            attachment_size_threshold=u'2Mb',
+        )
+
+        self.settings.update(**self.parse_settings())
+        if settings is not None:
+            self.settings.update(**settings)
+
+        # set archive paths
+        self.fs_archive_cleansed = self.settings.get('dropbox_cleansed_archive_path', join(root, 'archive_cleansed'))
+        self.fs_archive_failed = self.settings.get('dropbox_failed_archive_path', join(root, 'archive_failed'))
         self.fs_archive = dict(
             clean=self.fs_archive_cleansed,
             dirty=self.fs_archive_failed,
         )
-        self.fs_scratch = join(root, 'scratch')
+
+        # set smtp instance defensively, to not overwrite mocked version from test settings:
+        if 'smtp' not in self.settings:
+            self.settings['smtp'] = setup_smtp_factory(**self.settings)
+
+        # setup GPG
+        self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
+
+        # convert human readable size to bytes
+        self.settings['attachment_size_threshold'] = parse_size(self.settings['attachment_size_threshold'])
 
         # ensure directories exist
         for directory in [
@@ -65,28 +88,6 @@ class DropboxContainer(object):
                 self.fs_scratch]:
             if not exists(directory):
                 makedirs(directory)
-
-        # initialise settings from disk and parameters
-        # settings provided as init parameter take precedence over values on-disk
-        # which in turn take precedence over default values
-        self.settings = dict(
-            attachment_size_threshold=u'2Mb',
-            dropbox_cleansed_archive_url_format=self.fs_archive_cleansed + '/%s.zip.pgp',
-        )
-
-        self.settings.update(**self.parse_settings())
-        if settings is not None:
-            self.settings.update(**settings)
-
-        # set smtp instance defensively, to not overwrite mocked version from test settings:
-        if 'smtp' not in self.settings:
-            self.settings['smtp'] = setup_smtp_factory(**self.settings)
-
-        # setup GPG
-        self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
-
-        # convert human readable size to bytes
-        self.settings['attachment_size_threshold'] = parse_size(self.settings['attachment_size_threshold'])
 
     def parse_settings(self):
         fs_settings = join(self.fs_root, 'settings.yaml')
@@ -447,7 +448,8 @@ class Dropbox(object):
 
     @property
     def cleansed_archive_url(self):
-        return self.settings['dropbox_cleansed_archive_url_format'] % self.drop_id
+        if 'dropbox_dirty_archive_url_format' in self.settings:
+            return self.settings['dropbox_cleansed_archive_url_format'] % self.drop_id
 
     @property
     def dirty_archive_url(self):
