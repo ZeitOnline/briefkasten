@@ -27,7 +27,7 @@ def form(testing, browser):
 
 
 def test_submission_without_attachment_or_message(testing, dropbox_container, form):
-    response = form.submit()
+    form.submit()
 
 
 def test_submission_without_attachment_post(testing, dropbox_container, form):
