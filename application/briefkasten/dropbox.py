@@ -453,7 +453,7 @@ class Dropbox(object):
 
     @property
     def dirty_archive_url(self):
-        return self.settings['dropbox_dirty_archive_url_format'] % self.drop_id
+        return self.settings['dropbox_failed_archive_url_format'] % self.drop_id
 
     @property
     def drop_url(self):
