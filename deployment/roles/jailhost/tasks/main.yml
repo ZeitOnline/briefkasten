@@ -51,3 +51,8 @@
   sysrc:
     name: clear_tmp_enable
     value: "YES"
+
+- name: disable jail_parallel_start (bsdploy enables it by default)
+  sysrc:
+    name: jail_parallel_start
+    value: "NO"
