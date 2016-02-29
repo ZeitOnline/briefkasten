@@ -270,8 +270,8 @@ class Dropbox(object):
             clean=self.fs_attachment_container
         )
         with ZipFile(fs_backup, 'w', ZIP_STORED) as backup:
-            if exists('message'):
-                backup.write('message')
+            if exists(join(self.fs_path, 'message')):
+                backup.write(join(self.fs_path, 'message'))
                 for fs_attachment in fs_source[source]:
                     backup.write(fs_attachment)
 
