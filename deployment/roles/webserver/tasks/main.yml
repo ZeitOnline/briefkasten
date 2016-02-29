@@ -4,6 +4,7 @@
   pkgng:
     name: "{{ item }}"
     state: present
+    cached: yes
   with_items:
     - nginx
 

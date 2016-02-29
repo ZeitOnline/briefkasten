@@ -3,6 +3,7 @@
   pkgng:
     name: "{{ item }}"
     state: present
+    cached: yes
   with_items:
     - py27-supervisor
     - py27-virtualenv
