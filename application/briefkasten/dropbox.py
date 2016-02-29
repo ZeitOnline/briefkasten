@@ -448,7 +448,7 @@ class Dropbox(object):
 
     @property
     def cleansed_archive_url(self):
-        if 'dropbox_dirty_archive_url_format' in self.settings:
+        if 'dropbox_cleansed_archive_url_format' in self.settings:
             return self.settings['dropbox_cleansed_archive_url_format'] % self.drop_id
 
     @property
