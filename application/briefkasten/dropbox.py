@@ -272,8 +272,8 @@ class Dropbox(object):
         with ZipFile(fs_backup, 'w', ZIP_STORED) as backup:
             if exists(join(self.fs_path, 'message')):
                 backup.write(join(self.fs_path, 'message'))
-                for fs_attachment in fs_source[source]:
-                    backup.write(fs_attachment)
+            for fs_attachment in fs_source[source]:
+                backup.write(fs_attachment)
 
         with open(fs_backup, "rb") as backup:
             self.gpg_context.encrypt_file(
