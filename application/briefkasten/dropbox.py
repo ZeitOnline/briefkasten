@@ -309,7 +309,7 @@ class Dropbox(object):
         """
         # TODO: here would be the place to move the backup of the dirty attachments, depending
         # on the current state of the dropbox
-        self.status = u'700 creating final encrypted backup of cleansed attachments'
+        self.status = u'270 creating final encrypted backup of cleansed attachments'
         return self._create_encrypted_zip(source='clean', fs_target_dir=self.container.fs_archive_cleansed)
 
     def _notify_editors(self):
