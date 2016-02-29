@@ -267,7 +267,7 @@ class Dropbox(object):
             fs_backup_pgp = join(fs_target_dir, '%s.zip.pgp' % self.drop_id)
         fs_source = dict(
             dirty=self.fs_dirty_attachments,
-            clean=self.fs_attachment_container
+            clean=self.fs_cleansed_attachments
         )
         with ZipFile(fs_backup, 'w', ZIP_STORED) as backup:
             if exists(join(self.fs_path, 'message')):
