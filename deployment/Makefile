@@ -32,7 +32,10 @@ update-app:
 	bin/ploy do worker update_backend build=$(build)
 	bin/ploy do appserver update_backend build=false
 
+update-theme:
+	bin/ploy do appserver upload_theme
+
 clean:
 	git clean -fXd
 
-.PHONY: clean start-jails bootstrap configure-host configure-jails
+.PHONY: clean start-jails bootstrap configure-host configure-jails update-theme
