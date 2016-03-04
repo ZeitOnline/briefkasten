@@ -85,8 +85,10 @@ def janitor(root):     # pragma: no cover
     for drop in drop_root:
         print('debugging %s' % drop)
         age = now - drop.last_changed()
-        if age.days > 365:
-            print('drop %s is older than a year. Removing it.' % drop)
+        max_age = 365 if not drop.from_watchdog else 1
+
+        if age.days > max_age:
+            print('drop %s is expired. Removing it.' % drop)
             drop.destroy()
 
 
