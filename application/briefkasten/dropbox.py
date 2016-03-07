@@ -6,7 +6,7 @@ from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
 from json import load, dumps
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
-from os.path import exists, isdir, join, splitext, getmtime
+from os.path import exists, isdir, join, splitext, getmtime, split
 from datetime import datetime
 from random import SystemRandom
 from zipfile import ZipFile, ZIP_STORED
@@ -276,9 +276,9 @@ class Dropbox(object):
         # create archive
         with ZipFile(fs_backup, 'w', ZIP_STORED) as backup:
             if exists(join(self.fs_path, 'message')):
-                backup.write(join(self.fs_path, 'message'))
+                backup.write(join(self.fs_path, 'message'), arcname='message')
             for fs_attachment in fs_source[source]:
-                backup.write(fs_attachment)
+                backup.write(fs_attachment, arcname=split(fs_attachment)[-1])
 
         # encrypt archive
         with open(fs_backup, "rb") as backup:
