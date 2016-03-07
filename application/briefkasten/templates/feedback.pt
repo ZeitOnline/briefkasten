@@ -7,15 +7,13 @@
 
   <tal:content  metal:fill-slot="content">
     <h1 i18n:translate="">Status der Einreichung "<span id="feedback-token" i18n:name="drop_id">${drop_id}</span>"</h1>
-    <tal:status tal:condition="status[:3] != '000'">
-        <p tal:condition="status_code=='0'">Your submission has been received and is awaiting processing</p>
-        <p tal:condition="status_code=='1'">Your submission is being moved into quarantine, where it will be stripped of meta data before being sent on.</p>
-        <p tal:condition="status_code=='2'">Your submission is now in quarantine, where it will be stripped of meta data before being sent on.</p>
-        <p tal:condition="status_code=='6'">An error has occured while sending your submission to the editors. All your data has been deleted from the server. You may want to try it again.
-        <code>${status}</code>
-        </p>
-        <p tal:condition="status_code=='9'">Your submission has been successfully processed, encrypted and has been sent off to our editor.</p>
-    </tal:status>
+    <p class="status_class_${status_code}" id="status_code_${status_int}">
+        <tal:status tal:condition="status_code=='0'">Your submission has been received and is awaiting processing</tal:status>
+        <tal:status tal:condition="status_code=='1'">Your submission is being moved into quarantine, where it will be stripped of meta data before being sent on.</tal:status>
+        <tal:status tal:condition="status_code=='2'">Your submission is now in quarantine, where it will be stripped of meta data before being sent on.</tal:status>
+        <tal:status tal:condition="status_code=='6'">An error has occured while sending your submission to the editors. All your data has been deleted from the server. You may want to try it again.</tal:status>
+        <tal:status tal:condition="status_code=='9'">Your submission has been successfully processed, encrypted and has been sent off to our editor.</tal:status>
+    </p>
     <p>You can reload this page to follow the state of your submission and/or view any replies</p>
     <tal:replies tal:condition="replies">
       <h2>Antwort der Redaktion</h2>

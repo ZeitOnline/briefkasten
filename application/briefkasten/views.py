@@ -113,6 +113,7 @@ def dropbox_submitted(dropbox, request):
         title='%s - %s' % (title, dropbox.status),
         drop_id=dropbox.drop_id,
         status_code=dropbox.status[0],
+        status_int=dropbox.status_int,
         status=dropbox.status,
         replies=dropbox.replies)
     return appstruct
