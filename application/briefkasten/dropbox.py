@@ -314,8 +314,6 @@ class Dropbox(object):
     def _create_archive(self):
         """ creates an encrypted archive of the dropbox outside of the drop directory.
         """
-        # TODO: here would be the place to move the backup of the dirty attachments, depending
-        # on the current state of the dropbox
         self.status = u'270 creating final encrypted backup of cleansed attachments'
         return self._create_encrypted_zip(source='clean', fs_target_dir=self.container.fs_archive_cleansed)
 
