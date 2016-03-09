@@ -15,7 +15,9 @@
   supervisorctl:
     name: briefkasten_worker
     state: restarted
+  ignore_errors: yes
 - name: restart application
   supervisorctl:
     name: briefkasten_frontend
     state: restarted
+  ignore_errors: yes
