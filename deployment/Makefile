@@ -23,7 +23,7 @@ configure-jails:
 	bin/ploy playbook main.yml
 
 upload-pgp-keys:
-	bin/ploy do appserver upload_pgp_keys
+	bin/ploy do worker upload_pgp_keys
 
 reset-host:
 	bin/ploy do briefkasten reset_jails
