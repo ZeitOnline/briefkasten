@@ -7,7 +7,7 @@ bin/python bin/pip:
 	virtualenv --clear -p python2.7 .
 	bin/pip install --upgrade setuptools pip
 
-bootstrap:
+bootstrap: bin/ploy
 	bin/ploy bootstrap briefkasten
 
 configure-host:
