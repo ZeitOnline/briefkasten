@@ -86,3 +86,18 @@ def test_archive_is_created_for_large_attachments(dropbox_container, dropbox, se
     assert listdir(dropbox_container.fs_archive_cleansed) == []
     dropbox.process()
     assert listdir(dropbox_container.fs_archive_cleansed) == ['%s.zip.pgp' % dropbox.drop_id]
+
+
+@fixture
+def unsupported_attachment(dropbox, testing):
+    shutil.copy2(testing.asset_path('unicode.txt'), join(dropbox.fs_path, 'attach', 'unsupported.pages'))
+    return join(dropbox.fs_path, 'attach', 'unsupported.pages')
+
+
+def test_archive_is_not_created_for_unsupported_attachments(monkeypatch, dropbox_container, dropbox):
+    assert listdir(dropbox_container.fs_archive_cleansed) == []
+    monkeypatch.setenv('MOCKED_STATUS_CODE', '800')
+    dropbox.process()
+    assert listdir(dropbox_container.fs_archive_cleansed) == []
+    assert dropbox.status_int == 800
+    assert listdir(dropbox_container.fs_archive_dirty) == ['%s.zip.pgp' % dropbox.drop_id]

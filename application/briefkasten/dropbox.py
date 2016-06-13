@@ -62,10 +62,10 @@ class DropboxContainer(object):
 
         # set archive paths
         self.fs_archive_cleansed = self.settings.get('dropbox_cleansed_archive_path', join(root, 'archive_cleansed'))
-        self.fs_archive_failed = self.settings.get('dropbox_failed_archive_path', join(root, 'archive_failed'))
+        self.fs_archive_dirty = self.settings.get('dropbox_dirty_archive_path', join(root, 'archive_dirty'))
         self.fs_archive = dict(
             clean=self.fs_archive_cleansed,
-            dirty=self.fs_archive_failed,
+            dirty=self.fs_archive_dirty,
         )
 
         # set smtp instance defensively, to not overwrite mocked version from test settings:
@@ -84,7 +84,7 @@ class DropboxContainer(object):
                 self.fs_path,
                 self.fs_submission_queue,
                 self.fs_archive_cleansed,
-                self.fs_archive_failed,
+                self.fs_archive_dirty,
                 self.fs_scratch]:
             if not exists(directory):
                 makedirs(directory)
@@ -211,10 +211,21 @@ class Dropbox(object):
                 # create_archive
                 shutil.move(
                     fs_dirty_archive,
-                    '%s/%s.zip.pgp' % (self.container.fs_archive_failed, self.drop_id))
+                    '%s/%s.zip.pgp' % (self.container.fs_archive_dirty, self.drop_id))
                 # update status
                 # it's now considered 'successful-ish' again
                 self.status = '490 cleanser failure but notify success'
+
+        if self.status_int == 800:
+            # at least one attachment was not supported
+            # if configured, we need to move the uncleansed archive to
+            # the appropriate folder and notify the editors
+            if 'dropbox_dirty_archive_url_format' in self.settings:
+                # create_archive
+                shutil.move(
+                    fs_dirty_archive,
+                    '%s/%s.zip.pgp' % (self.container.fs_archive_dirty, self.drop_id))
+                # update status
 
         if self.status_int < 500:
             try:
@@ -458,7 +469,7 @@ class Dropbox(object):
 
     @property
     def dirty_archive_url(self):
-        return self.settings['dropbox_failed_archive_url_format'] % self.drop_id
+        return self.settings['dropbox_dirty_archive_url_format'] % self.drop_id
 
     @property
     def drop_url(self):

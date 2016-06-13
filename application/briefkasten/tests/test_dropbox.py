@@ -234,6 +234,11 @@ def test_notification_text_one(dropbox):
     assert u'Die Einreichung enthielt einen Anhang' in dropbox._notification_text
 
 
+def test_notification_text_unsupported(dropbox):
+    dropbox.status = '800 unsupported file type'
+    assert u'Mindestens ein Anhang wurde nicht bereinigt, da dessen Dateityp nicht unterstützt wird.' in dropbox._notification_text
+
+
 def test_notification_text_two(dropbox, testing):
     attachment = testing.attachment_factory(**{
         'file': open(testing.asset_path('unicode.txt'), 'r'),

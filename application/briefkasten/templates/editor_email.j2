@@ -24,6 +24,13 @@ Die unbereinigten Originaldatein koennen aber hier abgerufen werden:
 
 {{dropbox.dirty_archive_url}}
 
+{% elif dropbox.status_int == 800 %}
+Mindestens ein Anhang wurde nicht bereinigt, da dessen Dateityp nicht unterstützt wird.
+
+Die unbereinigten Originaldatein koennen aber hier abgerufen werden:
+
+{{dropbox.dirty_archive_url}}
+
 {% elif not dropbox.send_attachments %}
 Aufgrund der Groesse der Anhaenge wurden diese nicht an diese Email angehaengt, sondern koennen hier aberufen werden:
 
