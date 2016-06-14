@@ -103,7 +103,7 @@ def mocked_notify_dropbox(dropbox):
     return dropbox
 
 
-def test_archive_is_not_created_for_unsupported_attachments(monkeypatch, dropbox_container, mocked_notify_dropbox):
+def test_archive_is_marked_dirty_for_unsupported_attachments(monkeypatch, dropbox_container, mocked_notify_dropbox):
     assert listdir(dropbox_container.fs_archive_cleansed) == []
     monkeypatch.setenv('MOCKED_STATUS_CODE', '800')
     mocked_notify_dropbox.process()
