@@ -12,6 +12,7 @@
         <tal:status tal:condition="status_code=='1'">Your submission is being moved into quarantine, where it will be stripped of meta data before being sent on.</tal:status>
         <tal:status tal:condition="status_code=='2'">Your submission is now in quarantine, where it will be stripped of meta data before being sent on.</tal:status>
         <tal:status tal:condition="status_code=='6'">An error has occured while sending your submission to the editors. All your data has been deleted from the server. You may want to try it again.</tal:status>
+        <tal:status tal:condition="status_code=='8'">Your submission has been successfully processed, encrypted and has been sent off to our editor, however, at least one of the attachments has not been cleansed, as it was not supported by our cleanser setup.</tal:status>
         <tal:status tal:condition="status_code=='9'">Your submission has been successfully processed, encrypted and has been sent off to our editor.</tal:status>
     </p>
     <p>You can reload this page to follow the state of your submission and/or view any replies</p>
