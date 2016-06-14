@@ -225,7 +225,6 @@ class Dropbox(object):
                 shutil.move(
                     fs_dirty_archive,
                     '%s/%s.zip.pgp' % (self.container.fs_archive_dirty, self.drop_id))
-                # update status
 
         if self.status_int < 500 or self.status_int == 800:
             try:
