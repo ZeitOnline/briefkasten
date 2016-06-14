@@ -94,10 +94,20 @@ def unsupported_attachment(dropbox, testing):
     return join(dropbox.fs_path, 'attach', 'unsupported.pages')
 
 
-def test_archive_is_not_created_for_unsupported_attachments(monkeypatch, dropbox_container, dropbox):
+@fixture
+def mocked_notify_dropbox(dropbox):
+    from mock import MagicMock
+    mocked_notify = MagicMock()
+    mocked_notify.return_value = 1
+    dropbox._notify_editors = mocked_notify
+    return dropbox
+
+
+def test_archive_is_not_created_for_unsupported_attachments(monkeypatch, dropbox_container, mocked_notify_dropbox):
     assert listdir(dropbox_container.fs_archive_cleansed) == []
     monkeypatch.setenv('MOCKED_STATUS_CODE', '800')
-    dropbox.process()
+    mocked_notify_dropbox.process()
     assert listdir(dropbox_container.fs_archive_cleansed) == []
-    assert dropbox.status_int == 800
-    assert listdir(dropbox_container.fs_archive_dirty) == ['%s.zip.pgp' % dropbox.drop_id]
+    assert mocked_notify_dropbox.status_int == 800
+    assert listdir(dropbox_container.fs_archive_dirty) == ['%s.zip.pgp' % mocked_notify_dropbox.drop_id]
+    mocked_notify_dropbox._notify_editors.assert_called_once_with()

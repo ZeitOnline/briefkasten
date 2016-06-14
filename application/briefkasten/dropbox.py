@@ -227,10 +227,11 @@ class Dropbox(object):
                     '%s/%s.zip.pgp' % (self.container.fs_archive_dirty, self.drop_id))
                 # update status
 
-        if self.status_int < 500:
+        if self.status_int < 500 or self.status_int == 800:
             try:
                 if self._notify_editors() > 0:
-                    self.status = '900 success'
+                    if self.status_int < 500:
+                        self.status = '900 success'
                 else:
                     self.status = '605 smtp failure'
             except Exception:
