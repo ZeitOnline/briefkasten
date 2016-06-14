@@ -199,7 +199,7 @@ class Dropbox(object):
             fs_dirty_archive = self._create_backup()
             # calling _process_attachments has the side-effect of updating `send_attachments`
             self._process_attachments()
-            if self.status_int < 500:
+            if self.status_int < 500 or self.status_int == 800:
                 if not self.send_attachments:
                     self._create_archive()
 
