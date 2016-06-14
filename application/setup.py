@@ -3,7 +3,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='briefkasten',
-    version_format="{tag}.{commitcount}+{gitsha}",
+    version='0.2.12',
+    # version_format="{tag}.{commitcount}+{gitsha}",
     description='a reasonably secure web application for submitting content anonymously',
     long_description="",
     maintainer=u'Tom Lazar',
