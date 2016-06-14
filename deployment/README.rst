@@ -21,11 +21,13 @@ The short version is:
 
     3. `make bootstrap`
 
-    4. `make configure-host`
+    4. `source bin/activate`
 
-    5. `make start-jails`
+    5. `make configure-host`
 
-    6. `make configure-jails`
+    6. `make start-jails`
+
+    7. `make configure-jails`
 
 Obtaining the sources
 ---------------------
@@ -65,7 +67,7 @@ Create your own configuration directory inside::
 
 Create a copy from the provided example::
 
-  $ cp etc.sample/plain.conf etc/
+  $ cp etc.sample/plain.conf etc/ploy.conf
 
 If you want to use VirtualBox to try out the installation on a local virtual machine, you can copy ``etc.sample/vbox.conf`` instead, which contains a ready-to-use setup. 
 
@@ -194,6 +196,10 @@ Since we have a running host we can prepare for these jails like so:
 
 Anyway, now we have all requirements in place to install the jails.
 
+Before we continue, we need to activate the so-called Python `virtualenv` that has been created as a side-effect of the initial Make target. This will allow the subsequent commands to find the installed helper tools without them having to be installed globally. To activate the `virtualenv` do this::
+
+    $ source bin/activate
+
 
 Installing the jails
 --------------------
@@ -210,7 +216,22 @@ Testing the installation
 
 Once all steps have been completed successfully you should be able to visit the briefkasten in a webbrowser.
 
-in the case of testing via virtualbox the url would be `https://localhost:47023/briefkasten/submit <https://localhost:47023/briefkasten/submit>`_.
+in the case of testing via virtualbox the url would be `https://localhost:47023/briefkasten/ <https://localhost:47023/briefkasten/>`_.
+
+Note, that the above URL will only work for a configuration based on `vbox.conf`, for other setups you must substitute the IP address and port accordingly.
+
+In some cases the URL above does not work on VirtualBox based systems, in that case you need to find out which IP address the VirtualBox instance has received, like so::
+
+    # ploy ssh briefkasten 'ifconfig em0'
+    em0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> metric 0 mtu 1500
+            options=9b<RXCSUM,TXCSUM,VLAN_MTU,VLAN_HWTAGGING,VLAN_HWCSUM>
+            ether 08:00:27:02:07:9b
+            inet 192.168.56.160 netmask 0xffffff00 broadcast 192.168.56.255 
+            nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
+            media: Ethernet autoselect (1000baseT <full-duplex>)
+            status: active
+
+Note the entry labelled `inet` and use the IP address there (and port 443), i.e. `https://192.168.56.160/briefkasten/`.
 
 When visiting the page, enter some text into the form and add one or more attachments, then submit the form.
 
