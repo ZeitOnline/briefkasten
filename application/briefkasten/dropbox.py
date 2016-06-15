@@ -199,8 +199,7 @@ class Dropbox(object):
             fs_dirty_archive = self._create_backup()
             # calling _process_attachments has the side-effect of updating `send_attachments`
             self._process_attachments()
-            if self.status_int < 500 or self.status_int == 800:
-                if not self.send_attachments:
+            if self.status_int < 500 and not self.send_attachments:
                     self._create_archive()
 
         if self.status_int >= 500 and self.status_int < 600:
@@ -319,8 +318,12 @@ class Dropbox(object):
             shell=True,
             env=shellenv)
         # status is now < 500 if cleansing was successful or >= 500 && < 600 if cleansing failed
+        # or 800 if cleansing was not supported
         # update the decision whether to include attachments in email or not based on size of cleansed attachments:
-        self.send_attachments = self.size_attachments < self.settings.get('attachment_size_threshold', 0)
+        if self.status_int < 500:
+            self.send_attachments = self.size_attachments < self.settings.get('attachment_size_threshold', 0)
+        else:
+            self.send_attachments = False
 
     def _create_archive(self):
         """ creates an encrypted archive of the dropbox outside of the drop directory.

@@ -111,3 +111,9 @@ def test_archive_is_marked_dirty_for_unsupported_attachments(monkeypatch, dropbo
     assert mocked_notify_dropbox.status_int == 800
     assert listdir(dropbox_container.fs_archive_dirty) == ['%s.zip.pgp' % mocked_notify_dropbox.drop_id]
     mocked_notify_dropbox._notify_editors.assert_called_once_with()
+
+
+def test_unsupported_attachments_are_never_sent_as_mail_attachments(monkeypatch, mocked_notify_dropbox):
+    monkeypatch.setenv('MOCKED_STATUS_CODE', '800')
+    mocked_notify_dropbox.process()
+    assert not mocked_notify_dropbox.send_attachments
