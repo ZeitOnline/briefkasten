@@ -10,11 +10,11 @@ dropbox_cleansed_archive_path: '{{ ploy_dropbox_cleansed_archive_path }}'
 {% if ploy_dropbox_cleansed_archive_url_format is defined %}
 dropbox_cleansed_archive_url_format: '{{ ploy_dropbox_cleansed_archive_url_format }}'
 {% endif %}
-{% if ploy_dropbox_failed_archive_path is defined %}
-dropbox_failed_archive_path: '{{ ploy_dropbox_failed_archive_path }}'
+{% if ploy_dropbox_dirty_archive_path is defined %}
+dropbox_dirty_archive_path: '{{ ploy_dropbox_dirty_archive_path }}'
 {% endif %}
-{% if ploy_dropbox_failed_archive_url_format is defined %}
-dropbox_failed_archive_url_format: '{{ ploy_dropbox_failed_archive_url_format }}'
+{% if ploy_dropbox_dirty_archive_url_format is defined %}
+dropbox_dirty_archive_url_format: '{{ ploy_dropbox_dirty_archive_url_format }}'
 {% endif %}
 editors:
 {% for recipient in ploy_editors.split() %}
