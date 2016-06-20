@@ -31,7 +31,7 @@ Die unbereinigten Originaldatein koennen aber hier abgerufen werden:
 
 {{dropbox.dirty_archive_url}}
 
-{% elif not dropbox.send_attachments %}
+{% elif not dropbox.send_attachments and num_attachments > 0  %}
 Aufgrund der Groesse der Anhaenge wurden diese nicht an diese Email angehaengt, sondern koennen hier aberufen werden:
 
 {{dropbox.cleansed_archive_url}}
