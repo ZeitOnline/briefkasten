@@ -49,6 +49,8 @@ Under Mac OS X using `homebrew <http://brew.sh>`_ is the recommended way (``brew
 
 Under FreeBSD install ``devel/py-virtualenv``.
 
+Note, you might need to symlink `/usr/local/include/gmp.h` to `/usr/local/include/python2.7/gmp,h`
+
 
 Configuring your setup
 ----------------------
