@@ -1,0 +1,83 @@
+<html>
+    <head>
+    <!-- Force latest IE rendering engine or ChromeFrame if installed -->
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+        <title>Briefkasten</title>
+        <link rel="stylesheet" href="assets/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/style.css">
+        <link rel="stylesheet" href="assets/jquery.fileupload.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="bg-danger" id="warning">
+                <div class="container">
+                    <p>This is a default, unconfigured instance of the <a href="https://github.com/ZeitOnline/briefkasten/">ZEIT ONLINE Briefkasten</a>.</p>
+                    <p><strong>Important!</strong> Do <em>not</em> upload any information here, as this instance is obviously not yet configured properly!</p>
+                </div>
+            </div>
+        </div>
+        <div id="content" class="container">
+            <h1 id="title">Briefkasten</h1>
+            <form role="form" id="briefkasten-form">
+                <div class="form-group">
+                    <label for="message">Anonymisierte Nachricht an die Redaktion</label>
+                    <textarea id="message" class="form-control" name="message" rows="10" cols="60"></textarea>
+                    <!-- The fileinput-button span is used to style the file input field as button -->
+                </div>
+                <div class="form-group">
+                    <span class="btn btn-success fileinput-button">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        <span>Datei(en) ausw&auml;hlen...</span>
+                        <!-- The file input field used as target for the file upload widget -->
+                        <input id="fileupload" type="file" name="attachment" multiple>
+                    </span>
+                    <!-- The global progress bar -->
+                    <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success"></div>
+                    </div>
+                    <!-- The container for the uploaded files -->
+                    <div id="files" class="files"></div>
+                </div>
+                <input type="hidden" name="testing_secret" value="" />
+                <div class="form-group">
+                    <button class="btn btn-default"id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
+                    <label for="submit">Beim Abschicken werden die hochgeladenen Dateien zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
+                </div>
+            </form>
+        </div>
+        <script src="assets/jquery.min.js"></script>
+        <script class="custom-fileupload" src="assets/jquery.ui.widget.js"></script>
+        <script class="custom-fileupload" src="assets/jquery.iframe-transport.js"></script>
+        <script class="custom-fileupload" src="assets/jquery.fileupload.js"></script>
+        <script src="assets/bootstrap.min.js"></script>
+        <script class="custom-fileupload">
+        $(function () {
+            'use strict';
+            $('body').addClass('js');
+            var url = document.getElementById('briefkasten-form').dataset.fileupload_url;
+            $('#fileupload').fileupload({
+                url: url,
+                dataType: 'json',
+                add: function (e, data) {
+                    $("#briefkasten-formsubmit").attr('disabled', 'disabled')
+                    data.submit();
+                },
+                done: function (e, data) {
+                    $.each(data.result.files, function (index, file) {
+                        $('<p/>').text(file.name).appendTo('#files');
+                    });
+                    $("#briefkasten-formsubmit").removeAttr('disabled')
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .progress-bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                }
+            }).prop('disabled', !$.support.fileInput)
+                .parent().addClass($.support.fileInput ? undefined : 'disabled');
+        });
+        </script>
+    </body>
+</html>

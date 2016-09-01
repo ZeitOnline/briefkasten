@@ -1,7 +1,7 @@
 import re
 import time
 import json
-from imapclient import IMAPClient
+from imapclient import IMAPClient, create_default_context
 from datetime import datetime
 from calendar import timegm
 from os import path
@@ -45,7 +45,13 @@ def perform_submission(app_url, testing_secret):
     errors = []
     browser = Browser()
     browser.mech_browser.set_handle_robots(False)
-    browser.open(app_url)
+    try:
+        browser.open(app_url)
+    except Exception as exc:
+        errors.append(WatchdogError(
+            subject="Couldn't open submission page",
+            message=u"The attempt to access the submission form resulted in an exception (%s)" % exc))
+        return token, errors
     try:
         submit_form = browser.getForm(id='briefkasten-form')
     except LookupError:
@@ -76,12 +82,14 @@ def fetch_test_submissions(previous_history, config):
         is removed from the history.
         any entries left in the history are returned
     """
-    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True)
+    context = create_default_context()
+    context.check_hostname = False
+    context.verify_mode = False
+    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True, ssl_context=context)
     server.login(config['imap_user'], config['imap_passwd'])
     server.select_folder('INBOX')
     history = previous_history.copy()
-    candidates = server.fetch(server.search(criteria=['NOT DELETED',
-        'SUBJECT "Drop ID"']), ['BODY[HEADER.FIELDS (SUBJECT)]'])
+    candidates = server.fetch(server.search(criteria='NOT DELETED SUBJECT "Drop ID"'), ['BODY[HEADER.FIELDS (SUBJECT)]'])
     for imap_id, message in candidates.items():
         subject = message.get('BODY[HEADER.FIELDS (SUBJECT)]', 'Subject: ')
         try:
@@ -115,12 +123,12 @@ def main():
     errors = []
     fs_history = path.abspath(path.join(path.dirname(fs_config), 'var', 'watchdog-history.json'))
     if path.exists(fs_history):
-        history = json.load(open(fs_history, 'r'))
+        previous_history = json.load(open(fs_history, 'r'))
     else:
-        history = dict()
+        previous_history = dict()
 
     # fetch submissions from mail server
-    history = fetch_test_submissions(previous_history=history, config=config)
+    history = fetch_test_submissions(previous_history=previous_history, config=config)
 
     # check for failed test submissions
     max_process_secs = int(config.get('max_process_secs', 600))
@@ -128,14 +136,18 @@ def main():
     for token, timestamp_str in history.items():
         timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
         age = now - timestamp
-        if age.seconds > max_process_secs:
-            errors.append(WatchdogError(subject="Submission '%s' not received" % token,
-                message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (token, timestamp, max_process_secs)))
+        if age.seconds > max_process_secs and token not in previous_history:
+            errors.append(WatchdogError(
+                subject="Submission '%s' not received" % token,
+                message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
+                    token, timestamp, max_process_secs)))
 
     # perform test submission
-    token, submission_errors = perform_submission(app_url=config['app_url'],
+    token, submission_errors = perform_submission(
+        app_url=config['app_url'],
         testing_secret=config['testing_secret'])
-    history[token] = datetime.now().isoformat()
+    if token:
+        history[token] = datetime.now().isoformat()
     errors += submission_errors
 
     # record updated history
@@ -151,7 +163,7 @@ def main():
     from urlparse import urlparse
     mailer = mailer_factory_from_settings(config, prefix='smtp_')
     hostname = urlparse(config['app_url']).hostname
-    recipients = [recipient for recipient in config['notify_email'].split('\n') if recipient]
+    recipients = [recipient for recipient in config['notify_email'].split() if recipient]
     message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
         sender=config['the_sender'],
         recipients=recipients,

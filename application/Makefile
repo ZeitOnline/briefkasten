@@ -1,18 +1,21 @@
 pyversion = 2.7
 python = python$(pyversion)
-buildoutcfg = development
-cfgs = buildout development deployment
 
-all: buildout
+all: bin/tox
 
-$(cfgs): %: %.cfg bin/buildout
-	bin/buildout -c $@.cfg
+tests: bin/py.test
+	@bin/py.test
 
-buildout.cfg:
-	ln -s $(buildoutcfg).cfg buildout.cfg
+bin/pserve: requirements.txt bin/pip
+	bin/pip install -r requirements.txt
+	@touch $@
 
-bin/buildout: bin/pip
-	bin/pip install zc.buildout
+bin/tox bin/py.test bin/devpi: bin/python bin/pip setup.py bin/pserve
+	bin/python setup.py dev
+	@touch $@
+
+upload: setup.py bin/py.test bin/devpi
+	PATH=${PWD}/bin:${PATH} bin/devpi upload --no-vcs
 
 bin/python bin/pip:
 	virtualenv .
@@ -21,4 +24,4 @@ bin/python bin/pip:
 clean:
 	git clean -fXd
 
-.PHONY: all $(cfgs) clean
+.PHONY: all $(cfgs) clean tests upload

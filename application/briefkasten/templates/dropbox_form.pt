@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  i18n:domain="briefkasten"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="master">
+  <body>
+    <tal:content metal:fill-slot="content">
+        <form
+            id="briefkasten-form"
+            method="POST"
+            role="form"
+            enctype="multipart/form-data"
+            accept-charset="utf-8"
+            data-fileupload_url='${fileupload_url}'
+            action="${action}">
+            <label for="message">Anonymisierte Nachricht an die Redaktion</label>
+            <textarea id="message" name="message" rows="10" cols="60"></textarea>
+            <p>Datei anh&auml;ngen</p>
+            <input type="file" name="upload">
+            <input type="hidden" name="testing_secret" value="" />
+            <button id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
+            <label for="submit">Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
+        </form>
+    </tal:content>
+  </body>
+</html>

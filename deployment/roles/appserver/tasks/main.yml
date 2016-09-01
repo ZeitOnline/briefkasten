@@ -1,0 +1,25 @@
+---
+- name: configure appserver
+  template:
+    src: briefkasten.ini.j2
+    dest: "{{apphome}}/briefkasten.ini"
+  notify: restart application
+  tags:
+    - app-config
+    - update-app
+
+- name: upload frontend theme
+  # requires ploy-ssh to be in $PATH
+  synchronize:
+    src: "../../{{ploy_local_theme_path}}"
+    dest: "{{themes_dir}}/{{ploy_theme_name}}"
+    rsync_opts:
+      - "-e ploy-ssh"
+  notify: restart application
+  tags: update-theme
+
+- name: configure supervisor
+  template:
+    src: supervisord.conf.j2
+    dest: /usr/local/etc/supervisor.d/appserver.conf
+  notify: restart supervisord

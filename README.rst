@@ -177,19 +177,165 @@ Finally::
 
 After restarting the application, the new translations will be active.
 
-
-Further Documentation
-*********************
-
 For more details check these links:
 
  * `pyramid.i18n <http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/i18n.html>`_
  * `Chameleon <http://chameleon.repoze.org/docs/latest/i18n.html>`_
  * `Babel <http://babel.edgewall.org/wiki/Documentation/0.9/index.html>`_ 
 
-Roadmap
--------
 
-While the original releases were geared towards an instance of the briefkasten application hosted by `ZEIT ONLINE <https://ssl.zeit.de/briefkasten/submit>`_ further development is planned to make the application useful 'out of the box'. In particular:
+The life cycle of a submission
+******************************
 
- * provide fully functional deployment scripts that create a 'best practice' installation from scratch, including web server, SSL setup, installation of all dependencies etc.
+Users entrusting us with sensitive data is the key concern of the software and when and getting it straight where this data is stored for how long in what form is crucial.
+
+The stages are numbered with a three digit integer code, allowing to group and sort them.
+
+Status codes beginning with `0` mean that the submission is still being handled by the web application (and implies that it is still unencrypted)
+
+The life of a submission begins with the POST of the client browser succeeding.
+Any attachments are first stored in memory before writing them to disk into a dedicated dropbox directory.
+At this point the submission has the status `010 received` and is readable in plaintext by any attacker who gains access to the application jail.
+
+Next, the web application hands off the submission to an external processing script, which immediately either errors out or acknowledges the receipt of the drop directory.
+
+The error case at this stage means that the cleansing setup is seriously broken and the web application will take it upon itself to delete the attachments immediately to avoid exposing them in plaintext unduly.
+(TODO: a cronjob on the jailhost should additionally monitor for dropboxes in the 'submitted' or 'submitted failed' state for longer than a given threshold)
+
+If the submission was successful (the process script returns `0` as exit code) the dropbox is considered to be `020 submitted`.
+
+Once submitted, the cleanser performs basic sanity checking. If that fails for whatever reason it will set the status to `500 cleanser init failure`. Since it's basically being able to accept the attachments it will delete the attachment itself (TODO: confirm with @erdgeist)
+
+If the process script determines that the cleansing setup is intact (whether locally or via one or more cleanser jails) it will set the status to `100 processing`.
+The submission still resides in plaintext inside the application jail.
+
+The process will now initiate the cleansing, either locally or by submitting it to a cleanser jail. Either way, once the submission is sucessful, the status will change to `200 quarantined`, and the submission is (finally) no longer readable inside the application jail.
+
+If submission has failed the status will be set to `501 cleanser submission failure` and the attachments will be deleted.
+
+Now we are left with three possible outcomes: success, failure during cleansing or timeout:
+
+- `510 cleanser processing failure`
+- `520 cleanser timeout failure`
+- `900 success`
+
+In all cases except `900` the attachments will have been deleted from the fileystem of the briefkasten host.
+
+
+Further Documentation
+*********************
+
+
+TODO
+====
+
+general bugs
+------------
+
+X fix claim mechanism
+
+X investigate 'heisenbug'
+
+- update docs re: `source bin/activate`
+
+x ensure appserver is running after config changes
+
+X ensure testing secret is present in themed forms
+
+x use private devpi with git-setuptools-version
+
+
+
+feature: refactor process workflow
+----------------------------------
+
+- break into wrapping `process` call which will catch any exceptions and set the status accordingly
+  and will also be responsible for calling cleanup
+
+- `Dropbox.process` is
+
+  x the only entry point into and encapsulates the entire cleansing process
+
+  x a long-running, synchronous call that always succeeds (to the caller)
+
+  x but catches underlying failures and updates the status of the dropbox accordingly
+
+  x always calls cleanup
+
+  x separate 'private' tasks:
+
+  x if we have attachments:
+
+    x create uncleansed, encrypted fallback copy of attachments
+      - failures:
+        - no valid keys
+
+    x clean attachments (this also encrypts them)
+      - failures:
+        x no cleansers configured
+        x no cleansers available
+        - time-out
+
+    x archive clean attachments if cleaning was successful and size is over limit
+
+    - archive uncleaned attachments if cleaning failed
+      (re-uses the initially created encrypted backup before that is wiped during cleanup)
+
+    x notify editors via email
+
+      x (include cleaned attachments if cleaning was sucessful and size below limit)
+      x otherwise include link to share
+
+
+feature: large attachments support
+----------------------------------
+
+ x calculate total size of attachments
+
+ x add configurable threshold value (support MB/GB via humanfriendly)
+
+ x configure cleansed/uncleansed file system paths
+
+ x configure formatstrings to render them as shares
+
+
+feature: asynchronous workers
+-----------------------------
+
+x separate worker process (either using celery, or a custom worker)
+
+x runs in separate jail with mapped dropbox container file system
+
+x reads identical confguration on init
+
+x watches for appearance of new dropboxes and reacts to according to their status
+
+x keep dropbox specific settings in settings.json file inside container directory, only keep pyramid specific settings in .ini file (including path to dropbox container)
+
+TODOS:
+
+ x create `worker` entry point
+
+ x create supervisord config for worker
+
+ x create configuration reader (hardcode python dict for now)
+
+ x factor rendering of email text out of pyramid view into separate dropbox subtask
+
+
+feature: re-activate watchdog feature
+-------------------------------------
+
+ x set recipients to configured watchdog address instead of editors
+
+ - integrate watchdog setup into makefile and base.conf
+
+ - configure watchdog without buildout and from ploy.conf values
+
+
+feature: local janitor (in python)
+----------------------------------
+
+ - create cronjob (in worker jail)
+
+ - write tests for erdgeist's python code :)

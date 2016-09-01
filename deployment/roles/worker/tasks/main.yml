@@ -1,0 +1,102 @@
+---
+- name: install packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+    cached: yes
+  with_items:
+    - py27-supervisor
+    - py27-virtualenv
+    - rsync
+    - libxslt
+    - sudo
+    - gnupg
+
+- name: create application user
+  # this creates /home/pyramid/.ssh/id_rsa{.pub}
+  user:
+    name: "{{appuser}}"
+    uid: "{{appuserid}}"
+    createhome: yes
+    generate_ssh_key: yes
+
+- name: ensure application directory
+  file:
+    path: "{{apphome}}"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "775"
+
+- name: ensure data directories
+  file:
+    path: "/var/briefkasten/{{item}}"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "700"
+  with_items:
+    - log
+    - drop_root
+    - themes
+    - pgp_pubkeys
+
+- name: ensure middleware directory
+  file:
+    path: "{{apphome}}/middleware_scripts"
+    state: directory
+    owner: "{{appuser}}"
+    mode: "770"
+
+- name: install middleware scripts
+  copy:
+    dest: "{{apphome}}/middleware_scripts/"
+    src: "../../../../application/middleware_scripts/process-attachments.sh"
+    owner: "{{appuser}}"
+    mode: "770"
+  tags: update-middleware
+
+- name: configure the cleanser script (testing and production)
+  template:
+    src: briefkasten.conf.j2
+    dest: "{{apphome}}/middleware_scripts/{{item.dest}}"
+    owner: "{{appuser}}"
+    mode: "600"
+  with_items:
+    - { the_editors: "{{ploy_editors}}", the_admins: "{{ploy_admins}}", dest: briefkasten.conf }
+    - { the_editors: "{{watchdog_imap_recipient}}", the_admins: "{{watchdog_imap_recipient}}", dest: briefkasten_test.conf }
+  tags: update-middleware
+
+- name: ssh config for the the cleanser script
+  template:
+    src: briefkasten_ssh_config.j2
+    dest: "/var/briefkasten/cleanser_ssh_config"
+    owner: "{{appuser}}"
+    mode: "600"
+
+- name: configure drop root
+  template:
+    src: settings.yaml.j2
+    dest: "/var/briefkasten/drop_root/settings.yaml"
+  notify: restart application
+  tags:
+    - app-config
+    - update-app
+    - update-config
+
+- name: disable periodic emails
+  copy:
+    src: periodic.conf
+    dest: /etc/periodic.conf
+    owner: root
+    mode: "600"
+
+- name: configure supervisord
+  template:
+    src: supervisord.conf.j2
+    dest: /usr/local/etc/supervisor.d/worker.conf
+  notify: restart supervisord
+
+- name: enable cronjob for janitor
+  cron:
+    name: "performs regular maintenance tasks"
+    job: "{{apphome}}bin/janitor -r /var/briefkasten/drop_root/"
+    special_time: 'daily'

@@ -1,63 +1,124 @@
 # -*- coding: utf-8 -*-
 from os import listdir
-from os.path import join, dirname
+from os.path import join, dirname, exists
+from pytest import fixture
+from webtest import Upload
 
 
-def test_visit_fingerprint(browser):
-    response = browser.get('/briefkasten/fingerprint')
-    response.status == '200 OK'
+@fixture(scope="function")
+def submit_url(testing, post_token):
+    return testing.route_url('dropbox_form_submit', token=post_token)
 
 
-def test_successful_submission(browser):
-    response = browser.post('/briefkasten/submit', params=dict(message=u'hey'))
-    response.status == '200 OK'
+@fixture(scope="function")
+def upload_url(testing, post_token):
+    return testing.route_url('dropbox_fileupload', token=post_token)
 
 
-def test_submission_validation_failure(browser):
-    response = browser.post('/briefkasten/submit', params=dict(message=u''))
-    response.status == '200 OK'
+def test_successful_submission(browser, submit_url):
+    response = browser.post(submit_url, params=dict(message=u'hey'))
+    assert response.status == '302 Found'
+    browser.get(response.location)
 
 
-def test_submission_with_one_attachment_post(zbrowser):
-    from briefkasten import dropbox_container
+@fixture
+def form(testing, browser):
+    return browser.get(testing.route_url('dropbox_form')).forms[0]
+
+
+def test_submission_without_attachment_or_message(testing, dropbox_container, form):
+    form.submit()
+
+
+def test_submission_without_attachment_post(testing, dropbox_container, form):
     assert len(listdir(dropbox_container.fs_path)) == 0
-    zbrowser.getControl(name='upload', index=0).add_file(open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
-        'text/plain', 'attachment.txt')
-    zbrowser.getControl(name='message').value = 'Hello there'
-    zbrowser.getForm().submit()
+    form['message'] = u'Hellø there'
+    form.submit()
+    assert len(listdir(dropbox_container.fs_path)) == 1
+    created_drop_id = listdir(dropbox_container.fs_path)[0]
+    fs_dropbox_status = join(dropbox_container.fs_path, created_drop_id, 'status')
+    assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
+    fs_dropbox_submission = join(dropbox_container.fs_root, 'submissions', created_drop_id)
+    assert exists(fs_dropbox_submission)
+
+
+def test_submission_with_one_attachment_post(testing, dropbox_container, form):
+    fs_attachment = testing.asset_path('attachment.txt')
+    assert len(listdir(dropbox_container.fs_path)) == 0
+    form.set(
+        'upload',
+        Upload(
+            'attachment.txt',
+            open(fs_attachment, 'r').read(),
+            'text/plain'),
+        index=0)
+    form['message'] = 'Hello there'
+    form.submit()
+    assert len(listdir(dropbox_container.fs_path)) == 1
+    fs_dropbox_status = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0], 'status')
+    assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
+
+
+def test_upload_attachment_directly(testing, dropbox_container, browser, upload_url, submit_url):
+    """clients can also upload files directly, i.e. w/o submitting the form.
+    files uploaded like this will be stored in the dropbox."""
+    fs_attachment = testing.asset_path('attachment.txt')
+    browser.post(
+        upload_url,
+        params=dict(
+            attachment=Upload(
+                'attachment.txt',
+                open(fs_attachment, 'r').read(),
+                'text/plain'),
+        ),
+    )
     fs_dropbox = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0])
+    # we have one attachment:
     assert len(listdir(join(fs_dropbox, 'attach'))) == 1
-    fs_attachments = join(dropbox_container.fs_path,
+    fs_attachments = join(
+        dropbox_container.fs_path,
         listdir(dropbox_container.fs_path)[0], 'attach')
     fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
+    # its contents is still unencrypted:
     assert open(fs_attachment).read().decode('utf-8') == \
-        open(join(dirname(__file__), 'attachment.txt'), 'r').read().decode('utf-8')
+        open(fs_attachment, 'r').read().decode('utf-8')
 
 
-def test_submission_with_multiple_attachments(zbrowser):
-    from briefkasten import dropbox_container, views
-    # patch the default number of attachments, since the zbrowser cannot execute javascript
-    views.attachments_min_len = 3
-    zbrowser.reload()  # need to reload for change to take effect
-    zbrowser.getControl(name='upload', index=0).add_file(open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
-        'text/plain', 'attachment.txt')
-    # we skip the second upload field simply to cover that edge case while we're at it...
-    zbrowser.getControl(name='upload', index=2).add_file(open(join(dirname(__file__), 'attachment.png'), 'r').read(),
-        'image/png', 'attachment.png')
-    zbrowser.getControl(name='message').value = 'Hello there'
-    zbrowser.getForm().submit()
-    fs_attachments = join(dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'attach')
-    assert len(listdir(fs_attachments)) == 2
+@fixture
+def post_token_dropbox(dropbox_container, config, post_token):
+    """ returns a dropbox instance matching the given post_token"""
+    from briefkasten import parse_post_token
+    return dropbox_container.get_dropbox(
+        parse_post_token(
+            post_token,
+            secret=config.registry.settings['post_secret']
+        )
+    )
 
 
-def test_submission_generates_message_to_editors(browser):
-    browser.post('/briefkasten/submit', params=dict(message=u'Hello'))
-    from briefkasten import dropbox_container
-    fs_message = join(dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'message')
-    created_message = open(fs_message).read().decode('utf-8')
-    assert u'Hello' in created_message
-    editor_token = open(join(dropbox_container.fs_path,
-        listdir(dropbox_container.fs_path)[0], 'editor_token')).read().decode('utf-8')
-    assert editor_token in created_message
+def test_upload_attachment_directly_fails_post_submission(testing, dropbox_container, browser, post_token_dropbox, upload_url):
+    """clients cannot upload files directly once a dropbox has been submitted. """
+    post_token_dropbox.status = u'020 submitted'
+    fs_attachment = testing.asset_path('attachment.txt')
+    browser.post(
+        upload_url,
+        params=dict(
+            attachment=Upload(
+                'attachment.txt',
+                open(fs_attachment, 'r').read(),
+                'text/plain'),
+        ),
+        status=410,
+    )
+
+
+def test_submission_with_multiple_attachments(dropbox_container, form):
+    form.set(
+        'upload',
+        Upload(
+            'attachment.txt',
+            open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
+            'text/plain'),
+        index=0)
+    form['message'] = 'Hello there'
+    form.submit()

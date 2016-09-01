@@ -1,0 +1,23 @@
+---
+- name: restart ezjail
+  service: name=ezjail state=restarted
+- name: restart sshd
+  service: name=sshd state=restarted
+- name: restart pf
+  service: name=pf state=restarted
+- name: restart nginx
+  service: name=nginx state=restarted
+- name: reload nginx
+  service: name=nginx state=reloaded
+- name: restart supervisord
+  service: name=supervisord state=restarted
+- name: restart worker
+  supervisorctl:
+    name: briefkasten_worker
+    state: restarted
+  ignore_errors: yes
+- name: restart application
+  supervisorctl:
+    name: briefkasten_frontend
+    state: restarted
+  ignore_errors: yes

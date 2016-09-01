@@ -1,0 +1,41 @@
+<rules xmlns="http://namespaces.plone.org/diazo"
+    xmlns:css="http://namespaces.plone.org/diazo/css"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <theme href="default.html" />
+
+    <before
+        content="/html/head/*"
+        theme-children="/html/head"
+    />
+
+    <rules css:if-content="#briefkasten-form">
+        <!-- fill the upload urls from the content into the theme: -->
+        <merge
+            css:theme="form#briefkasten-form"
+            css:content="form#briefkasten-form"
+            attributes="action data-fileupload_url method"
+            />
+    </rules>
+
+    <rules css:if-not-content="#briefkasten-form">
+        <replace
+            css:if-not-content="#briefkasten-form"
+            css:theme-children="#content"
+            css:content-children="#content" />
+        <drop css:theme=".custom-fileupload" />
+        <!-- create custome status messages either by general status class (0-9)
+        or specific integer code (i.e. 999 for success etc.)-->
+        <replace css:content="#status_code_120">
+            <p>Your submission has been moved to quarantine.</p>
+        </replace>
+        <replace css:content=".status_class_0">
+            <p>Your submission has been received and is awaiting processing.</p>
+        </replace>
+    </rules>
+
+    <after
+        css:theme="#content"
+        css:content="#version-info" />
+
+</rules>

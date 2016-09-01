@@ -1,0 +1,18 @@
+
+# Note that for all email addresses gpg should have
+# a public key in its keyring
+
+# List of administrator email addresses
+the_admins="{{item.the_admins}}"
+
+# List of editors email addresses
+the_editors="{{item.the_editors}}"
+
+export GNUPGHOME="{{apphome}}/var/pgp_pubkeys"
+
+# The sender
+# Appears as the sender in the emails sent to all participants
+the_sender="{{ploy_mail_sender}}"
+
+the_jdispatcher_dir=/var/run/jdispatch/
+the_cleanser_ssh_conf=/var/briefkasten/cleanser_ssh_config

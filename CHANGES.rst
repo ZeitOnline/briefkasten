@@ -1,3 +1,10 @@
+0.2.0  - Unreleased
+-------------------
+
+- major refactoring
+- use ephemeral cleanser jails
+- use ephemeral storage for initial fileupload
+
 0.1.10 - Unreleased
 -------------------
 

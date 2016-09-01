@@ -1,0 +1,7 @@
+---
+pf_nat_rules:
+# http ports that the webserver jail's nginx will bind to
+    - "rdr on {{ pf_map_interface }} proto tcp from any to {{ pf_map_interface }} port 80 -> {{ hostvars['briefkasten-webserver']['ploy_ip'] }} port 80"
+    - "rdr on {{ pf_map_interface }} proto tcp from any to {{ pf_map_interface }} port 443 -> {{ hostvars['briefkasten-webserver']['ploy_ip'] }} port 443"
+# uncomment to debug appserver directly:
+    - "rdr on {{ pf_map_interface }} proto tcp from any to {{ pf_map_interface }} port 5555 -> {{ hostvars['briefkasten-appserver']['ploy_ip'] }} port 6543"

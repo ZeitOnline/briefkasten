@@ -1,0 +1,18 @@
+---
+fs_pgp_pubkeys: '~/.gnupg/'
+# fs_bin_path: 'middleware_scripts/'
+fs_bin_path: 'briefkasten/tests/bin/'
+dropbox_view_url_format: 'http://localhost:6543/briefkasten/dropbox/%s'
+dropbox_editor_url_format: 'http://localhost:6543/briefkasten/dropbox/%s/%s'
+dropbox_cleansed_archive_url_format: 'blubber/clean/%s.zip.pgp'
+dropbox_dirty_archive_url_format: 'blubber/dirt/%s.zip.pgp'
+editors:
+  - tom@tomster.org
+  # - erdgeist@erdgeist.org
+admins:
+ - tom@tomster.org
+ # - erdgeist@erdgeist.org
+mail.host: localhost
+mail.port: 8025
+mail.default_sender: noreply@briefkasten
+attachment_size_threshold: 2Mb

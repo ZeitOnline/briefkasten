@@ -4,9 +4,23 @@
   i18n:domain="briefkasten"
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="master">
-
-  <tal:content metal:fill-slot="content">
-    <form tal:condition="form" tal:replace="structure form" />
+  <body>
+    <tal:content metal:fill-slot="content">
+        <form
+        id="editor-reply"
+        method="POST"
+        role="form"
+        accept-charset="utf-8"
+        action="${action}">
+            <div class="form-group">
+                <label for="reply">Nachricht an den Einsender</label>
+                <textarea id="reply" name="reply" rows="10" cols="60" class="form-control"></textarea>
+                <label for="author">Autor</label>
+                <input type="text" id="author" name="author" class="form-control"/>
+            </div>
+        <button id="briefkasten-formsubmit" name="submit" type="submit" class="btn btn-default">Abschicken</button>
+    </form>
     <p class="subtext" tal:condition="message">${message}</p>
   </tal:content>
+  </body>
 </html>

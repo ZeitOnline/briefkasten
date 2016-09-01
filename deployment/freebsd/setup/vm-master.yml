@@ -1,7 +1,0 @@
----
-- hosts: vm-master
-  user: root
-  roles:
-    - dhcp_host
-    - { role: jails_host, tags: ['configure'] }
-    - { role: jailhost, tags: ['configure', 'hostports'] }

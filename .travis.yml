@@ -1,0 +1,16 @@
+language: python
+python: 2.7
+sudo: false
+env:
+  - TOX_ENV=py27
+install:
+  - pip install setuptools-git
+  - pip install tox
+before_script: cd application
+script:
+  - tox -e $TOX_ENV
+notifications:
+  irc:
+    - "irc.freenode.org#pyfidelity"
+  on_success: change
+  on_failure: change

@@ -9,10 +9,7 @@
     <meta charset="utf-8" />
     <title>Briefkasten</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script type="text/javascript" src="${request.static_url('briefkasten:static/jquery-1.4.2.min.js')}"></script>
-    <script type="text/javascript" src="${request.static_url('deform:static/scripts/deform.js')}"></script>
-    <script src="${request.static_url('briefkasten:static/jquery.form.js')}"></script>
-    <link rel="stylesheet" href="${request.static_url('deform:static/css/form.css')}" type="text/css" media="screen" charset="utf-8" />
+    <base href="${request.route_url('dropbox_form')}"/>
   </head>
 
   <body id="${request.matched_route.name}">

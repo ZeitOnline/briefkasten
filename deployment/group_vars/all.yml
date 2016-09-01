@@ -1,0 +1,30 @@
+---
+# FreeBSD
+ansible_python_interpreter: /usr/local/bin/python2.7
+apphome: /usr/local/briefkasten
+appuser: pyramid
+appuserid: 1001
+themes_dir: "/var/briefkasten/themes"
+geli_passphrase_location: /tmp/geli_passphrase
+jails_dir: /usr/jails
+zpool_name: tank
+jails_zfs_root: tank/jails
+jails_netmask_lo1: 255.255.255.0
+primary_if: em0
+# add multiple to use a mirror
+root_devices:
+    - ada0
+zfs_checksum: fletcher4
+timeserver: time.euro.apple.com
+# relative path to /usr/share/zoneinfo
+timezone: Europe/Berlin
+application_port: 6543
+
+# cleansers
+ploy_cleanser_count: 5
+ploy_cleanser_ssh_baseport: 100
+
+# watchdog
+watchdog_app_dir: /usr/local/watchdog
+watchdog_app_user: pyramid
+

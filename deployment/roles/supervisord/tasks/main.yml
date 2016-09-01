@@ -1,0 +1,27 @@
+---
+- name: install packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+    cached: yes
+  with_items:
+    - py27-supervisor
+    - sudo
+
+- name: ensure supervisor include dir
+  file:
+    path: "/usr/local/etc/supervisor.d"
+    state: directory
+    owner: "root"
+    mode: "775"
+
+- name: configure supervisord
+  template:
+    src: supervisord.conf.j2
+    dest: /usr/local/etc/supervisord.conf
+  notify: restart supervisord
+
+- name: enable supervisord at startup time
+  service:
+    name: supervisord
+    enabled: true

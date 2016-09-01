@@ -1,80 +1,47 @@
 # -*- coding: utf-8 -*-
+from pytest import fixture
 from os.path import dirname, join
-from tempfile import mkdtemp
-from webtest import TestApp
-from wsgi_intercept import add_wsgi_intercept, zope_testbrowser
-
-from briefkasten import main
 
 
-#
-# functional tests with an isolated, temporary dropbox
-#
-def setup_dropbox():
-    fs_dropbox_root = mkdtemp()
-    return main({},
-        appserver_root_url='/briefkasten/',
-        fs_dropbox_root=fs_dropbox_root,
-        fs_bin_path=join(dirname(__file__), 'bin')
+@fixture
+def post_token(dropbox_container, config):
+    from briefkasten import generate_post_token
+    return generate_post_token(secret=config.registry.settings['post_secret'])
+
+
+@fixture
+def drop_id(dropbox_container):
+    from briefkasten import generate_drop_id
+    return generate_drop_id()
+
+
+@fixture
+def dropbox_without_attachment(dropbox_container, drop_id):
+    return dropbox_container.add_dropbox(drop_id, message=u'Schönen guten Tag!')
+
+
+@fixture
+def attachment(testing):
+    return testing.attachment_factory(
+        filename=u'attachment.txt',
+        file=open(join(dirname(__file__), 'attachment.txt'), 'r')
     )
 
 
-def teardown_dropbox(test_app):
-    from briefkasten import dropbox_container
-    dropbox_container.destroy()
-
-
-def pytest_funcarg__app(request):
-    return request.cached_setup(
-        setup=setup_dropbox,
-        teardown=teardown_dropbox,
-        scope="function",
+@fixture
+def dropbox(dropbox_container, drop_id, attachment):
+    return dropbox_container.add_dropbox(
+        drop_id,
+        message=u'Schönen guten Tag!',
+        attachments=[attachment],
     )
 
 
-#
-# webtest based browser tests
-#
-def setup_browser_with_dropbox():
-    return TestApp(setup_dropbox())
-
-
-def teardown_browser_with_dropbox(browser):
-    teardown_dropbox(browser.app)
-
-
-def pytest_funcarg__browser(request):
-    return request.cached_setup(
-        setup=setup_browser_with_dropbox,
-        teardown=teardown_browser_with_dropbox,
-        scope="function",
-    )
-
-
-#
-# zope.testbrowser based browser tests
-#
-class WSGI_Browser(zope_testbrowser.WSGI_Browser):
-    """Allows storing an app instance, so it can be
-    torn down."""
-    app = None
-
-
-def setup_zopetestbrowser():
-    app = setup_dropbox()
-    add_wsgi_intercept('localhost', 80, lambda: app)
-    browser = WSGI_Browser('http://localhost:80/briefkasten/submit')
-    browser.app = app
-    return browser
-
-
-def teardown_zopetestbrowser(browser):
-    teardown_dropbox(browser.app)
-
-
-def pytest_funcarg__zbrowser(request):
-    return request.cached_setup(
-        setup=setup_zopetestbrowser,
-        teardown=teardown_zopetestbrowser,
-        scope="function",
+@fixture
+def watchdog_dropbox(dropbox_container, drop_id, attachment):
+    return dropbox_container.add_dropbox(
+        drop_id,
+        message=u'Schönen guten Tag!',
+        attachments=[attachment],
+        from_watchdog=True,
     )
