@@ -1,9 +1,13 @@
-0.2.0  - Unreleased
--------------------
+0.2.15  - 2016-09-01
+--------------------
 
-- major refactoring
+This is the first public release of the 0.2 branch after some extensive development and in-house testing.
+
+- major refactoring (separate web app and worker into separate code running in separate jails)
+- use custom FreeBSD package repo with known-good configurations and versions which makes deployment much (much!) more stable
 - use ephemeral cleanser jails
 - use ephemeral storage for initial fileupload
+
 
 0.1.10 - Unreleased
 -------------------
