@@ -1,4 +1,5 @@
 build = true
+use_pypi = false
 
 bin/devpi bin/ploy: bin/pip
 	bin/pip install -r requirements.txt
@@ -29,8 +30,8 @@ reset-host:
 	bin/ploy do briefkasten reset_jails
 
 update-app:
-	bin/ploy do worker update_backend build=$(build)
-	bin/ploy do appserver update_backend build=false
+	bin/ploy do worker update_backend build=$(build) use_pypi=$(use_pypi)
+	bin/ploy do appserver update_backend build=false use_pypi=$(use_pypi)
 
 update-theme:
 	bin/ploy do appserver upload_theme
