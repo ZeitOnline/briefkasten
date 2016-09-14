@@ -76,7 +76,9 @@
   template:
     src: settings.yaml.j2
     dest: "/var/briefkasten/drop_root/settings.yaml"
-  notify: restart application
+  notify:
+    - restart application
+    - restart worker
   tags:
     - app-config
     - update-app
