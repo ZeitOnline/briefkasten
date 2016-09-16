@@ -100,5 +100,5 @@
 - name: enable cronjob for janitor
   cron:
     name: "performs regular maintenance tasks"
-    job: "{{apphome}}bin/janitor -r /var/briefkasten/drop_root/"
+    job: "{{apphome}}/bin/janitor -r /var/briefkasten/drop_root/"
     special_time: 'daily'
