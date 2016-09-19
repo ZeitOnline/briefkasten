@@ -73,7 +73,10 @@ class DropboxContainer(object):
             self.settings['smtp'] = setup_smtp_factory(**self.settings)
 
         # setup GPG
-        self.gpg_context = gnupg.GPG(gnupghome=self.settings['fs_pgp_pubkeys'])
+        self.gpg_context = gnupg.GPG(
+            gnupghome=self.settings['fs_pgp_pubkeys'],
+            gpgbinary=self.settings.get('fs_gpg_path', 'gpg'),
+        )
 
         # convert human readable size to bytes
         self.settings['attachment_size_threshold'] = parse_size(self.settings['attachment_size_threshold'])
