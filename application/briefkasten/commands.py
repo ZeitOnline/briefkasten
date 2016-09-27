@@ -74,7 +74,7 @@ def janitor(root):     # pragma: no cover
             report = report + 'Editor %s has a key that never expires.\n' % editor
             continue
 
-        keyexpiry = datetime.utcfromtimestamp(int(k['expires']))
+        keyexpiry = datetime.utcfromtimestamp(int(key['expires']))
         delta = keyexpiry - now
 
         if delta.days < 0:
@@ -83,7 +83,6 @@ def janitor(root):     # pragma: no cover
             report = report + 'Editor ' + editor + ' has a key that will expire in %d days.\n' % delta.days
 
     for drop in drop_root:
-        print('debugging %s' % drop)
         age = now - drop.last_changed()
         max_age = 365 if not drop.from_watchdog else 1
 
