@@ -11,7 +11,7 @@ from pyquery import PyQuery
 
 import ConfigParser as ConfigParser_
 
-find_drop_id = re.compile('Drop ID\W(\w+)\s.*')
+find_drop_id = re.compile('Drop\W(\w+)\s.*')
 
 
 class ConfigParser(ConfigParser_.SafeConfigParser):
@@ -89,7 +89,7 @@ def fetch_test_submissions(previous_history, config):
     server.login(config['imap_user'], config['imap_passwd'])
     server.select_folder('INBOX')
     history = previous_history.copy()
-    candidates = server.fetch(server.search(criteria='NOT DELETED SUBJECT "Drop ID"'), ['BODY[HEADER.FIELDS (SUBJECT)]'])
+    candidates = server.fetch(server.search(criteria='NOT DELETED SUBJECT "Drop"'), ['BODY[HEADER.FIELDS (SUBJECT)]'])
     for imap_id, message in candidates.items():
         subject = message.get('BODY[HEADER.FIELDS (SUBJECT)]', 'Subject: ')
         try:
