@@ -97,7 +97,6 @@ def fetch_test_submissions(previous_history, config):
         except IndexError:
             # ignore emails that are not test submissions
             continue
-        print "Found submission '%s'" % drop_id
         server.delete_messages([imap_id])
         try:
             del history[drop_id]
