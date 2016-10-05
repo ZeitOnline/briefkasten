@@ -87,7 +87,8 @@ def janitor(root):     # pragma: no cover
         max_age = 365 if not drop.from_watchdog else 1
 
         if age.days > max_age:
-            print('drop %s is expired. Removing it.' % drop)
+            if not drop.from_watchdog:
+                print('drop %s is expired. Removing it.' % drop)
             drop.destroy()
 
 
