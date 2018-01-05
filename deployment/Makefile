@@ -25,6 +25,7 @@ configure-jails:
 
 upload-pgp-keys:
 	bin/ploy do worker upload_pgp_keys
+	bin/ploy configure worker -t update-pgp
 
 reset-host:
 	bin/ploy do briefkasten reset_jails

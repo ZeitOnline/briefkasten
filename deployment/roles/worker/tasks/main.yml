@@ -83,6 +83,7 @@
     - app-config
     - update-app
     - update-config
+    - update-pgp
 
 - name: disable periodic emails
   copy:
