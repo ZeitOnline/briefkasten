@@ -54,7 +54,7 @@ setup(
             'pyramid_debugtoolbar',
             'pytest <2.8',
             'py >= 1.4.17',
-            'pyflakes < 0.9',
+            'pyflakes',
             'pytest-flakes',
             'pytest-pep8',
             'pytest-cov',
