@@ -2,8 +2,8 @@ from py.test import fixture
 
 size_values = {
     '200': 200,
-    '20M': 20971520,
-    '1Gb': 1073741824
+    '20M': 20000000,
+    '1Gb': 1000000000
 }
 
 
