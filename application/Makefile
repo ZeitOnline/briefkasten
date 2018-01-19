@@ -18,7 +18,7 @@ upload: setup.py bin/py.test bin/devpi
 	PATH=${PWD}/bin:${PATH} bin/devpi upload --no-vcs
 
 bin/python bin/pip:
-	virtualenv .
+	virtualenv --python=$(python) .
 	bin/pip install -U pip setuptools
 
 clean:
