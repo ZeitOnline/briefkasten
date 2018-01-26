@@ -17,6 +17,13 @@ Die Einreichung enthielt einen Anhang.
 Die Einreichung enthielt keine Anhänge.
 {% endif %}
 
+{% if dropbox.status_int >= 500 and dropbox.status_int < 600 %}
+Der Bereinigungsvorgang ist leider fehlgeschlagen, da die Anhaenge nicht bereinigt werden konnten.
+{% if dropbox.status_int == 502 %}
+Konkret waren keine Cleanser-Jails verfuegbar. Bitte kontaktieren sie den Administrator, da dieses Problem wahrscheinlich manuelle Intervention erfordert!
+{% endif %}
+{% endif %}
+
 {% if dropbox.status_int == 490 %}
 Der Bereinigungsvorgang ist leider fehlgeschlagen.
 
