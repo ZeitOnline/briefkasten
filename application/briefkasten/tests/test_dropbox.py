@@ -249,3 +249,12 @@ def test_notification_text_two(dropbox, testing):
         'size': -1})
     dropbox.add_attachment(attachment)
     assert u'Die Einreichung enthielt 2 Anhänge.' in dropbox._notification_text
+
+
+def test_dirty_archive_url(dropbox, app, testing):
+    assert dropbox.dirty_archive_url is not None
+
+
+def test_dirty_archive_url_without_format(dropbox, app, testing):
+    del dropbox.settings['dropbox_dirty_archive_url_format']
+    assert dropbox.dirty_archive_url is None
