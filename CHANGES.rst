@@ -1,4 +1,4 @@
-0.2.16  - Unreleased
+0.2.16  - 2018-02-12
 --------------------
 
 - Reenabled sending of uncleansed attachments via email (if no "dirty archive" has been
