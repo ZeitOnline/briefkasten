@@ -1,3 +1,11 @@
+0.2.16  - Unreleased
+--------------------
+
+- Reenabled sending of uncleansed attachments via email (if no "dirty archive" has been
+  configured) - this had been a regression introduced in the 0.2 branch when adding the archive
+  feature
+
+
 0.2.15  - 2016-09-01
 --------------------
 

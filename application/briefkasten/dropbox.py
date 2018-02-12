@@ -323,8 +323,12 @@ class Dropbox(object):
         # status is now < 500 if cleansing was successful or >= 500 && < 600 if cleansing failed
         # or 800 if cleansing was not supported
         # update the decision whether to include attachments in email or not based on size of cleansed attachments:
+        # and whether we have an archive for uncleansed attachemts (if we do, don't send them via email, if we
+        # don't do send them via email, because otherwise editors would never receive those at all.)
         if self.status_int < 500:
             self.send_attachments = self.size_attachments < self.settings.get('attachment_size_threshold', 0)
+        elif self.status_int == 800 and 'dropbox_dirty_archive_url_format' not in self.settings:
+            self.send_attachments = True
         else:
             self.send_attachments = False
 

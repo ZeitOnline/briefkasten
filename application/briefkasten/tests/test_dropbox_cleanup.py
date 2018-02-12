@@ -113,7 +113,14 @@ def test_archive_is_marked_dirty_for_unsupported_attachments(monkeypatch, dropbo
     mocked_notify_dropbox._notify_editors.assert_called_once_with()
 
 
-def test_unsupported_attachments_are_never_sent_as_mail_attachments(monkeypatch, mocked_notify_dropbox):
+def test_unsupported_attachments_are_not_sent_as_mail_attachments_if_archive(settings, monkeypatch, mocked_notify_dropbox):
     monkeypatch.setenv('MOCKED_STATUS_CODE', '800')
     mocked_notify_dropbox.process()
     assert not mocked_notify_dropbox.send_attachments
+
+
+def test_unsupported_attachments_are_sent_if_no_archive(settings, monkeypatch, mocked_notify_dropbox):
+    del mocked_notify_dropbox.settings['dropbox_dirty_archive_url_format']
+    monkeypatch.setenv('MOCKED_STATUS_CODE', '800')
+    mocked_notify_dropbox.process()
+    assert mocked_notify_dropbox.send_attachments
