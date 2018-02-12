@@ -5,6 +5,15 @@
   configured) - this had been a regression introduced in the 0.2 branch when adding the archive
   feature
 
+- Fixed editor template when uncleansed attachments were included (if no "dirty archive" has been
+  configured) - this had been a regression introduced in the 0.2 branch when adding the archive
+  feature
+
+- Make the timeout value how long a submission token is valid configurable (instead of hard coding
+  it to 10 minutes)
+
+- Fixed various version pins and test fixtures to enable running tests in the year 2018 :)
+
 
 0.2.15  - 2016-09-01
 --------------------
