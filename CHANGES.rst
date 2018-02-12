@@ -14,6 +14,8 @@
 
 - Fixed various version pins and test fixtures to enable running tests in the year 2018 :)
 
+- Upgraded OS to 10.3-RELEASE
+
 
 0.2.15  - 2016-09-01
 --------------------
