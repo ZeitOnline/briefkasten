@@ -24,7 +24,7 @@
     </tal:replies>
     <tal:noreplies tal:condition="not replies"><p i18n:translate="">Kopieren oder notieren Sie sich die Adresszeile, um Nachrichten der Redaktion zu empfangen.
 Erstellen Sie aus Sicherheitsgründen kein Lesezeichen zu dieser Seite, da dieses von anderen gefunden werden könnte.</p>
-    <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Return to the submission form</a></p>
+    <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Zurück zum Einreichungsformular.</a></p>
     </tal:noreplies>
   </tal:content>
 </html>
