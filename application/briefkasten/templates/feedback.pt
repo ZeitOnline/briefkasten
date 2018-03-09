@@ -8,22 +8,24 @@
   <tal:content  metal:fill-slot="content">
     <h1 i18n:translate="">Status der Einreichung "<span id="feedback-token" i18n:name="drop_id">${drop_id}</span>"</h1>
     <p class="status_class_${status_code}" id="status_code_${status_int}">
-        <tal:status tal:condition="status_code=='0'">Your submission has been received and is awaiting processing</tal:status>
-        <tal:status tal:condition="status_code=='1'">Your submission is being moved into quarantine, where it will be stripped of meta data before being sent on.</tal:status>
-        <tal:status tal:condition="status_code=='2'">Your submission is now in quarantine, where it will be stripped of meta data before being sent on.</tal:status>
-        <tal:status tal:condition="status_code=='5'">An error has occured while processing your attached data. All your data has been deleted from the server. You may want to try it again.</tal:status>
-        <tal:status tal:condition="status_code=='6'">An error has occured while sending your submission to the editors. All your data has been deleted from the server. You may want to try it again.</tal:status>
-        <tal:status tal:condition="status_code=='8'">Your submission has been successfully processed, encrypted and has been sent off to our editor, however, at least one of the attachments has not been cleansed, as it was not supported by our cleanser setup.</tal:status>
-        <tal:status tal:condition="status_code=='9'">Your submission has been successfully processed, encrypted and has been sent off to our editor.</tal:status>
+        <tal:status tal:condition="status_code=='0'">Sie haben uns eine Nachricht übermittelt, die wir nun überprüfen und bearbeiten.</tal:status>
+        <tal:status tal:condition="status_code=='1'">Ihre Einreichung wird nun bereinigt.</tal:status>
+        <tal:status tal:condition="status_code=='2'">Ihre Einreichung befindet sich nun in Quarantäne und wird von Metadaten bereinigt, bevor sie an die Redaktion weitergeleitet wird.</tal:status>
+        <tal:status tal:condition="status_code=='5'">Leider ist ein Fehler bei der Bereinigung Ihrer Daten aufgetreten. Ihre unbereinigten Daten wurden vom Server geloescht. Versuchen Sie es ggf. später nochmal.</tal:status>
+        <tal:status tal:condition="status_code=='6'">Leider ist ein Fehler bei der Weiterleitung Ihrer Daten an die Redaktion aufgetreten. Ihre unbereinigten Daten wurden vom Server geloescht. Versuchen Sie es ggf. später nochmal.</tal:status>
+        <tal:status tal:condition="status_code=='8'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet, allerdings befand sich unter den Daten mindestens ein Dateityp der vom Bereinigungsprozess nicht unterstützt wird und deshalb unbereinigt weitergeleitet wurde.</tal:status>
+        <tal:status tal:condition="status_code=='9'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet.</tal:status>
     </p>
-    <p>You can reload this page to follow the state of your submission and/or view any replies</p>
+    <p>Sie können die Seite auch später neu laden, um zu überprüfen, ob die Redaktion eine Nachricht hinterlassen hat.</p>
     <tal:replies tal:condition="replies">
       <h2>Antwort der Redaktion</h2>
       <p class="byline"><span class="author">${replies[0]['author']}</span>:</p>
       <blockquote>${replies[0]['reply']}</blockquote>
     </tal:replies>
-    <tal:noreplies tal:condition="not replies"><p i18n:translate="">No reply has been posted so far. Please save the URL of this page in a secure location to check for a response at a later time. Please don't bookmark this page, though, as those could be found by third parties.</p>
+    <tal:noreplies tal:condition="not replies"><p i18n:translate="">Kopieren oder notieren Sie sich die Adresszeile, um Nachrichten der Redaktion zu empfangen.
+Erstellen Sie aus Sicherheitsgründen kein Lesezeichen zu dieser Seite, da dieses von anderen gefunden werden könnte.</p>
     <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Return to the submission form</a></p>
     </tal:noreplies>
   </tal:content>
 </html>
+
