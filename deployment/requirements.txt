@@ -24,7 +24,6 @@ lazy==1.3
 MarkupSafe==1.0
 mr.bob==0.1.2
 paramiko==2.4.0
-pkg-resources==0.0.0
 pkginfo==1.2.1
 ploy==1.5.1
 ploy-ansible==1.4.1
