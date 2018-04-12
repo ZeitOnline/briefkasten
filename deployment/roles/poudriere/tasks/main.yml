@@ -20,6 +20,15 @@
     - fish
     - htop
 
+- name: configure fish (for ssh-agent forwarding)
+  copy:
+    src: config.fish
+    dest: /root/.config/fish/config.fish
+    mode: 0750
+    owner: root
+    group: wheel
+  tags: poudriere
+
 - name: make sure work zpool is modern enough
   command: zpool upgrade tank
   tags: poudriere
@@ -91,3 +100,13 @@
     path: "{{ distfiles_cache }}"
     state: directory
   tags: poudriere
+
+- name: install helper to publish built packages
+  copy:
+    src: publish-packages.sh
+    dest: /usr/local/bin/publish-briefkasten-packages
+    mode: 0755
+    owner: root
+    group: wheel
+  tags: poudriere
+
