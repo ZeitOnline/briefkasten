@@ -1,7 +1,7 @@
 ports-mgmt/pkg
 ports-mgmt/poudriere
 sysutils/screen
-editors/vim-lite
+editors/vim-console
 sysutils/ezjail
 www/nginx
 devel/gmake
