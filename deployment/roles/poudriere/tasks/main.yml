@@ -6,6 +6,7 @@
   with_items:
     - poudriere
     - rsync
+    - dialog4ports
   tags: poudriere
 
 - name: install helpers for interactive usage
