@@ -7,7 +7,7 @@ www/nginx
 devel/gmake
 devel/py-virtualenv
 net/rsync
-lang/python27
+lang/python2
 sysutils/py-supervisor
 sysutils/jaildaemon
 textproc/libxslt
