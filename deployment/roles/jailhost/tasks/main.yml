@@ -27,7 +27,7 @@
 - name: Ensure our self-signed cert will be accepted
   copy:
     src: cert.pem
-    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.zeit.de.pem"
+    dest: "{{ jails_dir }}/newjail/etc/ssl/cert.pem"
   tags: poudriere
 
 - name: Ensure our self-signed poudriere packages will be accepted
