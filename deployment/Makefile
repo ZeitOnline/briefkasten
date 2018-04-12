@@ -15,10 +15,10 @@ configure-host:
 	bin/ploy configure briefkasten
 
 start-jails:
-	bin/ploy start worker
-	bin/ploy start webserver
-	bin/ploy start appserver
-	bin/ploy start cleanser
+	bin/ploy start briefkasten-worker
+	bin/ploy start briefkasten-webserver
+	bin/ploy start briefkasten-appserver
+	bin/ploy start briefkasten-cleanser
 
 configure-jails:
 	bin/ploy playbook main.yml
