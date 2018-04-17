@@ -33,7 +33,7 @@
 - name: Ensure our self-signed poudriere packages will be accepted
   copy:
     src: poudriere.cert
-    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.dtfh.de.pub"
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.zeit.de.pub"
   tags: poudriere
 
 - name: Ensure pkg configuration will be present in each jail

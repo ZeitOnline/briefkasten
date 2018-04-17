@@ -1,13 +1,13 @@
 ports-mgmt/pkg
 ports-mgmt/poudriere
 sysutils/screen
-editors/vim-lite
+editors/vim-console
 sysutils/ezjail
 www/nginx
 devel/gmake
 devel/py-virtualenv
 net/rsync
-lang/python27
+lang/python2
 sysutils/py-supervisor
 sysutils/jaildaemon
 textproc/libxslt

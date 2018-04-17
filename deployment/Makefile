@@ -15,27 +15,27 @@ configure-host:
 	bin/ploy configure briefkasten
 
 start-jails:
-	bin/ploy start worker
-	bin/ploy start webserver
-	bin/ploy start appserver
-	bin/ploy start cleanser
+	bin/ploy start briefkasten-worker
+	bin/ploy start briefkasten-webserver
+	bin/ploy start briefkasten-appserver
+	bin/ploy start briefkasten-cleanser
 
 configure-jails:
 	bin/ploy playbook main.yml
 
 upload-pgp-keys:
-	bin/ploy do worker upload_pgp_keys
-	bin/ploy configure worker -t update-pgp
+	bin/ploy do briefkasten-worker upload_pgp_keys
+	bin/ploy configure briefkasten-worker -t update-pgp
 
 reset-host:
 	bin/ploy do briefkasten reset_jails
 
 update-app:
-	bin/ploy do worker update_backend build=$(build) use_pypi=$(use_pypi)
-	bin/ploy do appserver update_backend build=false use_pypi=$(use_pypi)
+	bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
+	bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
 
 update-theme:
-	bin/ploy do appserver upload_theme
+	bin/ploy do briefkasten-appserver upload_theme
 
 clean:
 	git clean -fXd

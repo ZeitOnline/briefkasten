@@ -1,6 +1,12 @@
 0.2.17  - Unreleased
 --------------------
 
+- Upgraded OS to 11.1-RELEASE
+
+- Upgraded all packages to current versions
+
+- Moved package building and hosting to 'official' ``*.zeit.de`` infrastructure
+
 
 0.2.16  - 2018-02-12
 --------------------

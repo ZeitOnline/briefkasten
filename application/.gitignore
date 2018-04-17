@@ -18,3 +18,12 @@ __pycache__
 /fabfile.py
 /src
 /etc
+/.cache/
+/.eggs/
+/.kitchen/
+/.tox/
+/dist/
+/local/
+/share/
+/venv/
+

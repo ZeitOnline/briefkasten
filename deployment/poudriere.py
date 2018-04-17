@@ -29,12 +29,12 @@ def upload_packages():
 
 @fab.task
 def download_options():
-    rsync('-av', '{host_string}:/usr/local/etc/poudriere.d/102amd64-briefkasten-options', 'roles/poudriere/files/')
+    rsync('-av', '{host_string}:/usr/local/etc/poudriere.d/111amd64-briefkasten-options', 'roles/poudriere/files/')
 
 
 @fab.task
 def build_packages():
-    fab.run('poudriere bulk -f /usr/local/etc/poudriere.d/briefkasten-pkglist -p briefkasten -z briefkasten -j 102amd64')
+    fab.run('poudriere bulk -f /usr/local/etc/poudriere.d/briefkasten-pkglist -p briefkasten -z briefkasten -j 111amd64')
 
 
 @fab.task
