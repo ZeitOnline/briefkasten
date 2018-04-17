@@ -24,18 +24,18 @@ configure-jails:
 	bin/ploy playbook main.yml
 
 upload-pgp-keys:
-	bin/ploy do worker upload_pgp_keys
-	bin/ploy configure worker -t update-pgp
+	bin/ploy do briefkasten-worker upload_pgp_keys
+	bin/ploy configure briefkasten-worker -t update-pgp
 
 reset-host:
 	bin/ploy do briefkasten reset_jails
 
 update-app:
-	bin/ploy do worker update_backend build=$(build) use_pypi=$(use_pypi)
-	bin/ploy do appserver update_backend build=false use_pypi=$(use_pypi)
+	bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
+	bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
 
 update-theme:
-	bin/ploy do appserver upload_theme
+	bin/ploy do briefkasten-appserver upload_theme
 
 clean:
 	git clean -fXd
