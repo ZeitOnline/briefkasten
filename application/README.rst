@@ -1,1 +1,1 @@
-../README.rst
+../docs/application/develop.rst
