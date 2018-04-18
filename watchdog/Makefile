@@ -5,12 +5,12 @@ bin/watchdog: requirements.txt bin/pip
 	bin/pip install -r requirements.txt
 	@touch $@
 
-bin/devpi: bin/python bin/pip setup.py bin/watchdog
-	bin/python setup.py dev
+bin/devpi: bin/python bin/pip src/watchdog/setup.py bin/watchdog
+	bin/python src/watchdog/setup.py dev
 	@touch $@
 
 upload: setup.py bin/devpi
-	PATH=${PWD}/bin:${PATH} bin/devpi upload --no-vcs
+	PATH=${PWD}/bin:${PATH} bin/devpi upload --no-vcs src/watchdog 
 
 bin/python bin/pip:
 	virtualenv .
