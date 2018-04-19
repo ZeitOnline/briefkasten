@@ -1,3 +1,17 @@
+PROJECT := briefkasten_watchdog
+
+MOUNT_SOURCE := --volume $(CURDIR)/src/watchdog:/src
+
+.PHONY: develop
+develop: develop-container
+	docker run --rm -it $(MOUNT_SOURCE) $(PROJECT):develop
+
+
+.PHONY: develop-container
+develop-container: 
+	docker build --quiet --target develop --tag $(PROJECT):develop $(CURDIR)
+
+
 pyversion = 2.7
 python = python$(pyversion)
 
