@@ -13,7 +13,6 @@ ENTRYPOINT ["bash"]
 FROM base AS sdist
 WORKDIR /build
 COPY src/watchdog ./
-# kludge to make setuptools-git-version work
 RUN pip install -e .
 
 # --- production ---
