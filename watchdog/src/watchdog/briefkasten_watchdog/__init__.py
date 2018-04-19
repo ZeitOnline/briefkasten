@@ -6,6 +6,7 @@ from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
 from os import environ, path
+from time import sleep
 from zope.testbrowser.browser import Browser
 from pyquery import PyQuery
 
@@ -139,6 +140,10 @@ def config_from_env(prefix='BKWD_'):
     required=False,
     default='watchdog.ini',
 )
+@click.option(
+    '--sleep-seconds',
+    default=0,
+    help='''Run forever and sleep for n seconds between loops''')
 def main(fs_config=None, sleep_seconds=0):
     # read configuration
     fs_config = path.abspath(fs_config)
@@ -148,50 +153,56 @@ def main(fs_config=None, sleep_seconds=0):
     # read history of previous runs
     errors = []
     fs_history = path.abspath(path.join(path.dirname(fs_config), 'watchdog-history.json'))
-    if path.exists(fs_history):
-        previous_history = json.load(open(fs_history, 'r'))
-    else:
-        previous_history = dict()
 
-    # fetch submissions from mail server
-    history = fetch_test_submissions(previous_history=previous_history, config=config)
+    while True:
+        if path.exists(fs_history):
+            previous_history = json.load(open(fs_history, 'r'))
+        else:
+            previous_history = dict()
 
-    # check for failed test submissions
-    max_process_secs = int(config.get('max_process_secs', 600))
-    now = datetime.now()
-    for token, timestamp_str in history.items():
-        timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
-        age = now - timestamp
-        if age.seconds > max_process_secs and token not in previous_history:
-            errors.append(WatchdogError(
-                subject="Submission '%s' not received" % token,
-                message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
-                    token, timestamp, max_process_secs)))
+        # fetch submissions from mail server
+        history = fetch_test_submissions(previous_history=previous_history, config=config)
 
-    # perform test submission
-    token, submission_errors = perform_submission(
-        app_url=config['app_url'],
-        testing_secret=config['testing_secret'])
-    if token:
-        history[token] = datetime.now().isoformat()
-    errors += submission_errors
+        # check for failed test submissions
+        max_process_secs = int(config.get('max_process_secs', 600))
+        now = datetime.now()
+        for token, timestamp_str in history.items():
+            timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
+            age = now - timestamp
+            if age.seconds > max_process_secs and token not in previous_history:
+                errors.append(WatchdogError(
+                    subject="Submission '%s' not received" % token,
+                    message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
+                        token, timestamp, max_process_secs)))
 
-    # record updated history
-    file_history = open(fs_history, 'w')
-    file_history.write(json.dumps(history).encode('utf-8'))
-    file_history.close()
+        # perform test submission
+        token, submission_errors = perform_submission(
+            app_url=config['app_url'],
+            testing_secret=config['testing_secret'])
+        if token:
+            history[token] = datetime.now().isoformat()
+        errors += submission_errors
 
-    if len(errors) == 0:
-        exit()
+        # record updated history
+        file_history = open(fs_history, 'w')
+        file_history.write(json.dumps(history).encode('utf-8'))
+        file_history.close()
 
-    from pyramid_mailer import mailer_factory_from_settings
-    from pyramid_mailer.message import Message
-    from urlparse import urlparse
-    mailer = mailer_factory_from_settings(config, prefix='smtp_')
-    hostname = urlparse(config['app_url']).hostname
-    recipients = [recipient for recipient in config['notify_email'].split() if recipient]
-    message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
-        sender=config['the_sender'],
-        recipients=recipients,
-        body="\n".join([str(error) for error in errors]))
-    mailer.send_immediately(message, fail_silently=False)
+        if len(errors) > 0:
+            from pyramid_mailer import mailer_factory_from_settings
+            from pyramid_mailer.message import Message
+            from urlparse import urlparse
+            mailer = mailer_factory_from_settings(config, prefix='smtp_')
+            hostname = urlparse(config['app_url']).hostname
+            recipients = [recipient for recipient in config['notify_email'].split() if recipient]
+            message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
+                sender=config['the_sender'],
+                recipients=recipients,
+                body="\n".join([str(error) for error in errors]))
+            mailer.send_immediately(message, fail_silently=False)
+
+        if sleep_seconds > 0:
+            print("Sleeping %d seconds" % sleep_seconds)
+            sleep(sleep_seconds)
+        else:
+            exit(0)
