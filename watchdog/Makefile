@@ -13,7 +13,7 @@ develop-container:
 
 .PHONY: production
 production: production-container
-	docker run -it $(PROJECT):production
+	docker run (PROJECT):production
 
 .PHONY: production-container
 production-container: 
