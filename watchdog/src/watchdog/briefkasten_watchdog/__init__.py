@@ -4,7 +4,7 @@ import json
 from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
-from os import path
+from os import environ, path
 from zope.testbrowser.browser import Browser
 from pyquery import PyQuery
 
@@ -102,6 +102,35 @@ def fetch_test_submissions(previous_history, config):
     return history
 
 
+def default_config():
+    return dict(
+        app_url="http://localhost:6543/briefkasten/",
+        max_process_secs=60,
+        smtp_host="localhost",
+        smtp_port=25,
+    )
+
+
+def config_from_file(fs_config):
+    parser = ConfigParser(allow_no_value=True)
+    parser.read(fs_config)
+    config = default_config()
+    try:
+        config.update(parser.as_dict()['briefkasten'])
+    except KeyError:
+        pass
+    return config
+
+
+def config_from_env(prefix='BKWD_'):
+    keys = [e for e in environ.keys() if e.startswith(prefix)]
+    config=dict()
+    for key in keys:
+        target_key = key.split(prefix)[-1].lower()
+        config[target_key] = environ[key]
+    return config
+
+
 def main():
     # read configuration
     import sys
@@ -110,9 +139,8 @@ def main():
     except IndexError:
         fs_config = path.join(path.dirname(__file__), '..', 'watchdog.ini')
     fs_config = path.abspath(fs_config)
-    parser = ConfigParser(allow_no_value=True)
-    parser.read(fs_config)
-    config = parser.as_dict()['briefkasten']
+    config = config_from_file(fs_config)
+    config.update(config_from_env())
 
     # read history of previous runs
     errors = []
