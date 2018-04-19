@@ -1,7 +1,7 @@
 import re
 import time
 import json
-from imapclient import IMAPClient, create_default_context
+from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
 from os import path
@@ -44,7 +44,6 @@ def perform_submission(app_url, testing_secret):
     token = None
     errors = []
     browser = Browser()
-    browser.mech_browser.set_handle_robots(False)
     try:
         browser.open(app_url)
     except Exception as exc:
@@ -82,10 +81,7 @@ def fetch_test_submissions(previous_history, config):
         is removed from the history.
         any entries left in the history are returned
     """
-    context = create_default_context()
-    context.check_hostname = False
-    context.verify_mode = False
-    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True, ssl_context=context)
+    server = IMAPClient(config['imap_host'], use_uid=True, ssl=True)
     server.login(config['imap_user'], config['imap_passwd'])
     server.select_folder('INBOX')
     history = previous_history.copy()
