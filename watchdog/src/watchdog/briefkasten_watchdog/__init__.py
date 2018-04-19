@@ -1,3 +1,4 @@
+import click
 import re
 import time
 import json
@@ -131,13 +132,15 @@ def config_from_env(prefix='BKWD_'):
     return config
 
 
-def main():
+
+@click.command(help='Performs a test submission and checks it arrived')
+@click.argument(
+    'fs_config',
+    required=False,
+    default='watchdog.ini',
+)
+def main(fs_config=None, sleep_seconds=0):
     # read configuration
-    import sys
-    try:
-        fs_config = sys.argv[1]
-    except IndexError:
-        fs_config = path.join(path.dirname(__file__), '..', 'watchdog.ini')
     fs_config = path.abspath(fs_config)
     config = config_from_file(fs_config)
     config.update(config_from_env())
