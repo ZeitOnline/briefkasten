@@ -6,6 +6,7 @@ RUN pip install --no-deps -r requirements.txt
 FROM base AS develop
 WORKDIR /build
 RUN pip install pdbpp
+COPY watchdog.ini .
 # RUN pip install -e /src/watchdog/
 ENTRYPOINT ["bash"]
 
@@ -17,4 +18,5 @@ RUN pip install -e .
 
 # --- production ---
 FROM sdist AS production
-#ENTRYPOINT ["watchdog", "watchdog.ini"]
+COPY watchdog.ini .
+ENTRYPOINT ["watchdog", "watchdog.ini"]

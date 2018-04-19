@@ -6,10 +6,18 @@ MOUNT_SOURCE := --volume $(CURDIR)/src/watchdog:/src
 develop: develop-container
 	docker run --rm -it $(MOUNT_SOURCE) $(PROJECT):develop
 
-
 .PHONY: develop-container
 develop-container: 
 	docker build --quiet --target develop --tag $(PROJECT):develop $(CURDIR)
+
+
+.PHONY: production
+production: production-container
+	docker run -it $(PROJECT):production
+
+.PHONY: production-container
+production-container: 
+	docker build --quiet --target production --tag $(PROJECT):production $(CURDIR)
 
 
 pyversion = 2.7
