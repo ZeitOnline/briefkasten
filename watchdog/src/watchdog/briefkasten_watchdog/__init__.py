@@ -1,7 +1,9 @@
 import click
+import logging
 import re
 import time
 import json
+import sys
 from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
@@ -14,6 +16,7 @@ from pyquery import PyQuery
 import ConfigParser as ConfigParser_
 
 find_drop_id = re.compile('Drop\W(\w+)\s.*')
+log = logging.getLogger(__name__)
 
 
 class ConfigParser(ConfigParser_.SafeConfigParser):
@@ -110,6 +113,7 @@ def default_config():
         max_process_secs=60,
         smtp_host="localhost",
         smtp_port=25,
+        log_level='INFO',
     )
 
 
@@ -150,6 +154,10 @@ def main(fs_config=None, sleep_seconds=0):
     config = config_from_file(fs_config)
     config.update(config_from_env())
 
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=getattr(logging, config['log_level'].upper()))
+
     # read history of previous runs
     errors = []
     fs_history = path.abspath(path.join(path.dirname(fs_config), 'watchdog-history.json'))
@@ -158,9 +166,11 @@ def main(fs_config=None, sleep_seconds=0):
         if path.exists(fs_history):
             previous_history = json.load(open(fs_history, 'r'))
         else:
+            log.info("Starting with empty history.")
             previous_history = dict()
 
         # fetch submissions from mail server
+        log.debug("Fetching previous submissions from IMAP server")
         history = fetch_test_submissions(previous_history=previous_history, config=config)
 
         # check for failed test submissions
@@ -176,6 +186,7 @@ def main(fs_config=None, sleep_seconds=0):
                         token, timestamp, max_process_secs)))
 
         # perform test submission
+        log.debug("Performing test submissions against {app_url}".format(**config))
         token, submission_errors = perform_submission(
             app_url=config['app_url'],
             testing_secret=config['testing_secret'])
@@ -189,6 +200,7 @@ def main(fs_config=None, sleep_seconds=0):
         file_history.close()
 
         if len(errors) > 0:
+            log.warning("Errors were found.")
             from pyramid_mailer import mailer_factory_from_settings
             from pyramid_mailer.message import Message
             from urlparse import urlparse
