@@ -18,5 +18,4 @@ RUN pip install -e .
 
 # --- production ---
 FROM sdist AS production
-COPY watchdog.ini .
-ENTRYPOINT ["watchdog", "--sleep-seconds=3600"]
+ENTRYPOINT ["watchdog"]
