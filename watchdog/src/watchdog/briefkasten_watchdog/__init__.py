@@ -120,12 +120,10 @@ def default_config():
 def config_from_file(fs_config):
     parser = ConfigParser(allow_no_value=True)
     parser.read(fs_config)
-    config = default_config()
     try:
-        config.update(parser.as_dict()['briefkasten'])
+        return parser.as_dict()['briefkasten']
     except KeyError:
-        pass
-    return config
+        return dict()
 
 
 def config_from_env(prefix='BKWD_'):
@@ -150,8 +148,10 @@ def config_from_env(prefix='BKWD_'):
     help='''Run forever and sleep for n seconds between loops''')
 def main(fs_config=None, sleep_seconds=0):
     # read configuration
-    fs_config = path.abspath(fs_config)
-    config = config_from_file(fs_config)
+    config = default_config()
+    if fs_config is not None:
+        fs_config = path.abspath(fs_config)
+        config.update(config_from_file(fs_config))
     config.update(config_from_env())
 
     logging.basicConfig(
