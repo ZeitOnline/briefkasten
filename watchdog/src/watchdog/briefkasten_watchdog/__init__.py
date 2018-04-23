@@ -144,15 +144,20 @@ def config_from_env(prefix='BKWD_'):
 )
 @click.option(
     '--sleep-seconds',
-    default=0,
+    default=None,
     help='''Run forever and sleep for n seconds between loops''')
-def main(fs_config=None, sleep_seconds=0):
+def main(fs_config=None, sleep_seconds=None):
     # read configuration
     config = default_config()
     if fs_config is not None:
         fs_config = path.abspath(fs_config)
         config.update(config_from_file(fs_config))
     config.update(config_from_env())
+
+    if sleep_seconds is not None:
+        config['sleep_seconds'] = sleep_seconds
+    else:
+        config['sleep_seconds'] = int(config['sleep_seconds'])
 
     logging.basicConfig(
         stream=sys.stdout,
@@ -213,8 +218,8 @@ def main(fs_config=None, sleep_seconds=0):
                 body="\n".join([str(error) for error in errors]))
             mailer.send_immediately(message, fail_silently=False)
 
-        if sleep_seconds > 0:
-            print("Sleeping %d seconds" % sleep_seconds)
-            sleep(sleep_seconds)
+        if config['sleep_seconds'] > 0:
+            log.info("Sleeping {sleep_seconds} seconds".format(**config))
+            sleep(config['sleep_seconds'])
         else:
             exit(0)
