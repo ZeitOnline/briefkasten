@@ -190,3 +190,5 @@
         minute: "*/3"
       tags:
       - jdispatch
+  roles:
+    - { role: zabbix-agent, when: ploy_enable_zabbix }
