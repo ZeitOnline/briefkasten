@@ -7,6 +7,10 @@
 
 - Moved package building and hosting to 'official' ``*.zeit.de`` infrastructure
 
+- Enable optional monitoring of the jail host with zabbix
+
+- Enable optional monitoring of the watchdog with zabbix
+
 
 0.2.16  - 2018-02-12
 --------------------
