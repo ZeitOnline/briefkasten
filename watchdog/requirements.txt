@@ -24,6 +24,7 @@ pyquery==1.4.0
 pyramid==1.9.1
 pyramid-mailer==0.15.1
 pytz==2018.4
+py-zabbix==1.1.3
 repoze.lru==0.7
 repoze.sendmail==4.4.1
 six==1.11.0

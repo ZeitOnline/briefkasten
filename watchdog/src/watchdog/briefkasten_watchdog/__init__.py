@@ -8,6 +8,7 @@ from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
 from os import environ, path
+from pyzabbix import ZabbixMetric, ZabbixSender
 from time import sleep
 from zope.testbrowser.browser import Browser
 from pyquery import PyQuery
@@ -114,6 +115,7 @@ def default_config():
         smtp_host="localhost",
         smtp_port=25,
         log_level='INFO',
+        sleep_seconds=0,
     )
 
 
@@ -167,56 +169,78 @@ def main(fs_config=None, sleep_seconds=None):
     errors = []
     fs_history = path.abspath(path.join(path.dirname(fs_config), 'watchdog-history.json'))
 
+    zbx = None
+    result_code = None
+
+    if 'zabbix_host' in config:
+        zbx = ZabbixSender(config['zabbix_host'])
+
     while True:
-        if path.exists(fs_history):
-            previous_history = json.load(open(fs_history, 'r'))
-        else:
-            log.info("Starting with empty history.")
-            previous_history = dict()
+        try:
+            if path.exists(fs_history):
+                previous_history = json.load(open(fs_history, 'r'))
+            else:
+                log.info("Starting with empty history.")
+                previous_history = dict()
 
-        # fetch submissions from mail server
-        log.debug("Fetching previous submissions from IMAP server")
-        history = fetch_test_submissions(previous_history=previous_history, config=config)
+            # fetch submissions from mail server
+            log.debug("Fetching previous submissions from IMAP server")
+            history = fetch_test_submissions(previous_history=previous_history, config=config)
 
-        # check for failed test submissions
-        max_process_secs = int(config['max_process_secs'])
-        now = datetime.now()
-        for token, timestamp_str in history.items():
-            timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
-            age = now - timestamp
-            if age.seconds > max_process_secs and token not in previous_history:
-                errors.append(WatchdogError(
-                    subject="Submission '%s' not received" % token,
-                    message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
-                        token, timestamp, max_process_secs)))
+            # check for failed test submissions
+            max_process_secs = int(config['max_process_secs'])
+            now = datetime.now()
+            for token, timestamp_str in history.items():
+                timestamp = datetime.utcfromtimestamp((timegm(time.strptime(timestamp_str.split('.')[0] + 'UTC', "%Y-%m-%dT%H:%M:%S%Z"))))
+                age = now - timestamp
+                if age.seconds > max_process_secs and token not in previous_history:
+                    errors.append(WatchdogError(
+                        subject="Submission '%s' not received" % token,
+                        message=u"The submission with token %s which was submitted on %s was not received after %d seconds." % (
+                            token, timestamp, max_process_secs)))
 
-        # perform test submission
-        log.debug("Performing test submissions against {app_url}".format(**config))
-        token, submission_errors = perform_submission(
-            app_url=config['app_url'],
-            testing_secret=config['testing_secret'])
-        if token:
-            history[token] = datetime.now().isoformat()
-        errors += submission_errors
+            # perform test submission
+            log.debug("Performing test submissions against {app_url}".format(**config))
+            token, submission_errors = perform_submission(
+                app_url=config['app_url'],
+                testing_secret=config['testing_secret'])
+            if token:
+                history[token] = datetime.now().isoformat()
+            errors += submission_errors
 
-        # record updated history
-        file_history = open(fs_history, 'w')
-        file_history.write(json.dumps(history).encode('utf-8'))
-        file_history.close()
+            # record updated history
+            file_history = open(fs_history, 'w')
+            file_history.write(json.dumps(history).encode('utf-8'))
+            file_history.close()
 
-        if len(errors) > 0:
-            log.warning("Errors were found.")
-            from pyramid_mailer import mailer_factory_from_settings
-            from pyramid_mailer.message import Message
-            from urlparse import urlparse
-            mailer = mailer_factory_from_settings(config, prefix='smtp_')
-            hostname = urlparse(config['app_url']).hostname
-            recipients = [recipient for recipient in config['notify_email'].split() if recipient]
-            message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
-                sender=config['the_sender'],
-                recipients=recipients,
-                body="\n".join([str(error) for error in errors]))
-            mailer.send_immediately(message, fail_silently=False)
+            if len(errors) > 0:
+                log.warning("Errors were found.")
+                from pyramid_mailer import mailer_factory_from_settings
+                from pyramid_mailer.message import Message
+                from urlparse import urlparse
+                mailer = mailer_factory_from_settings(config, prefix='smtp_')
+                hostname = urlparse(config['app_url']).hostname
+                recipients = [recipient for recipient in config['notify_email'].split() if recipient]
+                message = Message(subject="[Briefkasten %s] Submission failure" % hostname,
+                    sender=config['the_sender'],
+                    recipients=recipients,
+                    body="\n".join([str(error) for error in errors]))
+                mailer.send_immediately(message, fail_silently=False)
+
+            result_code = 0
+
+        except Exception as exc:
+            log.error(exc)
+            result_code = 1
+
+        if zbx is not None:
+            log.info("Pinging Zabbix")
+            metric = ZabbixMetric(
+                config.get('zabbix_sender', 'localhost'),
+                'briefkasten.watchdog.last_completed_run', result_code)
+            sent = zbx.send([metric])
+            if sent.failed > 0:
+                log.warning("Failed to ping Zabbix host")
 
         if config['sleep_seconds'] > 0:
             log.info("Sleeping {sleep_seconds} seconds".format(**config))
