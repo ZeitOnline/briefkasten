@@ -36,9 +36,13 @@ dropbox_schema = DropboxSchema()
 
 
 def defaults(request):
+    form = 'dropbox_form'
+    if dropbox.settings.get('briefkasten_flavor', 'briefkasten') == 'kummerkasten':
+        form = 'kummerkasten_form'
     return dict(
         static_url=request.static_url('briefkasten:static/'),
         master=get_renderer('templates/master.pt').implementation().macros['master'],
+        form=form,
         version=version,
         title=title)
 

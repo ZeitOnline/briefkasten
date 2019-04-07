@@ -3,6 +3,8 @@ fs_pgp_pubkeys: /var/briefkasten/pgp_pubkeys
 fs_gpg_path: /usr/local/bin/gpg
 fs_bin_path: {{apphome}}/middleware_scripts/
 
+briefkasten_flavor: {{ploy_briefkasten_flavor}}
+
 dropbox_view_url_format: 'https://{{ploy_fqdn}}{{ploy_approot_url}}/dropbox/%s'
 dropbox_editor_url_format: 'https://{{ploy_fqdn}}{{ploy_approot_url}}/dropbox/%s/%s'
 {% if ploy_dropbox_cleansed_archive_path is defined %}

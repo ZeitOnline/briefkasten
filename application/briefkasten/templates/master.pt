@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <title>Briefkasten</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="${request.route_url('dropbox_form')}"/>
+    <base href="${request.route_url(form)}"/>
   </head>
 
   <body id="${request.matched_route.name}">
