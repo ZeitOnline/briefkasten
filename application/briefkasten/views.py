@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pkg_resources
 import colander
+import json
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
 from pyramid.view import view_config
@@ -36,13 +37,9 @@ dropbox_schema = DropboxSchema()
 
 
 def defaults(request):
-    form = 'dropbox_form'
-    if dropbox.settings.get('briefkasten_flavor', 'briefkasten') == 'kummerkasten':
-        form = 'kummerkasten_form'
     return dict(
         static_url=request.static_url('briefkasten:static/'),
         master=get_renderer('templates/master.pt').implementation().macros['master'],
-        form=form,
         version=version,
         title=title)
 
@@ -58,6 +55,8 @@ def dropbox_form(request):
     return dict(
         action=request.route_url('dropbox_form_submit', token=token),
         fileupload_url=request.route_url('dropbox_fileupload', token=token),
+        form=request.registry.settings.get(u'briefkasten_flavor', u'briefkasten'),
+        editors=request.registry.settings['dropbox_container'].settings.get('editors', []),
         **defaults(request))
 
 
@@ -87,6 +86,10 @@ def dropbox_submission(dropbox, request):
         data = dropbox_schema.deserialize(request.POST)
     except Exception:
         return HTTPFound(location=request.route_url('dropbox_form'))
+
+    recipients = request.POST.getall('recipients')
+    if recipients:
+        dropbox.set_editors(recipients)
 
     # set the message
     dropbox.message = data.get('message')

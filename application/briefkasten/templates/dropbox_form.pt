@@ -16,11 +16,20 @@
             action="${action}">
             <label for="message">Anonymisierte Nachricht an die Redaktion</label>
             <textarea id="message" name="message" rows="10" cols="60"></textarea>
-            <p>Datei anh&auml;ngen</p>
-            <input type="file" name="upload">
+	    <tal:block condition="request.registry.settings['briefkasten_flavor'] == 'briefkasten'">
+	        <p>Datei anh&auml;ngen</p>
+                <input type="file" name="upload">
+                <label for="submit">Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
+	    </tal:block>
             <input type="hidden" name="testing_secret" value="" />
+	    <div tal:condition="request.registry.settings['briefkasten_flavor'] == 'kummerkasten'">
+	    <input type="checkbox" name="want_reply">Wuenschen sie einen Rueckkanal?</input>
+	    <p>Empfaenger auswaehlen</p>
+            <div tal:repeat="editor editors">
+                <input type="checkbox" checked name="recipients" value="${editor}">${editor}</input>
+            </div>
+	    </div>
             <button id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
-            <label for="submit">Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
         </form>
     </tal:content>
   </body>

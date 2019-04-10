@@ -4,7 +4,7 @@ import shutil
 import yaml
 from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
-from json import load, dumps
+import json
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, join, splitext, getmtime, split
 from datetime import datetime
@@ -137,8 +137,10 @@ class Dropbox(object):
         self.fs_attachment_container = join(self.fs_path, 'attach')
         self.fs_cleansed_attachment_container = join(self.fs_path, 'clean')
         self.fs_replies_path = join(self.fs_path, 'replies')
+        self.fs_editors_path = join(self.fs_path, 'editors')
         self.gpg_context = self.container.gpg_context
         self.admins = self.settings['admins']
+        self.editors = self.settings['editors']
 
         if not exists(fs_dropbox_path):
             mkdir(fs_dropbox_path)
@@ -151,12 +153,13 @@ class Dropbox(object):
             self.from_watchdog = from_watchdog
         else:
             self.editor_token = open(join(self.fs_path, 'editor_token')).readline()
+            if exists(self.fs_editors_path):
+                with open(self.fs_editors_path) as editor_file:
+                    self.editors = json.load(editor_file)
 
         # set recipients of email depending on watchdog status
         if self.from_watchdog:
             self.editors = [self.settings['watchdog_imap_recipient']]
-        else:
-            self.editors = self.settings['editors']
 
         if message is not None:
             # write the message into a file
@@ -186,6 +189,13 @@ class Dropbox(object):
         chmod(fs_attachment_path, 0660)
         self.paths_created.append(fs_attachment_path)
         return sanitized_filename
+
+    def set_editors(self, editors):
+        if not self.from_watchdog:
+            # editors can only be from the list of configured editors
+            self.editors = list(set(editors) & set(self.settings['editors']))
+            with open(self.fs_editors_path, 'w+') as editors_file:
+                json.dump(self.editors, editors_file)
 
     def submit(self):
         with open(join(self.container.fs_submission_queue, self.drop_id), 'w'):
