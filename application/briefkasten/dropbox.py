@@ -276,7 +276,7 @@ class Dropbox(object):
             :param reply: the message, must conform to  :class:`views.DropboxReplySchema`
 
         """
-        self._write_message(self.fs_replies_path, 'message_001.txt', dumps(reply))
+        self._write_message(self.fs_replies_path, 'message_001.txt', json.dumps(reply))
 
     #
     # "private" helper methods for processing a drop
@@ -393,7 +393,7 @@ class Dropbox(object):
         """ returns a list of strings """
         fs_reply_path = join(self.fs_replies_path, 'message_001.txt')
         if exists(fs_reply_path):
-            return [load(open(fs_reply_path, 'r'))]
+            return [json.load(open(fs_reply_path, 'r'))]
         else:
             return []
 
