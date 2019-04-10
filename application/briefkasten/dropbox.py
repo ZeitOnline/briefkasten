@@ -176,7 +176,7 @@ class Dropbox(object):
     # top level methods that govern the life cycle of a dropbox:
 
     def add_attachment(self, attachment):
-        if self.setting.get('briefkasten_flavor', '') == 'kummerkasten':
+        if self.settings.get('briefkasten_flavor', '') == 'kummerkasten':
             return
         fs_attachment_container = self.fs_attachment_container
         if not exists(fs_attachment_container):
