@@ -16,7 +16,7 @@
         <tal:status tal:condition="status_code=='8'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet, allerdings befand sich unter den Daten mindestens ein Dateityp der vom Bereinigungsprozess nicht unterstützt wird und deshalb unbereinigt weitergeleitet wurde.</tal:status>
         <tal:status tal:condition="status_code=='9'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet.</tal:status>
     </p>
-    <tal:block tal:condition="want_feedback">
+    <tal:block condition="want_feedback">
       <p>Sie können die Seite auch später neu laden, um zu überprüfen, ob die Redaktion eine Nachricht hinterlassen hat.</p>
       <tal:replies condition="replies">
         <h2>Antwort der Redaktion</h2>
@@ -28,5 +28,6 @@ Erstellen Sie aus Sicherheitsgründen kein Lesezeichen zu dieser Seite, da diese
       </tal:noreplies>
     </tal:block>
     <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Zurück zum Einreichungsformular.</a></p>
+  </tal:content>
 </html>
 
