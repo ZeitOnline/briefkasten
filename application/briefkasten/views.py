@@ -91,6 +91,9 @@ def dropbox_submission(dropbox, request):
     if recipients:
         dropbox.set_editors(recipients)
 
+    if request.POST.get('want_reply', ''):
+        dropbox.disable_feedback()
+
     # set the message
     dropbox.message = data.get('message')
 

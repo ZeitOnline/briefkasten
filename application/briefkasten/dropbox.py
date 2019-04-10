@@ -176,6 +176,8 @@ class Dropbox(object):
     # top level methods that govern the life cycle of a dropbox:
 
     def add_attachment(self, attachment):
+        if self.setting.get('briefkasten_flavor', '') == 'kummerkasten':
+            return
         fs_attachment_container = self.fs_attachment_container
         if not exists(fs_attachment_container):
             mkdir(fs_attachment_container)
@@ -196,6 +198,10 @@ class Dropbox(object):
             self.editors = list(set(editors) & set(self.settings['editors']))
             with open(self.fs_editors_path, 'w+') as editors_file:
                 json.dump(self.editors, editors_file)
+
+    def disable_feedback(self):
+        self.editor_token = "--NO-FEEDBACK--"
+        self._write_message(fs_dropbox_path, 'editor_token', self.editor_token)
 
     def submit(self):
         with open(join(self.container.fs_submission_queue, self.drop_id), 'w'):
@@ -390,6 +396,13 @@ class Dropbox(object):
             return [load(open(fs_reply_path, 'r'))]
         else:
             return []
+
+    @property
+    def want_feedback(self):
+        """ returns true if the user has not disabled feedback for this drop """
+        if self.editor_token == "--NO-FEEDBACK--"
+            return False
+        return True
 
     @property
     def message(self):
