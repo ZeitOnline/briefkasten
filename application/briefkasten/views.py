@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pkg_resources
 import colander
-import json
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
 from pyramid.view import view_config
