@@ -201,7 +201,7 @@ class Dropbox(object):
 
     def disable_feedback(self):
         self.editor_token = "--NO-FEEDBACK--"
-        self._write_message(fs_dropbox_path, 'editor_token', self.editor_token)
+        self._write_message(self.fs_path, 'editor_token', self.editor_token)
 
     def submit(self):
         with open(join(self.container.fs_submission_queue, self.drop_id), 'w'):
