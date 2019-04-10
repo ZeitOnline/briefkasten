@@ -91,7 +91,7 @@ def dropbox_submission(dropbox, request):
     if recipients:
         dropbox.set_editors(recipients)
 
-    if not request.POST.get('want_reply', ''):
+    if not request.POST.get('want_feedback', ''):
         dropbox.disable_feedback()
 
     # set the message
@@ -125,6 +125,7 @@ def dropbox_submitted(dropbox, request):
         status_code=dropbox.status[0],
         status_int=dropbox.status_int,
         status=dropbox.status,
+        want_feedback=dropbox.want_feedback,
         replies=dropbox.replies)
     return appstruct
 
