@@ -1,0 +1,53 @@
+---
+
+- name: install acme.sh
+  pkgng:
+    name: "{{item}}"
+    state: present
+    cached: yes
+  with_items:
+    - "acme.sh"
+    - "bind-tools"
+    - "sudo"
+
+- name: configure acme secret
+  template:
+    src: ddns.key
+    dest: /var/db/acme/ddns.key
+
+- name: configure acme setup
+  template:
+    src: account.conf
+    dest: /var/db/acme/.acme.sh/account.conf
+
+- name: configure log access
+  file:
+    dest: /var/log/acme.sh.log
+    owner: acme
+    state: touch
+
+- name: upload nginx reload script
+  copy:
+    src: reload-nginx.sh
+    dest: "/usr/local/bin/reload-nginx"
+    owner: root
+    group: wheel
+    mode: "6555"
+
+- name: let acme user reload nginx
+  copy:
+    src: acme
+    dest: /usr/local/etc/sudoers.d/acme
+    owner: root
+    group: wheel
+    mode: "644"
+    validate: "visudo -cf %s"
+
+- name: install cronjob to run check and renew sites automatically
+  copy:
+    src: acme_crontab
+    dest: /var/cron/tabs/acme
+    owner: root
+    group: wheel
+    mode: "600"
+  notify: restart cron

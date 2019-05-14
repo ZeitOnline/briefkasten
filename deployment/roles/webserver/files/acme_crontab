@@ -1,0 +1,4 @@
+#Ansible: check and update outdated letsencrypt certs
+PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin 
+@weekly /usr/local/sbin/acme.sh  --cron --home /var/db/acme/.acme.sh --reloadcmd "/usr/local/bin/reload-nginx" > /dev/null
+
