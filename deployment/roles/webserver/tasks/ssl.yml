@@ -1,0 +1,17 @@
+---
+- name: configure nginx
+  template:
+    src: nginx.conf
+    dest: /usr/local/etc/nginx/nginx.conf
+
+- name: upload ssl certificate
+  copy:
+    src: "{{ cert_location }}"
+    dest: /usr/local/etc/nginx/briefkasten.crt
+  notify: restart nginx
+
+- name: upload ssl key
+  copy:
+    src: "{{ key_location }}"
+    dest: /usr/local/etc/nginx/briefkasten.key
+  notify: restart nginx
