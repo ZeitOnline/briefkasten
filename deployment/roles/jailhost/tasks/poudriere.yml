@@ -1,0 +1,22 @@
+- name: Ensure our self-signed cert will be accepted
+  copy:
+    src: cert.pem
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.zeit.de.pem"
+  tags: poudriere
+
+- name: Ensure our self-signed poudriere packages will be accepted
+  copy:
+    src: poudriere.cert
+    dest: "{{ jails_dir }}/newjail/etc/ssl/briefkastenpkg.zeit.de.pub"
+  tags: poudriere
+
+- name: Ensure pkg configuration will be present in each jail
+  copy:
+    src: pkg.conf
+    dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg.conf"
+
+- name: Ensure pkg repo configuration will be present in each jail
+  template:
+    src: pkg_repo.conf
+    dest: "{{ jails_dir }}/flavours/bsdploy_base/usr/local/etc/pkg/repos/FreeBSD.conf"
+  tags: poudriere
