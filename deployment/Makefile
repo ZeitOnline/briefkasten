@@ -18,7 +18,7 @@ start-jails:
 	bin/ploy start briefkasten-worker
 	bin/ploy start briefkasten-webserver
 	bin/ploy start briefkasten-appserver
-	bin/ploy start briefkasten-cleanser
+#	bin/ploy start briefkasten-cleanser
 
 configure-jails:
 	bin/ploy playbook main.yml
