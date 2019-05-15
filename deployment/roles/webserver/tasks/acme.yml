@@ -26,6 +26,12 @@
     owner: acme
     state: touch
 
+- name: request initial certificate (this may take a while)
+  command: "sudo -u acme /usr/local/sbin/acme.sh --issue --dns dns_nsupdate --dnssleep 5 -d {{ploy_fqdn}} --domain-alias {{ploy_acme_domain}}"
+  args:
+    chdir: /var/db/acme
+    creates: "/var/db/acme/certs/{{ploy_fqdn}}/{{ploy_fqdn}}.conf"
+
 - name: upload nginx reload script
   copy:
     src: reload-nginx.sh
@@ -33,6 +39,14 @@
     owner: root
     group: wheel
     mode: "6555"
+
+- name: ensure certs directory exists
+  file:
+    path: /usr/local/etc/nginx/certs
+    state: directory
+    owner: acme
+    group: wheel
+    mode: "0775"
 
 - name: let acme user reload nginx
   copy:
@@ -42,6 +56,11 @@
     group: wheel
     mode: "644"
     validate: "visudo -cf %s"
+
+- name: install certificate
+  command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt --reloadcmd 'sudo /usr/local/bin/reload-nginx'"
+  args:
+    creates: /usr/local/etc/nginx/briefkasten.key
 
 - name: install cronjob to run check and renew sites automatically
   copy:
