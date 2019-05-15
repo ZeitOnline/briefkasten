@@ -117,6 +117,16 @@ SSL certificate for the webserver
 
 The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It is expected in ``etc/briefkasten.crt`` and ``etc/briefkasten.key`` respectively, ``etc.sample`` contains a self-signed pair for development and testing purposes.
 
+In the most common scenario the public facing HTTP server is not identical with the webserver of this setup (IOW the briefkasten is running behind a proxy and is reachable via a subpath such as `/briefkasten`` it is entirely reasonable to provide a self-signed key/certificate pair since its only purpose is to ensure that the HTTP traffic between the proxy and the briefkasten is encrypted.
+
+If, however you wish to expose the briefkasten directly to the public, we provide support for using Letsencrypt, specifically using the acme.sh client and the `DDNS alias update method <https://github.com/Neilpang/acme.sh/wiki/DNS-alias-mode>`_.
+To use it, set the following in the ``ez-base`` section of your configuration::
+
+    use_acme = true
+    acme_domain = <the alias domain you are using>
+    acme_key = <the key with which the dns update needs to be signed with>
+    acme_ddns_server = <the IP or hostname of the nameserver>
+
 
 Booting the target host into FreeBSD
 ------------------------------------
