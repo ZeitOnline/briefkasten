@@ -29,7 +29,7 @@ port = {{application_port}}
 
 [composite:main]
 use = egg:Paste#urlmap
-/briefkasten/assets = assets
+{{ploy_approot_url}}/assets = assets
 / = default
 
 [app:assets]
