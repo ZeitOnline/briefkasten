@@ -400,7 +400,7 @@ class Dropbox(object):
     @property
     def want_feedback(self):
         """ returns true if the user has not disabled feedback for this drop """
-        if self.editor_token == "--NO-FEEDBACK--":
+        if self.editor_token.strip() == "--NO-FEEDBACK--":
             return False
         return True
 
