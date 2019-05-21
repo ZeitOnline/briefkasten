@@ -6,8 +6,8 @@
   metal:use-macro="master">
 
   <tal:content  metal:fill-slot="content">
-    <h1 i18n:translate="">Status der Einreichung "<span id="feedback-token" i18n:name="drop_id">${drop_id}</span>"</h1>
-    <p class="status_class_${status_code}" id="status_code_${status_int}">
+    <h1 id="feedback" i18n:translate="">Status der Einreichung "<span id="feedback-token" i18n:name="drop_id">${drop_id}</span>"</h1>
+    <p class="status_message status_class_${status_code}" id="status_code_${status_int}">
         <tal:status tal:condition="status_code=='0'">Sie haben uns eine Nachricht übermittelt, die wir nun überprüfen und bearbeiten.</tal:status>
         <tal:status tal:condition="status_code=='1'">Ihre Einreichung wird nun bereinigt.</tal:status>
         <tal:status tal:condition="status_code=='2'">Ihre Einreichung befindet sich nun in Quarantäne und wird von Metadaten bereinigt, bevor sie an die Redaktion weitergeleitet wird.</tal:status>
@@ -16,18 +16,20 @@
         <tal:status tal:condition="status_code=='8'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet, allerdings befand sich unter den Daten mindestens ein Dateityp der vom Bereinigungsprozess nicht unterstützt wird und deshalb unbereinigt weitergeleitet wurde.</tal:status>
         <tal:status tal:condition="status_code=='9'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet.</tal:status>
     </p>
-    <tal:block condition="want_feedback">
+    <div id="feedback-section" tal:condition="want_feedback">
       <p>Sie können die Seite auch später neu laden, um zu überprüfen, ob die Redaktion eine Nachricht hinterlassen hat.</p>
       <tal:replies condition="replies">
         <h2>Antwort der Redaktion</h2>
-        <p class="byline"><span class="author">${replies[0]['author']}</span>:</p>
-        <blockquote>${replies[0]['reply']}</blockquote>
+        <div class="reply" tal:repeat="reply replies">
+        <p class="byline"><span class="author">${reply['author']}</span>:</p>
+        <blockquote>${reply['reply']}</blockquote>
+      </div>
       </tal:replies>
-      <tal:noreplies tal:condition="not replies"><p i18n:translate="">Kopieren oder notieren Sie sich die Adresszeile, um Nachrichten der Redaktion zu empfangen.
+      <tal:noreplies tal:condition="not replies"><p id="bookmark-notice" i18n:translate="">Kopieren oder notieren Sie sich die Adresszeile, um Nachrichten der Redaktion zu empfangen.
 Erstellen Sie aus Sicherheitsgründen kein Lesezeichen zu dieser Seite, da dieses von anderen gefunden werden könnte.</p>
       </tal:noreplies>
-    </tal:block>
-    <p><a href="${request.route_url('dropbox_form')}" i18n:translate="">Zurück zum Einreichungsformular.</a></p>
+    </div>
+    <p><a id="back-to-form" href="${request.route_url('dropbox_form')}" i18n:translate="">Zurück zum Einreichungsformular.</a></p>
   </tal:content>
 </html>
 
