@@ -8,6 +8,11 @@
     - app-config
     - update-app
 
+- name: ensure theme directory exists
+  file:
+    dest: "{{themes_dir}}/{{ploy_theme_name}}"
+    state: directory
+
 - name: upload frontend theme
   # requires ploy-ssh to be in $PATH
   synchronize:
