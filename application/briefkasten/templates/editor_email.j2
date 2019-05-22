@@ -11,6 +11,7 @@ benutzen das Webformular unter der Adresse:
 
 {{dropbox.editor_url}}
 
+{% if dropbox.settings.get('briefkasten_flavour', 'briefkasten') == 'briefkasten' %}
 {% if num_attachments > 1 %}
 Die Einreichung enthielt {{num_attachments}} Anhänge.
 {% elif num_attachments == 1 %}
@@ -50,6 +51,6 @@ Aufgrund der Groesse der Anhaenge wurden diese nicht an diese Email angehaengt, 
 {{dropbox.cleansed_archive_url}}
 
 {% endif %}
-
+{% endif %}
 {%- endif %}
 
