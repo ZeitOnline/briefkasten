@@ -43,3 +43,6 @@ pipeline = theme
 use = egg:diazo
 rules = {{themes_dir}}/{{ploy_theme_name}}/rules.xml
 debug = false
+{% if ploy_doctype is defined %}
+doctype = {{ ploy_doctype }}
+{% endif %}
