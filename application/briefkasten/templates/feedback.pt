@@ -17,7 +17,7 @@
         <tal:status tal:condition="status_code=='9'">Ihre Einreichung wurde erfolgreich bereinigt, verschlüsselt und an die Redaktion weitergeleitet.</tal:status>
     </p>
     <div id="feedback-section" tal:condition="want_feedback">
-      <p>Sie können die Seite auch später neu laden, um zu überprüfen, ob die Redaktion eine Nachricht hinterlassen hat.</p>
+      <p id="reload-hint">Sie können die Seite auch später neu laden, um zu überprüfen, ob die Redaktion eine Nachricht hinterlassen hat.</p>
       <tal:replies condition="replies">
         <h2>Antwort der Redaktion</h2>
         <div class="reply" tal:repeat="reply replies">

@@ -8,6 +8,8 @@ dropbox_cleansed_archive_url_format: 'blubber/clean/%s.zip.pgp'
 dropbox_dirty_archive_url_format: 'blubber/dirt/%s.zip.pgp'
 editors:
   - tom@tomster.org
+  - sebastian.horn@zeit.de
+  - maria.exner@zeit.de
   # - erdgeist@erdgeist.org
 admins:
  - tom@tomster.org
