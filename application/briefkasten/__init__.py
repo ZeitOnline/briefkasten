@@ -77,12 +77,45 @@ def german_locale(request):
 
 
 def configure(global_config, **settings):
+    import views
     config = Configurator(settings=settings, locale_negotiator=german_locale)
+    theme_package = settings.get('theme_package', 'briefkasten')
     config.begin()
     config.add_translation_dirs('briefkasten:locale')
     app_route = settings.get('appserver_root_url', '/')
     config.add_static_view('%sstatic' % app_route, 'briefkasten:static')
     config.add_renderer('.pt', 'pyramid_chameleon.zpt.renderer_factory')
+    # configure views
+    config.add_view(
+        view=views.dropbox_form,
+        route_name='dropbox_form',
+        request_method='GET',
+        renderer='%s:templates/dropbox_form.pt' % theme_package)
+    config.add_view(
+        view=views.dropbox_fileupload,
+        route_name='dropbox_fileupload',
+        accept='application/json',
+        renderer='json',
+        request_method='POST')
+    config.add_view(
+        view=views.dropbox_submission,
+        route_name='dropbox_form_submit',
+        request_method='POST')
+    config.add_view(
+        view=views.dropbox_submitted,
+        route_name="dropbox_view",
+        renderer='%s:templates/feedback.pt' % theme_package)
+    config.add_view(
+        view=views.dropbox_editor_view,
+        route_name="dropbox_editor",
+        request_method='GET',
+        renderer='%s:templates/editor_reply.pt' % theme_package)
+    config.add_view(
+        view=views.dropbox_reply_submitted,
+        route_name="dropbox_editor",
+        request_method='POST',
+        renderer='%s:templates/editor_reply.pt' % theme_package)
+
     config.add_route('fingerprint', '%sfingerprint' % app_route)
     config.add_route('dropbox_form_submit', '%s{token}/submit' % app_route, factory=dropbox_post_factory)
     config.add_route('dropbox_fileupload', '%s{token}/upload' % app_route, factory=dropbox_post_factory)

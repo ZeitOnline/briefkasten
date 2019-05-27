@@ -3,7 +3,6 @@ import pkg_resources
 import colander
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import get_renderer
-from pyramid.view import view_config
 from briefkasten import _, is_equal
 
 title = "ZEIT ONLINE Briefkasten"
@@ -38,15 +37,13 @@ dropbox_schema = DropboxSchema()
 def defaults(request):
     return dict(
         static_url=request.static_url('briefkasten:static/'),
-        master=get_renderer('templates/master.pt').implementation().macros['master'],
+        base_url=request.registry.settings.get('appserver_root_url', '/'),
+        master=get_renderer('%s:templates/master.pt' % request.registry.settings.get(
+            'theme_package', 'briefkasten')).implementation().macros['master'],
         version=version,
         title=title)
 
 
-@view_config(
-    route_name='dropbox_form',
-    request_method='GET',
-    renderer='briefkasten:templates/dropbox_form.pt')
 def dropbox_form(request):
     """ generates a dropbox uid and renders the submission form with a signed version of that id"""
     from briefkasten import generate_post_token
@@ -59,11 +56,6 @@ def dropbox_form(request):
         **defaults(request))
 
 
-@view_config(
-    route_name='dropbox_fileupload',
-    accept='application/json',
-    renderer='json',
-    request_method='POST')
 def dropbox_fileupload(dropbox, request):
     """ accepts a single file upload and adds it to the dropbox as attachment"""
     attachment = request.POST['attachment']
@@ -76,9 +68,6 @@ def dropbox_fileupload(dropbox, request):
     )
 
 
-@view_config(
-    route_name='dropbox_form_submit',
-    request_method='POST')
 def dropbox_submission(dropbox, request):
     """ handles the form submission, redirects to the dropbox's status page."""
     try:
@@ -113,9 +102,6 @@ def dropbox_submission(dropbox, request):
     return HTTPFound(location=drop_url)
 
 
-@view_config(
-    route_name="dropbox_view",
-    renderer='briefkasten:templates/feedback.pt')
 def dropbox_submitted(dropbox, request):
     appstruct = defaults(request)
     appstruct.update(
@@ -132,13 +118,11 @@ def dropbox_submitted(dropbox, request):
 class DropboxReplySchema(colander.MappingSchema):
     reply = colander.SchemaNode(colander.String())
     author = colander.SchemaNode(colander.String())
+
+
 dropboxreply_schema = DropboxReplySchema()
 
 
-@view_config(
-    route_name="dropbox_editor",
-    request_method='GET',
-    renderer='briefkasten:templates/editor_reply.pt')
 def dropbox_editor_view(dropbox, request):
     appstruct = defaults(request)
     appstruct.update(
@@ -152,10 +136,6 @@ def dropbox_editor_view(dropbox, request):
     return appstruct
 
 
-@view_config(
-    route_name="dropbox_editor",
-    request_method='POST',
-    renderer='briefkasten:templates/editor_reply.pt')
 def dropbox_reply_submitted(dropbox, request):
     try:
         data = DropboxReplySchema().deserialize(request.POST)
