@@ -6,8 +6,9 @@
   metal:use-macro="master">
   <body>
     <tal:content metal:fill-slot="content">
+    <div id="editor-reply">
+   <h1 id="feedback" i18n:translate="">Feedback zur Einreichung "<span id="feedback-token" i18n:name="drop_id">${drop_id}</span>"</h1>
         <form
-        id="editor-reply"
         method="POST"
         role="form"
         accept-charset="utf-8"
@@ -21,6 +22,7 @@
         <button id="briefkasten-formsubmit" name="submit" type="submit" class="btn btn-default">Abschicken</button>
     </form>
     <p class="subtext" tal:condition="message">${message}</p>
+  </div>
   </tal:content>
   </body>
 </html>
