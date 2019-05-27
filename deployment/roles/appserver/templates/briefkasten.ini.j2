@@ -36,9 +36,16 @@ use = egg:Paste#urlmap
 use = egg:Paste#static
 document_root = {{themes_dir}}/{{ploy_theme_name}}/assets
 
+# {{ ploy_use_diazo }}
+{% if ploy_use_diazo == 'true' %}
 [pipeline:default]
 pipeline = theme
    briefkasten
+{% else %}
+[pipeline:default]
+pipeline =
+   briefkasten
+{% endif %}
 
 [filter:theme]
 use = egg:diazo
