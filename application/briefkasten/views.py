@@ -155,6 +155,7 @@ def dropbox_reply_submitted(dropbox, request):
             title='%s - %s' % (title, dropbox.status),
             action=request.url,
             message=u'Alle Felder müssen ausgefüllt werden.',
+            drop_id=dropbox.drop_id,
         )
         return appstruct
     dropbox.add_reply(data)
