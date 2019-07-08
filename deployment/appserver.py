@@ -103,14 +103,20 @@ def update_backend(use_pypi=False, index="dev", build=True, user=None, version=N
         upload_backend(index=index, user=user)
     with fab.cd("{apphome}".format(**AV)):
         if value_asbool(use_pypi):
-            command = "bin/pip install --upgrade briefkasten"
+            command = "bin/pip install --upgrade %s"
         else:
-            command = "bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/briefkasten/{index}/+simple/ briefkasten".format(
+            command = "bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/briefkasten/{index}/+simple/ %s".format(
                 index=index, user=user, **AV
             )
         if version:
-            command = "%s==%s" % (command, version)
-        fab.sudo(command)
+            app_command = "%s==%s" % (command, version)
+        else:
+            app_command = command
+        fab.sudo(app_command % 'briefkasten')
+        theme_package = AV.get('ploy_theme_package')
+        if theme_package is not None and theme_package != 'briefkasten':
+            theme_command = command % theme_package
+            fab.sudo(theme_command)
 
     briefkasten_ctl("restart")
 
