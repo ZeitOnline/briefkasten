@@ -33,21 +33,8 @@ use = egg:Paste#urlmap
 {{ploy_approot_url}}/assets = assets
 / = default
 
-[app:assets]
-use = egg:Paste#static
-document_root = {{themes_dir}}/{{ploy_theme_name}}/assets
-
 # {{ ploy_use_diazo }}
 {% if ploy_use_diazo == 'true' %}
-[pipeline:default]
-pipeline = theme
-   briefkasten
-{% else %}
-[pipeline:default]
-pipeline =
-   briefkasten
-{% endif %}
-
 [filter:theme]
 use = egg:diazo
 rules = {{themes_dir}}/{{ploy_theme_name}}/rules.xml
@@ -55,3 +42,21 @@ debug = false
 {% if ploy_doctype is defined %}
 doctype = {{ ploy_doctype }}
 {% endif %}
+
+[app:assets]
+use = egg:Paste#static
+document_root = {{themes_dir}}/{{ploy_theme_name}}/assets
+
+[pipeline:default]
+pipeline = theme
+   briefkasten
+{% else %}
+[app:assets]
+use = egg:Paste#static
+document_root = {apphome}}/python2.7/site-packages/{{ploy_theme_package}}/static/assets/ 
+
+[pipeline:default]
+pipeline =
+   briefkasten
+{% endif %}
+
