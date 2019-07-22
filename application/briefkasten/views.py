@@ -53,6 +53,7 @@ def dropbox_form(request):
         fileupload_url=request.route_url('dropbox_fileupload', token=token),
         form=request.registry.settings.get(u'briefkasten_flavour', u'briefkasten'),
         editors=request.registry.settings['dropbox_container'].settings.get('editors', []),
+        ausschuss=request.registry.settings['dropbox_container'].settings.get('ausschuss', []),
         **defaults(request))
 
 
