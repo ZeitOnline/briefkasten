@@ -7,6 +7,7 @@
   tags:
     - app-config
     - update-app
+    - update-config
 
 - name: ensure theme directory exists
   file:
