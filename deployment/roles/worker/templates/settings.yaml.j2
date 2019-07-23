@@ -23,6 +23,10 @@ editors:
 {% for recipient in ploy_editors.split() %}
     - {{ recipient }}
 {% endfor %}
+ausschuss:
+{% for recipient in ploy_ausschuss.split() %}
+    - {{ recipient }}
+{% endfor %}
 admins:
 {% for recipient in ploy_admins.split() %}
     - {{ recipient }}
