@@ -30,6 +30,9 @@ upload-pgp-keys:
 reset-host:
 	bin/ploy do briefkasten reset_jails
 
+login-devpi:
+	bin/ploy do briefkasten-appserver login_devpi user=briefkasten
+
 update-app:
 	bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
 	bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
