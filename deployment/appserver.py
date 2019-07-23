@@ -126,7 +126,7 @@ def use_devpi(index="dev"):
     get_vars()
     publish_devpi = AV.get("ploy_default_publish_devpi")
     return fab.local(
-        "bin/devpi use {base_url}/briefkasten/{index}".format(
+        "venv/bin/devpi use {base_url}/briefkasten/{index}".format(
             index=index, base_url=publish_devpi
         ),
         capture=True,
@@ -138,4 +138,4 @@ def login_devpi(index="dev", user=None):
     use_devpi(index=index)
     if user is None:
         user = fab.env["user"]
-    fab.local("bin/devpi login {user}".format(user=user))
+    fab.local("venv/bin/devpi login {user}".format(user=user))

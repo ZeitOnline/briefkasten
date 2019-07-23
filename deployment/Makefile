@@ -1,7 +1,7 @@
 build = true
 use_pypi = false
 
-venv/bin/devpi venv/bin/ploy: bin/pip
+venv/bin/devpi venv/bin/ploy: venv/bin/pip
 	bin/pip install -r requirements.txt
 
 venv/bin/python venv/bin/pip:
