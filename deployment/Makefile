@@ -1,44 +1,43 @@
 build = true
 use_pypi = false
 
-bin/devpi bin/ploy: bin/pip
+venv/bin/devpi venv/bin/ploy: bin/pip
 	bin/pip install -r requirements.txt
 
-bin/python bin/pip:
-	virtualenv --clear -p python2.7 .
-	bin/pip install --upgrade setuptools pip
+venv/bin/python venv/bin/pip:
+	tox -e develop --notest
 
-bootstrap: bin/ploy
-	bin/ploy bootstrap briefkasten
+bootstrap: venv/bin/ploy
+	venv/bin/ploy bootstrap briefkasten
 
 configure-host:
-	bin/ploy configure briefkasten
+	venv/bin/ploy configure briefkasten
 
 start-jails:
-	bin/ploy start briefkasten-worker
-	bin/ploy start briefkasten-webserver
-	bin/ploy start briefkasten-appserver
-	bin/ploy start briefkasten-cleanser
+	venv/bin/ploy start briefkasten-worker
+	venv/bin/ploy start briefkasten-webserver
+	venv/bin/ploy start briefkasten-appserver
+	venv/bin/ploy start briefkasten-cleanser
 
 configure-jails:
-	bin/ploy playbook main.yml
+	venv/bin/ploy playbook main.yml
 
 upload-pgp-keys:
-	bin/ploy do briefkasten-worker upload_pgp_keys
-	bin/ploy playbook main.yml -t update-config -t update-pgp
+	venv/bin/ploy do briefkasten-worker upload_pgp_keys
+	venv/bin/ploy playbook main.yml -t update-config -t update-pgp
 
 reset-host:
-	bin/ploy do briefkasten reset_jails
+	venv/bin/ploy do briefkasten reset_jails
 
 login-devpi:
-	bin/ploy do briefkasten-appserver login_devpi user=briefkasten
+	venv/bin/ploy do briefkasten-appserver login_devpi user=briefkasten
 
 update-app:
-	bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
-	bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
+	venv/bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
+	venv/bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
 
 update-theme:
-	bin/ploy do briefkasten-appserver upload_theme
+	venv/bin/ploy do briefkasten-appserver upload_theme
 
 clean:
 	git clean -fXd
