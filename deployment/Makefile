@@ -39,6 +39,9 @@ update-app:
 update-theme:
 	venv/bin/ploy do briefkasten-appserver upload_theme
 
+update-config:
+	venv/bin/ploy playbook main.yml -t update-config -t update-pgp
+
 clean:
 	git clean -fXd
 
