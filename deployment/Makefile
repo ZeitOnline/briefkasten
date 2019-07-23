@@ -25,7 +25,7 @@ configure-jails:
 
 upload-pgp-keys:
 	bin/ploy do briefkasten-worker upload_pgp_keys
-	bin/ploy configure briefkasten-worker -t update-pgp
+	bin/ploy playbook main.yml -t update-config -t update-pgp
 
 reset-host:
 	bin/ploy do briefkasten reset_jails
