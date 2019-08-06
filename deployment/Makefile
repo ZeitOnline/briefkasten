@@ -1,5 +1,6 @@
 build = true
 use_pypi = false
+flavour ?= briefkasten
 
 venv/bin/devpi venv/bin/ploy: venv/bin/pip
 	bin/pip install -r requirements.txt
