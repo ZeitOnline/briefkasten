@@ -174,6 +174,18 @@ Verify the integrity of the downloaded image::
 
 Make sure the output matches the one in the downloaded text. Next you will need to create a bootable medium from that image.
 
+Installation on a BeagleBone black
+==================================
+
+Follow the guide according to https://wiki.freebsd.org/FreeBSD/arm/BeagleBoneBlack and install a recent FreeBSD, e.g. from
+
+https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0/FreeBSD-12.0-RELEASE-arm-armv7-BEAGLEBONE.img.xz
+
+Install ezjail, python2.7 in host system and configure your IP addresses.
+
+Don't deploy pkg.conf to the jails, as they dont work from amd64 packets. Add a proper resolv.conf and localtime to your templates.
+
+If you ever encounter deployment issues during lxml builds, you might have to manually log into the jails and ``pip install lxml`` in the respective venvs. YMMV.
 
 Creating a bootable USB medium (Mac OSX)
 ****************************************
