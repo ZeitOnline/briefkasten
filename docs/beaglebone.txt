@@ -1,0 +1,48 @@
+Setup on Beagle Bone:
+
+Follow the guide according to https://wiki.freebsd.org/FreeBSD/arm/BeagleBoneBlack and install a recent FreeBSD, e.g. from
+
+https://download.freebsd.org/ftp/releases/ISO-IMAGES/12.0/FreeBSD-12.0-RELEASE-arm-armv7-BEAGLEBONE.img.xz
+
+Install ezjail, python2.7 in host system and configure your IP addresses.
+
+Don't deploy pkg.conf to the jails, as they dont work from amd64 packets. Add a proper resolv.conf and localtime to your templates.
+
+If you ever encounter deployment issues during lxml builds, you might have to manually log into the jails and 'pip install lxml' in the respective venvs. YMMV.
+
+////       ////
+\\\\ notes \\\\
+////       ////
+
+no distribution packages for arm7
+ezjail installs from source
+pkg quarterly is there
+make pkg-zeit build for arm7
+
+Several variables not set nor explained:
+ansible-pf_map_interface = cpsw0
+ansible-ploy_post_secret = FoHyethJas
+
+local theme path not relative to Makefile:
+local_theme_path = ../../application/themes/default/
+
+
+lxml doesn't build on low memory
+use python-pkg for lxml?
+
+python-gnupg needs 0.4.4
+watchdog needs 0.8.0
+https://github.com/gorakhargosh/watchdog/pull/531/commits/8d68295c191635c0f4ee9bfb085bd5ef32b02706
+
+version pinning as pull request
+
+TODO:
+ezjail-admin steal, only make distribution from source
+poudriere arm7 target
+bsdploy beaglebone bootstrap target, assumes bootet beaglebone image with root password "root"
+open: janitor and watchdog?
+fixup pkg.conf
+ntpdate
+verify resolv.conf in jails
+
+
