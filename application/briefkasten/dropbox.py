@@ -18,7 +18,6 @@ from .notifications import (
     setup_smtp_factory
 )
 
-jinja_env = Environment(loader=PackageLoader('briefkasten', 'templates'))
 allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
 
 
@@ -141,6 +140,8 @@ class Dropbox(object):
         self.gpg_context = self.container.gpg_context
         self.admins = self.settings['admins']
         self.editors = self.settings['editors']
+        self.theme_package = self.settings.get('theme_package', 'briefkasten')
+        self.jinja_env = Environment(loader=PackageLoader(self.theme_package, 'templates'))
 
         if not exists(fs_dropbox_path):
             mkdir(fs_dropbox_path)
@@ -469,7 +470,7 @@ class Dropbox(object):
 
     @property
     def _notification_text(self):
-        return jinja_env.get_template('editor_email.j2').render(
+        return self.jinja_env.get_template('editor_email.j2').render(
             num_attachments=self.num_attachments,
             dropbox=self)
 
