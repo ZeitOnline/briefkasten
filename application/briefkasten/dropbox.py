@@ -5,6 +5,8 @@ import yaml
 from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
 import json
+import fnmatch
+import time
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, join, splitext, getmtime, split
 from datetime import datetime
@@ -277,7 +279,8 @@ class Dropbox(object):
             :param reply: the message, must conform to  :class:`views.DropboxReplySchema`
 
         """
-        self._write_message(self.fs_replies_path, 'message_001.txt', json.dumps(reply))
+        # Add the creation date for sorting (and probably displaying) later
+        self._write_message(self.fs_replies_path, 'message_'+str(time.time())+'.txt', json.dumps(reply))
 
     #
     # "private" helper methods for processing a drop
@@ -392,11 +395,13 @@ class Dropbox(object):
     @property
     def replies(self):
         """ returns a list of strings """
-        fs_reply_path = join(self.fs_replies_path, 'message_001.txt')
-        if exists(fs_reply_path):
-            return [json.load(open(fs_reply_path, 'r'))]
-        else:
-            return []
+        reply_list = []
+        if exists(self.fs_replies_path):
+            for fs_reply in sorted(fnmatch.filter(listdir(self.fs_replies_path), 'message_*.txt')):
+                fs_reply_path = join(self.fs_replies_path, fs_reply)
+                if exists(fs_reply_path):
+                    reply_list.append(json.load(open(fs_reply_path, 'r')))
+        return reply_list
 
     @property
     def want_feedback(self):
