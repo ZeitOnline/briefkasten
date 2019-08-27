@@ -396,10 +396,11 @@ class Dropbox(object):
     def replies(self):
         """ returns a list of strings """
         reply_list = []
-        for fs_reply in sorted(fnmatch.filter(listdir(self.fs_replies_path), 'message_*.txt')):
-            fs_reply_path = join(self.fs_replies_path, fs_reply)
-            if exists(fs_reply_path):
-                reply_list.append(json.load(open(fs_reply_path, 'r')))
+        if exists(self.fs_replies_path):
+            for fs_reply in sorted(fnmatch.filter(listdir(self.fs_replies_path), 'message_*.txt')):
+                fs_reply_path = join(self.fs_replies_path, fs_reply)
+                if exists(fs_reply_path):
+                    reply_list.append(json.load(open(fs_reply_path, 'r')))
         return reply_list
 
     @property
