@@ -30,7 +30,7 @@
   command: "sudo -u acme /usr/local/sbin/acme.sh --issue --dns dns_nsupdate --dnssleep 5 -d {{ploy_fqdn}} --domain-alias {{ploy_acme_domain}}"
   args:
     chdir: /var/db/acme
-    creates: "/var/db/acme/certs/{{ploy_fqdn}}/{{ploy_fqdn}}.conf"
+    creates: "/var/db/acme/certs/{{ploy_fqdn}}/fullchain.cer"
 
 - name: upload nginx reload script
   copy:
