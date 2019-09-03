@@ -198,7 +198,7 @@ class Dropbox(object):
     def set_editors(self, editors):
         if not self.from_watchdog:
             # editors can only be from the list of configured editors
-            self.editors = list(set(editors) & set(self.settings['editors']))
+            self.editors = list(set(editors) & set(self.settings['editors'] + self.settings.get('ausschuss', [])))
             with open(self.fs_editors_path, 'w+') as editors_file:
                 json.dump(self.editors, editors_file)
 
