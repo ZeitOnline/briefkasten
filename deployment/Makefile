@@ -1,6 +1,7 @@
 build = true
 use_pypi = false
 flavour ?= briefkasten
+index = kummerkasten
 
 venv/bin/devpi venv/bin/ploy: venv/bin/pip
 	bin/pip install -r requirements.txt
@@ -31,11 +32,11 @@ reset-host:
 	venv/bin/ploy do briefkasten reset_jails
 
 login-devpi:
-	venv/bin/ploy do briefkasten-appserver login_devpi user=briefkasten
+	venv/bin/ploy do briefkasten-appserver login_devpi user=briefkasten index=$(index)
 
 update-app:
-	venv/bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
-	venv/bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
+	venv/bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi) index=$(index)
+	venv/bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi) index=$(index)
 
 update-theme:
 	venv/bin/ploy do briefkasten-appserver upload_theme
