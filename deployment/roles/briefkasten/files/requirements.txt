@@ -1,5 +1,5 @@
 Chameleon==2.24
-colander==1.0
+colander==1.7.0
 cssselect==0.9.1
 diazo==1.2.2
 future==0.15.2
