@@ -144,7 +144,7 @@ class Dropbox(object):
 
         if not exists(fs_dropbox_path):
             mkdir(fs_dropbox_path)
-            chmod(fs_dropbox_path, 0770)
+            chmod(fs_dropbox_path, 0o770)
             self.paths_created.append(fs_dropbox_path)
             self.status = u'010 created'
             # create an editor token
@@ -178,7 +178,7 @@ class Dropbox(object):
         fs_attachment_container = self.fs_attachment_container
         if not exists(fs_attachment_container):
             mkdir(fs_attachment_container)
-            chmod(fs_attachment_container, 0770)
+            chmod(fs_attachment_container, 0o770)
             self.paths_created.append(fs_attachment_container)
         sanitized_filename = sanitize_filename(attachment.filename)
         fs_attachment_path = join(fs_attachment_container, sanitized_filename)
@@ -439,7 +439,7 @@ class Dropbox(object):
             return
         if not exists(fs_container):
             mkdir(fs_container)
-            chmod(fs_container, 0770)
+            chmod(fs_container, 0o770)
         fs_reply_path = join(fs_container, fs_name)
         with open(fs_reply_path, 'w') as fs_reply:
             fs_reply.write(message.encode('utf-8'))
