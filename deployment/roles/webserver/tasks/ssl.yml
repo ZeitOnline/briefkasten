@@ -1,0 +1,20 @@
+---
+- name: ensure certs directory exists
+  file:
+    path: /usr/local/etc/nginx/certs
+    state: directory
+    owner: root
+    group: wheel
+    mode: "0775"
+
+- name: upload ssl certificate
+  copy:
+    src: "{{ cert_location }}"
+    dest: /usr/local/etc/nginx/certs/briefkasten.crt
+  notify: restart nginx
+
+- name: upload ssl key
+  copy:
+    src: "{{ key_location }}"
+    dest: /usr/local/etc/nginx/certs/briefkasten.key
+  notify: restart nginx

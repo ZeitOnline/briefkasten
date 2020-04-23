@@ -15,9 +15,8 @@ AV = None
 def get_vars():
     global AV
     if AV is None:
-        hostname = env.host_string.split('@')[-1]
-        AV = dict(hostname=hostname,
-            **env.instances[hostname].get_ansible_variables())
+        hostname = env.host_string.split("@")[-1]
+        AV = dict(hostname=hostname, **env.instances[hostname].get_ansible_variables())
     return AV
 
 
@@ -27,61 +26,70 @@ def upload_theme():
     get_vars()
     with fab.settings():
         local_theme_path = path.abspath(
-            path.join(fab.env['config_base'],
-                fab.env.instance.config['local_theme_path']))
-        rsync(
-            '-av',
-            '--delete',
-            '%s/' % local_theme_path,
-            '{{host_string}}:{themes_dir}/{ploy_theme_name}'.format(**AV)
+            path.join(
+                fab.env["config_base"], fab.env.instance.config["local_theme_path"]
+            )
         )
-        briefkasten_ctl('restart')
+        rsync(
+            "-av",
+            "--delete",
+            "%s/" % local_theme_path,
+            "{{host_string}}:{themes_dir}/{ploy_theme_name}".format(**AV),
+        )
+        briefkasten_ctl("restart")
 
 
 @task
 def upload_pgp_keys():
     """ upload and/or update the PGP keys for editors, import them into PGP"""
     get_vars()
-    upload_target = '/tmp/pgp_pubkeys.tmp'
-    with fab.settings(fab.hide('running')):
-        fab.run('rm -rf %s' % upload_target)
-        fab.run('mkdir %s' % upload_target)
-        local_key_path = path.join(fab.env['config_base'], fab.env.instance.config['local_pgpkey_path'])
-        remote_key_path = '/var/briefkasten/pgp_pubkeys/'.format(**AV)
-        rsync('-av', local_key_path, '{host_string}:%s' % upload_target)
-        fab.run('chown -R %s %s' % (AV['appuser'], remote_key_path))
-        fab.run('chmod 700 %s' % remote_key_path)
+    upload_target = "/tmp/pgp_pubkeys.tmp"
+    with fab.settings(fab.hide("running")):
+        fab.run("rm -rf %s" % upload_target)
+        fab.run("mkdir %s" % upload_target)
+        local_key_path = path.join(
+            fab.env["config_base"], fab.env.instance.config["local_pgpkey_path"]
+        )
+        remote_key_path = "/var/briefkasten/pgp_pubkeys/".format(**AV)
+        rsync("-av", local_key_path, "{host_string}:%s" % upload_target)
+        fab.run("chown -R %s %s" % (AV["appuser"], remote_key_path))
+        fab.run("chmod 700 %s" % remote_key_path)
         with fab.shell_env(GNUPGHOME=remote_key_path):
-            fab.sudo('''gpg --import %s/*.*''' % upload_target,
-                user=AV['appuser'], shell_escape=False)
-        fab.run('rm -rf %s' % upload_target)
+            fab.sudo(
+                """gpg --import %s/*.*""" % upload_target,
+                user=AV["appuser"],
+                shell_escape=False,
+            )
+        fab.run("rm -rf %s" % upload_target)
 
 
 @task
-def upload_backend(index='dev', user=None):
+def upload_backend(index="dev", user=None):
     """
     Build the backend and upload it to the remote server at the given index
     """
     get_vars()
     use_devpi(index=index)
-    with fab.lcd('../application'):
-        fab.local('make upload')
+    with fab.lcd("../application"):
+        fab.local("make upload")
 
 
 @task
-def briefkasten_ctl(action='restart'):
+def briefkasten_ctl(action="restart"):
     get_vars()
-    what = env.host_string.split('-')[-1]
-    if what == 'appserver':
-        what = 'frontend'
-    fab.sudo('supervisorctl {action} briefkasten_{what}'.format(
-        action=action,
-        what=what,
-        **AV), warn_only=True)
+    what = env.host_string.split("-")[-1]
+    if what == "appserver":
+        what = "frontend"
+    fab.sudo(
+        "supervisorctl {action} briefkasten_{what}".format(
+            action=action, what=what, **AV
+        ),
+        warn_only=True,
+    )
 
 
 @task
-def update_backend(use_pypi=False, index='dev', build=True, user=None, version=None):
+def update_backend(use_pypi=False, index="dev", build=True, user=None, version=None):
     """
     Install the backend from the given devpi index at the given version on the target host and restart the service.
 
@@ -93,37 +101,41 @@ def update_backend(use_pypi=False, index='dev', build=True, user=None, version=N
     get_vars()
     if value_asbool(build):
         upload_backend(index=index, user=user)
-    with fab.cd('{apphome}'.format(**AV)):
+    with fab.cd("{apphome}".format(**AV)):
         if value_asbool(use_pypi):
-            command = 'bin/pip install --upgrade briefkasten'
+            command = "bin/pip install --upgrade %s"
         else:
-            command = 'bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/briefkasten/{index}/+simple/ briefkasten'.format(
-                index=index,
-                user=user,
-                **AV)
+            command = "bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/briefkasten/{index}/+simple/ %s".format(
+                index=index, user=user, **AV
+            )
         if version:
-            command = '%s==%s' % (command, version)
-        fab.sudo(command)
+            app_command = "%s==%s" % (command, version)
+        else:
+            app_command = command
+        fab.sudo(app_command % 'briefkasten')
+        theme_package = AV.get('ploy_theme_package')
+        if theme_package is not None and theme_package != 'briefkasten':
+            theme_command = command % theme_package
+            fab.sudo(theme_command)
 
-    briefkasten_ctl('restart')
+    briefkasten_ctl("restart")
 
 
 @task
-def use_devpi(index='dev'):
+def use_devpi(index="dev"):
     get_vars()
-    publish_devpi = AV.get('ploy_default_publish_devpi')
+    publish_devpi = AV.get("ploy_default_publish_devpi")
     return fab.local(
-        'bin/devpi use {base_url}/briefkasten/{index}'.format(
-            index=index,
-            base_url=publish_devpi,
+        "venv/bin/devpi use {base_url}/briefkasten/{index}".format(
+            index=index, base_url=publish_devpi
         ),
-        capture=True
+        capture=True,
     )
 
 
 @task
-def login_devpi(index='dev', user=None):
+def login_devpi(index="dev", user=None):
     use_devpi(index=index)
     if user is None:
-        user = fab.env['user']
-    fab.local('bin/devpi login {user}'.format(user=user))
+        user = fab.env["user"]
+    fab.local("venv/bin/devpi login {user}".format(user=user))

@@ -1,5 +1,4 @@
 ---
-
 - name: install packages
   pkgng:
     name: "{{ item }}"
@@ -13,18 +12,8 @@
     src: nginx.conf
     dest: /usr/local/etc/nginx/nginx.conf
 
-- name: upload ssl certificate
-  copy:
-    src: "{{ cert_location }}"
-    dest: /usr/local/etc/nginx/briefkasten.crt
-  notify: restart nginx
-
-- name: upload ssl key
-  copy:
-    src: "{{ key_location }}"
-    dest: /usr/local/etc/nginx/briefkasten.key
-  notify: restart nginx
-
+- { include: ssl.yml, when: "not {{ ploy_use_acme }}" }
+- { include: acme.yml, tags: acme, when: "{{ ploy_use_acme }}" }
 
 - name: make sure nginx is running or reloaded
   service:
