@@ -58,6 +58,7 @@ def upload_pgp_keys():
             fab.sudo(
                 """gpg --import %s/*.*""" % upload_target,
                 user=AV["appuser"],
+                warn_only=True,
                 shell_escape=False,
             )
         fab.run("rm -rf %s" % upload_target)
