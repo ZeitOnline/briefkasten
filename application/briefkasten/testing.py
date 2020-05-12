@@ -6,7 +6,7 @@ from os.path import abspath, dirname, join
 from mock import Mock
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pytest import fixture
-from urllib import unquote
+from urllib.parse import unquote
 from webtest import TestApp
 
 
