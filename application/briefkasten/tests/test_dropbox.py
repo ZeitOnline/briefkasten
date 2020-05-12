@@ -35,7 +35,7 @@ def test_dropbox_status_no_file(dropbox):
 
 def test_dropbox_status_manual(dropbox):
     with open(join(dropbox.fs_path, 'status'), 'w') as status_file:
-        status_file.write(u'23 in limbo'.encode('utf-8'))
+        status_file.write(u'23 in limbo')
     assert dropbox.status == u'23 in limbo'
 
 
@@ -114,7 +114,7 @@ def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing
     assert not dropbox.paths_created[-1].endswith("/attach/attachment.txt")
     # but preserve the file ending
     assert dropbox.paths_created[-1].endswith(".txt")
-    assert open(dropbox.paths_created[-1]).read().decode('utf-8') == u'Schönen Guten Tag!'  # contents of attachment.txt
+    assert open(dropbox.paths_created[-1]).read() == u'Schönen Guten Tag!'  # contents of attachment.txt
 
 
 def test_attachment_creation_outside_container(dropbox_container, drop_id, testing):

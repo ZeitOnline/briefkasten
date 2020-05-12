@@ -389,9 +389,9 @@ class Dropbox(object):
         """
         try:
             with open(join(self.fs_path, u'message')) as message_file:
-                return u''.join([line.decode('utf-8') for line in message_file.readlines()])
+                return u''.join([line for line in message_file.readlines()])
         except IOError:
-            return u''
+            return ''
 
     @message.setter
     def message(self, newtext):
@@ -442,7 +442,7 @@ class Dropbox(object):
             chmod(fs_container, 0o770)
         fs_reply_path = join(fs_container, fs_name)
         with open(fs_reply_path, 'w') as fs_reply:
-            fs_reply.write(message.encode('utf-8'))
+            fs_reply.write(message)
         chmod(fs_reply_path, 0o660)
         self.paths_created.append(fs_reply_path)
 

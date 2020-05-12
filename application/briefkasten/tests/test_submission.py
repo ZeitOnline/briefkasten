@@ -80,8 +80,8 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
         listdir(dropbox_container.fs_path)[0], 'attach')
     fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
     # its contents is still unencrypted:
-    assert open(fs_attachment).read().decode('utf-8') == \
-        open(fs_attachment, 'r').read().decode('utf-8')
+    assert open(fs_attachment).read() == \
+        open(fs_attachment, 'r').read()
 
 
 @fixture
@@ -117,7 +117,7 @@ def test_submission_with_multiple_attachments(dropbox_container, form):
         'upload',
         Upload(
             'attachment.txt',
-            open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
+            open(join(dirname(__file__), 'attachment.txt'), 'r').read().encode('utf-8'),
             'text/plain'),
         index=0)
     form['message'] = 'Hello there'
