@@ -31,6 +31,8 @@ class DropboxSchema(colander.MappingSchema):
     testing_secret = colander.SchemaNode(
         colander.String(),
         missing=u'')
+
+
 dropbox_schema = DropboxSchema()
 
 
