@@ -143,16 +143,16 @@ def debug_worker(root):     # pragma: no cover
     default='var/drop_root/',
     help='''location of the dropbox container directory''')
 @click.option(
-    '--async/--no-async',
+    '--async/--no-async', 'async_',
     default=True,
     help='''process asynchronously''')
-def worker(root, async=True):     # pragma: no cover
+def worker(root, async_=True):     # pragma: no cover
     drop_root = DropboxContainer(root=root)
     settings = drop_root.settings
 
     # Setup multiprocessing pool with that amount of workers as
     # implied by the amount of worker jails
-    if async:
+    if async_:
         workers = Pool(processes=settings.get('num_workers', 1))
 
     # Setup the condition object that we will wait for, it
@@ -177,7 +177,7 @@ def worker(root, async=True):     # pragma: no cover
             # Only look at drops that actually are for us
             if drop.status_int == 20:
                 # process drops without attachments synchronously
-                if async and drop.num_attachments > 0:
+                if async_ and drop.num_attachments > 0:
                     workers.map_async(process_drop, [drop])
                 else:
                     process_drop(drop)
