@@ -77,7 +77,7 @@ def german_locale(request):
 
 
 def configure(global_config, **settings):
-    import views
+    from . import views
     config = Configurator(settings=settings, locale_negotiator=german_locale)
     theme_package = settings.get('theme_package', 'briefkasten')
     config.begin()
