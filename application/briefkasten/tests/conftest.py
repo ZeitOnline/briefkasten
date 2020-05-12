@@ -24,7 +24,7 @@ def dropbox_without_attachment(dropbox_container, drop_id):
 def attachment(testing):
     return testing.attachment_factory(
         filename=u'attachment.txt',
-        file=open(join(dirname(__file__), 'attachment.txt'), 'r')
+        file=open(join(dirname(__file__), 'attachment.txt'), 'rb')
     )
 
 

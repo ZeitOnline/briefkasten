@@ -68,7 +68,7 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
         params=dict(
             attachment=Upload(
                 'attachment.txt',
-                open(fs_attachment, 'r').read(),
+                open(fs_attachment, 'rb').read(),
                 'text/plain'),
         ),
     )
@@ -105,7 +105,7 @@ def test_upload_attachment_directly_fails_post_submission(testing, dropbox_conta
         params=dict(
             attachment=Upload(
                 'attachment.txt',
-                open(fs_attachment, 'r').read(),
+                open(fs_attachment, 'rb').read(),
                 'text/plain'),
         ),
         status=410,

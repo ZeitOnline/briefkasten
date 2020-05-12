@@ -182,7 +182,7 @@ class Dropbox(object):
             self.paths_created.append(fs_attachment_container)
         sanitized_filename = sanitize_filename(attachment.filename)
         fs_attachment_path = join(fs_attachment_container, sanitized_filename)
-        with open(fs_attachment_path, 'w') as fs_attachment:
+        with open(fs_attachment_path, 'wb') as fs_attachment:
             shutil.copyfileobj(attachment.file, fs_attachment)
         fs_attachment.close()
         chmod(fs_attachment_path, 0o660)
