@@ -185,7 +185,7 @@ class Dropbox(object):
         with open(fs_attachment_path, 'w') as fs_attachment:
             shutil.copyfileobj(attachment.file, fs_attachment)
         fs_attachment.close()
-        chmod(fs_attachment_path, 0660)
+        chmod(fs_attachment_path, 0o660)
         self.paths_created.append(fs_attachment_path)
         return sanitized_filename
 
@@ -443,7 +443,7 @@ class Dropbox(object):
         fs_reply_path = join(fs_container, fs_name)
         with open(fs_reply_path, 'w') as fs_reply:
             fs_reply.write(message.encode('utf-8'))
-        chmod(fs_reply_path, 0660)
+        chmod(fs_reply_path, 0o660)
         self.paths_created.append(fs_reply_path)
 
     @property
