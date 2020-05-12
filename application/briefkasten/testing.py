@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import shutil
 from cgi import FieldStorage
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 from os.path import abspath, dirname, join
 from mock import Mock
 from pyramid.testing import DummyRequest, setUp, tearDown
@@ -10,11 +10,12 @@ from urllib.parse import unquote
 from webtest import TestApp
 
 
-jinja_env = Environment(loader=PackageLoader('briefkasten', 'tests'))
-
-
 def asset_path(*parts):
     return abspath(join(dirname(__file__), 'tests', *parts))
+
+
+jinja_env = Environment(
+    loader=FileSystemLoader(asset_path()))
 
 
 @fixture(scope="function")
