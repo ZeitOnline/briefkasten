@@ -23,7 +23,7 @@ class MyHandler(FileSystemEventHandler):
 
 
 def keyboard_interrupt_handler(signal, frame):
-    print 'Caught keyboard interrupt. Exit.'
+    print('Caught keyboard interrupt. Exit.')
     exit(0)
 
 

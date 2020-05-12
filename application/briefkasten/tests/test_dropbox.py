@@ -84,18 +84,18 @@ def test_dropbox_retrieval(dropbox_container, dropbox):
 
 
 def test_dropbox_permissions(dropbox):
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[0]).st_mode) == 0770
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[0]).st_mode) == 0o770
 
 
 def test_message_permissions(dropbox):
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0660
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0o660
 
 
 def test_editor_token_created(dropbox_container, dropbox):
     assert (dropbox_container.get_dropbox(
         dropbox.drop_id).editor_token ==
         open(dropbox.paths_created[1], 'r').readline())
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0660
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0o660
 
 
 def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing):
@@ -107,9 +107,9 @@ def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing
         'filename': u'attachment.txt',
         'size': -1})
     dropbox = dropbox_container.add_dropbox(drop_id, message=u'Überraschung!', attachments=[attachment])
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[-2]).st_mode) == 0770
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[-2]).st_mode) == 0o770
     assert dropbox.paths_created[-2].endswith("/attach")
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[-1]).st_mode) == 0660
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[-1]).st_mode) == 0o660
     # we strip the original filename
     assert not dropbox.paths_created[-1].endswith("/attach/attachment.txt")
     # but preserve the file ending
