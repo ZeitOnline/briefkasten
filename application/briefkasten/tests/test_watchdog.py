@@ -37,7 +37,7 @@ def form(testing, browser):
 
 
 def test_watchdog_submits_with_invalid_secret(testing, dropbox_container, form):
-    form['message'] = u'Hellø there'
+    form['message'] = 'Hellø there'
     form['testing_secret'] = 'xxx'
     form.submit()
     created_drop = dropbox_container.get_dropbox(listdir(dropbox_container.fs_path)[0])
@@ -45,7 +45,7 @@ def test_watchdog_submits_with_invalid_secret(testing, dropbox_container, form):
 
 
 def test_watchdog_submits_with_valid_secret(testing, dropbox_container, form):
-    form['message'] = u'Hellø there'
+    form['message'] = 'Hellø there'
     form['testing_secret'] = dropbox_container.settings['test_submission_secret']
     form.submit()
     created_drop = dropbox_container.get_dropbox(listdir(dropbox_container.fs_path)[0])
