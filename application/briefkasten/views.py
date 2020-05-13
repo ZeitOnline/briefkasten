@@ -11,7 +11,7 @@ version = pkg_resources.get_distribution("briefkasten").version
 
 class _FieldStorage(colander.SchemaType):
     def deserialize(self, node, cstruct):
-        if cstruct in (colander.null, None, ''):
+        if cstruct in (colander.null, None, '', b''):
             return colander.null
         # weak attempt at duck-typing
         if not hasattr(cstruct, 'file'):
