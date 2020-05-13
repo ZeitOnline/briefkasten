@@ -100,7 +100,7 @@ def test_editor_token_created(dropbox_container, dropbox):
 
 def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('attachment.txt'), 'r'),
+        'file': open(testing.asset_path('attachment.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -119,7 +119,7 @@ def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing
 
 def test_attachment_creation_outside_container(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('attachment.txt'), 'r'),
+        'file': open(testing.asset_path('attachment.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -156,7 +156,7 @@ def test_attachment_is_image(dropbox_container, drop_id, testing):
 
 def test_attachment_is_unicode(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -241,7 +241,7 @@ def test_notification_text_unsupported(dropbox):
 
 def test_notification_text_two(dropbox, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
