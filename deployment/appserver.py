@@ -55,11 +55,13 @@ def upload_pgp_keys():
         fab.run("chown -R %s %s" % (AV["appuser"], remote_key_path))
         fab.run("chmod 700 %s" % remote_key_path)
         with fab.shell_env(GNUPGHOME=remote_key_path):
-            fab.sudo(
-                """gpg --import %s/*.*""" % upload_target,
-                user=AV["appuser"],
-                shell_escape=False,
-            )
+            # gpg is stingy with exit code 0:
+            with fab.warn_only():
+                fab.sudo(
+                    """gpg --import %s/*.*""" % upload_target,
+                    user=AV["appuser"],
+                    shell_escape=False,
+                )
         fab.run("rm -rf %s" % upload_target)
 
 
