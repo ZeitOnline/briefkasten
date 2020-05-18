@@ -1,17 +1,4 @@
 ---
-- name: install packages
-  pkgng:
-    name: "{{ item }}"
-    state: present
-    cached: yes
-  with_items:
-    - py27-supervisor
-    - py27-virtualenv
-    - rsync
-    - libxslt
-    - sudo
-    - gnupg
-
 - name: create application user
   # this creates /home/pyramid/.ssh/id_rsa{.pub}
   user:
