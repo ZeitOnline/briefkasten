@@ -95,7 +95,7 @@ class DropboxContainer(object):
         fs_settings = join(self.fs_root, 'settings.yaml')
         if exists(fs_settings):
             with open(fs_settings, 'r') as settings:
-                return yaml.load(settings)
+                return yaml.load(settings, Loader=yaml.FullLoader)
         else:
             return dict()
 
