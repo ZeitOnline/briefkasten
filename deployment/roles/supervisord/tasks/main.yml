@@ -5,7 +5,7 @@
     state: present
     cached: yes
   with_items:
-    - py27-supervisor
+    - py37-supervisor
     - sudo
 
 - name: ensure supervisor include dir
