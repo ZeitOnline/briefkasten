@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = '0.2.2.dev'
+version = '0.3.0.dev'
 
 setup(
     name='briefkasten_watchdog',

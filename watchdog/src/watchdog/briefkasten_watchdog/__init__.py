@@ -8,19 +8,17 @@ from imapclient import IMAPClient
 from datetime import datetime
 from calendar import timegm
 from os import environ, path
-from pyzabbix import ZabbixMetric, ZabbixSender
 from time import sleep
 from zope.testbrowser.browser import Browser
 from pyquery import PyQuery
 
-
-import ConfigParser as ConfigParser_
+import configparser as configparser
 
 find_drop_id = re.compile("Drop\W(\w+)\s.*")
 log = logging.getLogger(__name__)
 
 
-class ConfigParser(ConfigParser_.SafeConfigParser):
+class ConfigParser(configparser.SafeConfigParser):
     """ a ConfigParser that can provide its values as simple dictionary.
     taken from http://stackoverflow.com/questions/3220670
     """
@@ -102,7 +100,11 @@ def fetch_test_submissions(previous_history, config):
         is removed from the history.
         any entries left in the history are returned
     """
-    server = IMAPClient(config["imap_host"], use_uid=True, ssl=True)
+    from distutils import util
+    use_ssl = bool(util.strtobool(config.get('imap_ssl')))
+    server = IMAPClient(
+        config["imap_host"], port=config.get("imap_port"), use_uid=True, ssl=use_ssl,
+    )
     server.login(config["imap_user"], config["imap_passwd"])
     server.select_folder("INBOX")
     history = previous_history.copy()
@@ -187,12 +189,6 @@ def main(fs_config=None, sleep_seconds=None):
         path.join(path.dirname(fs_config), "watchdog-history.json")
     )
 
-    zbx = None
-    result_code = None
-
-    if "zabbix_host" in config:
-        zbx = ZabbixSender(config["zabbix_host"])
-
     while True:
         try:
             if path.exists(fs_history):
@@ -242,14 +238,14 @@ def main(fs_config=None, sleep_seconds=None):
 
             # record updated history
             file_history = open(fs_history, "w")
-            file_history.write(json.dumps(history).encode("utf-8"))
+            file_history.write(json.dumps(history))
             file_history.close()
 
             if len(errors) > 0:
                 log.warning("Errors were found.")
                 from pyramid_mailer import mailer_factory_from_settings
                 from pyramid_mailer.message import Message
-                from urlparse import urlparse
+                from urllib.parse import urlparse
 
                 mailer = mailer_factory_from_settings(config, prefix="smtp_")
                 hostname = urlparse(config["app_url"]).hostname
@@ -266,22 +262,8 @@ def main(fs_config=None, sleep_seconds=None):
                 )
                 mailer.send_immediately(message, fail_silently=False)
 
-            result_code = 0
-
         except Exception as exc:
             log.error(exc)
-            result_code = 1
-
-        if zbx is not None:
-            log.info("Pinging Zabbix")
-            metric = ZabbixMetric(
-                config.get("zabbix_sender", "localhost"),
-                "briefkasten.watchdog.last_completed_run",
-                result_code,
-            )
-            sent = zbx.send([metric])
-            if sent.failed > 0:
-                log.warning("Failed to ping Zabbix host")
 
         if config["sleep_seconds"] > 0:
             log.info("Sleeping {sleep_seconds} seconds".format(**config))
