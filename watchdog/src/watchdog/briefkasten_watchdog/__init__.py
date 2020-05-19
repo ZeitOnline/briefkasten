@@ -1,12 +1,9 @@
 import click
 import logging
 import re
-import time
-import json
 import sys
 from imapclient import IMAPClient
 from datetime import datetime
-from calendar import timegm
 from os import environ, path
 from time import sleep
 from zope.testbrowser.browser import Browser
@@ -47,6 +44,7 @@ class WatchdogError(object):
 def perform_submission(app_url, testing_secret):
     token = None
     errors = []
+    now = datetime.now()
     browser = Browser()
     try:
         browser.open(app_url)
@@ -58,7 +56,7 @@ def perform_submission(app_url, testing_secret):
                 % exc,
             )
         )
-        return token, errors
+        return token, now, errors
     try:
         submit_form = browser.getForm(id="briefkasten-form")
     except LookupError:
@@ -68,7 +66,7 @@ def perform_submission(app_url, testing_secret):
                 message=u"""The contact form was not accessible""",
             )
         )
-        return token
+        return token, now, errors
     submit_form.getControl(
         name="message"
     ).value = u"This is an automated test submission from the watchdog instance."
@@ -88,17 +86,15 @@ def perform_submission(app_url, testing_secret):
                 % browser.url,
             )
         )
-    return token, errors
+    return token, now, errors
 
 
-def fetch_test_submissions(previous_history, config):
+def fetch_test_submissions(config, target_token):
     """ fetch emails from IMAP server using the given configuration
         each email is parsed to see whether it matches a submission
         if so, its token is extracted and checked against the given
-        history.
-        if found, the email is deleted from the server and the entry
-        is removed from the history.
-        any entries left in the history are returned
+        one.
+        if found, the email is deleted from the server and True is returned
     """
     from distutils import util
     use_ssl = bool(util.strtobool(config.get('imap_ssl')))
@@ -107,25 +103,25 @@ def fetch_test_submissions(previous_history, config):
     )
     server.login(config["imap_user"], config["imap_passwd"])
     server.select_folder("INBOX")
-    history = previous_history.copy()
     candidates = server.fetch(
         server.search(criteria='NOT DELETED SUBJECT "Drop"'),
         ["BODY[HEADER.FIELDS (SUBJECT)]"],
     )
+    success = False
     for imap_id, message in candidates.items():
-        subject = message.get("BODY[HEADER.FIELDS (SUBJECT)]", "Subject: ")
+        subject = message.get(b"BODY[HEADER.FIELDS (SUBJECT)]", "Subject: ")
         try:
-            drop_id = find_drop_id.findall(subject)[0]
+            drop_id = find_drop_id.findall(subject.decode('utf-8'))[0]
         except IndexError:
             # ignore emails that are not test submissions
             continue
-        server.delete_messages([imap_id])
-        try:
-            del history[drop_id]
-        except KeyError:
-            pass  # TODO: log this?
+        if drop_id == target_token:
+            server.delete_messages([imap_id])
+            success = True
+            log.info("Found %s" % target_token)
+            break
     server.logout()
-    return history
+    return success
 
 
 def send_error_email(errors, config):
@@ -143,11 +139,12 @@ def send_error_email(errors, config):
         for recipient in config["notify_email"].split()
         if recipient
     ]
+    body = "\n".join([str(error) for error in errors])
     message = Message(
         subject="[Briefkasten %s] Submission failure" % hostname,
         sender=config["the_sender"],
         recipients=recipients,
-        body="\n".join([str(error) for error in errors]),
+        body=body,
     )
     mailer.send_immediately(message, fail_silently=False)
 
@@ -160,6 +157,8 @@ def default_config():
         smtp_port=25,
         log_level="INFO",
         sleep_seconds=0,
+        retry_seconds=20,
+        max_attempts=3,
     )
 
 
@@ -179,6 +178,40 @@ def config_from_env(prefix="BKWD_"):
         target_key = key.split(prefix)[-1].lower()
         config[target_key] = environ[key]
     return config
+
+
+def once(config):
+    # perform test submission
+    log.debug("Performing test submissions against {app_url}".format(**config))
+    token, timestamp, errors = perform_submission(
+        app_url=config["app_url"], testing_secret=config["testing_secret"]
+    )
+    log.info("Created drop with token %s" % token)
+    # fetch submissions from mail server
+    log.debug("Fetching previous submissions from IMAP server")
+    attempts = 0
+    while True:
+        log.info("Waiting {retry_seconds} seconds".format(**config))
+        sleep(int(config["retry_seconds"]))
+        success = fetch_test_submissions(config, token)
+        attempts += 1
+        if success or attempts >= int(config['max_attempts']):
+            break
+        log.info("Retrying fetching %s" % token)
+
+    # check for failed test submissions
+    now = datetime.now()
+    age = now - timestamp
+    max_process_secs = int(config['max_process_secs'])
+    if age.seconds > max_process_secs:
+        errors.append(
+            WatchdogError(
+                subject="Submission '%s' not received" % token,
+                message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
+                % (token, timestamp, max_process_secs),
+            )
+        )
+    send_error_email(errors, config)
 
 
 @click.command(help="Performs a test submission and checks it arrived")
@@ -207,69 +240,9 @@ def main(fs_config=None, sleep_seconds=None):
         stream=sys.stdout, level=getattr(logging, config["log_level"].upper())
     )
 
-    # read history of previous runs
-    errors = []
-    fs_history = path.abspath(
-        path.join(path.dirname(fs_config), "watchdog-history.json")
-    )
-
     while True:
-        try:
-            if path.exists(fs_history):
-                previous_history = json.load(open(fs_history, "r"))
-            else:
-                log.info("Starting with empty history.")
-                previous_history = dict()
 
-            # fetch submissions from mail server
-            log.debug("Fetching previous submissions from IMAP server")
-            history = fetch_test_submissions(
-                previous_history=previous_history, config=config
-            )
-
-            # check for failed test submissions
-            max_process_secs = int(config["max_process_secs"])
-            now = datetime.now()
-            for token, timestamp_str in history.items():
-                timestamp = datetime.utcfromtimestamp(
-                    (
-                        timegm(
-                            time.strptime(
-                                timestamp_str.split(".")[0] + "UTC",
-                                "%Y-%m-%dT%H:%M:%S%Z",
-                            )
-                        )
-                    )
-                )
-                age = now - timestamp
-                if age.seconds > max_process_secs and token not in previous_history:
-                    errors.append(
-                        WatchdogError(
-                            subject="Submission '%s' not received" % token,
-                            message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
-                            % (token, timestamp, max_process_secs),
-                        )
-                    )
-
-            # perform test submission
-            log.debug("Performing test submissions against {app_url}".format(**config))
-            token, submission_errors = perform_submission(
-                app_url=config["app_url"], testing_secret=config["testing_secret"]
-            )
-            if token:
-                history[token] = datetime.now().isoformat()
-            errors += submission_errors
-
-            # record updated history
-            file_history = open(fs_history, "w")
-            file_history.write(json.dumps(history))
-            file_history.close()
-
-            send_error_email(errors, config)
-
-        except Exception as exc:
-            log.error(exc)
-
+        once(config)
         if config["sleep_seconds"] > 0:
             log.info("Sleeping {sleep_seconds} seconds".format(**config))
             sleep(config["sleep_seconds"])
