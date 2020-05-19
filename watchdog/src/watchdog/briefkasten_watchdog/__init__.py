@@ -128,6 +128,30 @@ def fetch_test_submissions(previous_history, config):
     return history
 
 
+def send_error_email(errors, config):
+    if len(errors) == 0:
+        return
+    log.warning("Errors were found.")
+    from pyramid_mailer import mailer_factory_from_settings
+    from pyramid_mailer.message import Message
+    from urllib.parse import urlparse
+
+    mailer = mailer_factory_from_settings(config, prefix="smtp_")
+    hostname = urlparse(config["app_url"]).hostname
+    recipients = [
+        recipient
+        for recipient in config["notify_email"].split()
+        if recipient
+    ]
+    message = Message(
+        subject="[Briefkasten %s] Submission failure" % hostname,
+        sender=config["the_sender"],
+        recipients=recipients,
+        body="\n".join([str(error) for error in errors]),
+    )
+    mailer.send_immediately(message, fail_silently=False)
+
+
 def default_config():
     return dict(
         app_url="http://localhost:6543/briefkasten/",
@@ -241,26 +265,7 @@ def main(fs_config=None, sleep_seconds=None):
             file_history.write(json.dumps(history))
             file_history.close()
 
-            if len(errors) > 0:
-                log.warning("Errors were found.")
-                from pyramid_mailer import mailer_factory_from_settings
-                from pyramid_mailer.message import Message
-                from urllib.parse import urlparse
-
-                mailer = mailer_factory_from_settings(config, prefix="smtp_")
-                hostname = urlparse(config["app_url"]).hostname
-                recipients = [
-                    recipient
-                    for recipient in config["notify_email"].split()
-                    if recipient
-                ]
-                message = Message(
-                    subject="[Briefkasten %s] Submission failure" % hostname,
-                    sender=config["the_sender"],
-                    recipients=recipients,
-                    body="\n".join([str(error) for error in errors]),
-                )
-                mailer.send_immediately(message, fail_silently=False)
+            send_error_email(errors, config)
 
         except Exception as exc:
             log.error(exc)
