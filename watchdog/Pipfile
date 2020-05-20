@@ -7,6 +7,8 @@ verify_ssl = true
 pdbpp = "*"
 
 [packages]
+pip = ">=20.1.1"
+setuptools = ">=46.4.0"
 briefkasten_watchdog = {editable = true, path = "src/watchdog/"}
 
 [requires]

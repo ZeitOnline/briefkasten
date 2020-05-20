@@ -1,9 +1,10 @@
 from setuptools import setup
 
 version = '0.3.0.dev'
+name = 'briefkasten_watchdog'
 
 setup(
-    name='briefkasten_watchdog',
+    name=name,
     version=version,
     description='Perform functional testing of a Briefkasten instance',
     long_description="""
@@ -17,7 +18,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         'License :: OSI Approved :: BSD License',
     ],
-    packages=['briefkasten_watchdog'],
+    packages=[name],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
