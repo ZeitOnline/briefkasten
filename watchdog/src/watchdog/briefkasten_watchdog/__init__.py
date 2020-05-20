@@ -212,42 +212,28 @@ def once(config):
             )
         )
     send_error_email(errors, config)
+    return errors
 
 
 @click.command(help="Performs a test submission and checks it arrived")
 @click.argument(
     "fs_config", required=False, default="watchdog.ini",
 )
-@click.option(
-    "--sleep-seconds",
-    default=None,
-    help="""Run forever and sleep for n seconds between loops""",
-)
-def main(fs_config=None, sleep_seconds=None):
-    # read configuration
+def main(fs_config=None):
     config = default_config()
     if fs_config is not None:
         fs_config = path.abspath(fs_config)
         config.update(config_from_file(fs_config))
     config.update(config_from_env())
-
-    if sleep_seconds is not None:
-        config["sleep_seconds"] = sleep_seconds
-    else:
-        config["sleep_seconds"] = int(config["sleep_seconds"])
-
     logging.basicConfig(
         stream=sys.stdout, level=getattr(logging, config["log_level"].upper())
     )
 
-    while True:
-
-        once(config)
-        if config["sleep_seconds"] > 0:
-            log.info("Sleeping {sleep_seconds} seconds".format(**config))
-            sleep(config["sleep_seconds"])
-        else:
-            exit(0)
+    errors = once(config)
+    if len(errors) > 0:
+        exit(1)
+    else:
+        exit(0)
 
 
 if __name__ == '__main__':
