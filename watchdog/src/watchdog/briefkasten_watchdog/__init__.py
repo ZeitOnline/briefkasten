@@ -118,7 +118,7 @@ def fetch_test_submissions(config, target_token):
         if drop_id == target_token:
             server.delete_messages([imap_id])
             success = True
-            log.info("Found %s" % target_token)
+            log.info("Success! Found %s" % target_token)
             break
     server.logout()
     return success
