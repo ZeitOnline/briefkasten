@@ -248,3 +248,7 @@ def main(fs_config=None, sleep_seconds=None):
             sleep(config["sleep_seconds"])
         else:
             exit(0)
+
+
+if __name__ == '__main__':
+    main()
