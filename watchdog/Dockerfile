@@ -13,7 +13,7 @@ ENTRYPOINT ["bash"]
 # --- sdist ---
 FROM base AS sdist
 WORKDIR /build
-COPY src/watchdog ./
+COPY src/watchdog ./watchdog/
 RUN pip install -e .
 
 # --- production ---
