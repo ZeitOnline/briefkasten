@@ -15,7 +15,7 @@ find_drop_id = re.compile("Drop\W(\w+)\s.*")
 log = logging.getLogger(__name__)
 
 
-class ConfigParser(configparser.SafeConfigParser):
+class ConfigParser(configparser.ConfigParser):
     """ a ConfigParser that can provide its values as simple dictionary.
     taken from http://stackoverflow.com/questions/3220670
     """
@@ -97,9 +97,9 @@ def fetch_test_submissions(config, target_token):
         if found, the email is deleted from the server and True is returned
     """
     from distutils import util
-    use_ssl = bool(util.strtobool(config.get('imap_ssl')))
+    use_ssl = bool(util.strtobool(config.get('imap_ssl', True)))
     server = IMAPClient(
-        config["imap_host"], port=config.get("imap_port"), use_uid=True, ssl=use_ssl,
+        config["imap_host"], port=int(config.get("imap_port", 143)), use_uid=True, ssl=use_ssl,
     )
     server.login(config["imap_user"], config["imap_passwd"])
     server.select_folder("INBOX")
