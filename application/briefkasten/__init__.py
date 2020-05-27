@@ -65,7 +65,7 @@ def is_equal(a, b):
 def dropbox_editor_factory(request):
     """ this factory also requires the editor token"""
     dropbox = dropbox_factory(request)
-    if is_equal(dropbox.editor_token, request.matchdict['editor_token'].encode('utf-8')):
+    if is_equal(dropbox.editor_token, request.matchdict['editor_token']):
         return dropbox
     else:
         raise HTTPNotFound('invalid editor token')
@@ -77,7 +77,7 @@ def german_locale(request):
 
 
 def configure(global_config, **settings):
-    import views
+    from . import views
     config = Configurator(settings=settings, locale_negotiator=german_locale)
     theme_package = settings.get('theme_package', 'briefkasten')
     config.begin()

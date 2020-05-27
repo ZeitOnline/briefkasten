@@ -37,7 +37,7 @@ def test_submission_without_attachment_post(testing, dropbox_container, form):
     assert len(listdir(dropbox_container.fs_path)) == 1
     created_drop_id = listdir(dropbox_container.fs_path)[0]
     fs_dropbox_status = join(dropbox_container.fs_path, created_drop_id, 'status')
-    assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
+    assert open(fs_dropbox_status).read() == u'020 submitted'
     fs_dropbox_submission = join(dropbox_container.fs_root, 'submissions', created_drop_id)
     assert exists(fs_dropbox_submission)
 
@@ -49,14 +49,14 @@ def test_submission_with_one_attachment_post(testing, dropbox_container, form):
         'upload',
         Upload(
             'attachment.txt',
-            open(fs_attachment, 'r').read(),
+            open(fs_attachment, 'rb').read(),
             'text/plain'),
         index=0)
     form['message'] = 'Hello there'
     form.submit()
     assert len(listdir(dropbox_container.fs_path)) == 1
     fs_dropbox_status = join(dropbox_container.fs_path, listdir(dropbox_container.fs_path)[0], 'status')
-    assert open(fs_dropbox_status).read().decode('utf-8') == u'020 submitted'
+    assert open(fs_dropbox_status).read() == u'020 submitted'
 
 
 def test_upload_attachment_directly(testing, dropbox_container, browser, upload_url, submit_url):
@@ -68,7 +68,7 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
         params=dict(
             attachment=Upload(
                 'attachment.txt',
-                open(fs_attachment, 'r').read(),
+                open(fs_attachment, 'rb').read(),
                 'text/plain'),
         ),
     )
@@ -80,8 +80,8 @@ def test_upload_attachment_directly(testing, dropbox_container, browser, upload_
         listdir(dropbox_container.fs_path)[0], 'attach')
     fs_attachment = join(fs_attachments, listdir(fs_attachments)[0])
     # its contents is still unencrypted:
-    assert open(fs_attachment).read().decode('utf-8') == \
-        open(fs_attachment, 'r').read().decode('utf-8')
+    assert open(fs_attachment).read() == \
+        open(fs_attachment, 'r').read()
 
 
 @fixture
@@ -105,7 +105,7 @@ def test_upload_attachment_directly_fails_post_submission(testing, dropbox_conta
         params=dict(
             attachment=Upload(
                 'attachment.txt',
-                open(fs_attachment, 'r').read(),
+                open(fs_attachment, 'rb').read(),
                 'text/plain'),
         ),
         status=410,
@@ -117,7 +117,7 @@ def test_submission_with_multiple_attachments(dropbox_container, form):
         'upload',
         Upload(
             'attachment.txt',
-            open(join(dirname(__file__), 'attachment.txt'), 'r').read(),
+            open(join(dirname(__file__), 'attachment.txt'), 'rb').read(),
             'text/plain'),
         index=0)
     form['message'] = 'Hello there'

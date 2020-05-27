@@ -11,7 +11,7 @@ version = pkg_resources.get_distribution("briefkasten").version
 
 class _FieldStorage(colander.SchemaType):
     def deserialize(self, node, cstruct):
-        if cstruct in (colander.null, None, ''):
+        if cstruct in (colander.null, None, '', b''):
             return colander.null
         # weak attempt at duck-typing
         if not hasattr(cstruct, 'file'):
@@ -31,6 +31,8 @@ class DropboxSchema(colander.MappingSchema):
     testing_secret = colander.SchemaNode(
         colander.String(),
         missing=u'')
+
+
 dropbox_schema = DropboxSchema()
 
 
@@ -79,8 +81,8 @@ def dropbox_submission(dropbox, request):
     # recognize submission from watchdog
     if 'testing_secret' in dropbox.settings:
         dropbox.from_watchdog = is_equal(
-            unicode(dropbox.settings['test_submission_secret']),
-            data.pop('testing_secret', u''))
+            dropbox.settings['test_submission_secret'],
+            data.pop('testing_secret', ''))
 
     # a non-js client might have uploaded an attachment via the form's fileupload field:
     if data.get('upload') is not None:

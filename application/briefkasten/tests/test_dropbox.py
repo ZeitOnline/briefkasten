@@ -35,7 +35,7 @@ def test_dropbox_status_no_file(dropbox):
 
 def test_dropbox_status_manual(dropbox):
     with open(join(dropbox.fs_path, 'status'), 'w') as status_file:
-        status_file.write(u'23 in limbo'.encode('utf-8'))
+        status_file.write(u'23 in limbo')
     assert dropbox.status == u'23 in limbo'
 
 
@@ -84,42 +84,42 @@ def test_dropbox_retrieval(dropbox_container, dropbox):
 
 
 def test_dropbox_permissions(dropbox):
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[0]).st_mode) == 0770
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[0]).st_mode) == 0o770
 
 
 def test_message_permissions(dropbox):
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0660
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0o660
 
 
 def test_editor_token_created(dropbox_container, dropbox):
     assert (dropbox_container.get_dropbox(
         dropbox.drop_id).editor_token ==
         open(dropbox.paths_created[1], 'r').readline())
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0660
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0o660
 
 
 def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('attachment.txt'), 'r'),
+        'file': open(testing.asset_path('attachment.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
         'filename': u'attachment.txt',
         'size': -1})
     dropbox = dropbox_container.add_dropbox(drop_id, message=u'Überraschung!', attachments=[attachment])
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[-2]).st_mode) == 0770
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[-2]).st_mode) == 0o770
     assert dropbox.paths_created[-2].endswith("/attach")
-    assert stat.S_IMODE(os.stat(dropbox.paths_created[-1]).st_mode) == 0660
+    assert stat.S_IMODE(os.stat(dropbox.paths_created[-1]).st_mode) == 0o660
     # we strip the original filename
     assert not dropbox.paths_created[-1].endswith("/attach/attachment.txt")
     # but preserve the file ending
     assert dropbox.paths_created[-1].endswith(".txt")
-    assert open(dropbox.paths_created[-1]).read().decode('utf-8') == u'Schönen Guten Tag!'  # contents of attachment.txt
+    assert open(dropbox.paths_created[-1]).read() == u'Schönen Guten Tag!'  # contents of attachment.txt
 
 
 def test_attachment_creation_outside_container(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('attachment.txt'), 'r'),
+        'file': open(testing.asset_path('attachment.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -156,7 +156,7 @@ def test_attachment_is_image(dropbox_container, drop_id, testing):
 
 def test_attachment_is_unicode(dropbox_container, drop_id, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,
@@ -241,7 +241,7 @@ def test_notification_text_unsupported(dropbox):
 
 def test_notification_text_two(dropbox, testing):
     attachment = testing.attachment_factory(**{
-        'file': open(testing.asset_path('unicode.txt'), 'r'),
+        'file': open(testing.asset_path('unicode.txt'), 'rb'),
         'mimetype': 'text/plain',
         'uid': 'foobar',
         'preview_url': None,

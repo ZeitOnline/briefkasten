@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pdbpp = "*"
+
+[packages]
+pip = ">=20.1.1"
+setuptools = ">=46.4.0"
+briefkasten_watchdog = {editable = true, path = "src/watchdog/"}
+
+[requires]
+python_version = "3"
+
+[scripts]
+watchdog = "python src/watchdog/briefkasten_watchdog/__init__.py"

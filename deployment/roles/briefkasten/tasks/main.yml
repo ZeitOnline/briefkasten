@@ -5,8 +5,8 @@
     state: present
     cached: yes
   with_items:
-    - py27-supervisor
-    - py27-virtualenv
+    - py37-supervisor
+    - py37-virtualenv
     - rsync
     - libxslt
     - sudo
