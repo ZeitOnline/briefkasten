@@ -1,3 +1,13 @@
+0.3.0 - 2020-06-16
+------------------
+
+- Upgrade OS to 12.1-RELEASE
+- Upgraded all packages to current versions
+- Now using official FreeBSD packages instead of custom builds
+- Upgrade appserver, worker, cleanser and watchdog to python3
+- Added LetsEncrypt support
+
+
 0.2.17  - Unreleased
 --------------------
 
