@@ -1,4 +1,4 @@
-0.3.0 - 2020-06-16
+0.3.1 - 2020-06-16
 ------------------
 
 - Upgrade OS to 12.1-RELEASE
@@ -6,6 +6,13 @@
 - Now using official FreeBSD packages instead of custom builds
 - Upgrade appserver, worker, cleanser and watchdog to python3
 - Added LetsEncrypt support
+
+
+0.3.0 - 2020-03-18
+------------------
+
+- Unsupported brownbag release
+
 
 
 0.2.17  - Unreleased
