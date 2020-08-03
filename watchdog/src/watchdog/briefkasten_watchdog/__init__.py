@@ -213,6 +213,8 @@ def once(config):
                 )
             )
     send_error_email(errors, config)
+    if errors:
+        log.error(errors)
     return errors
 
 
