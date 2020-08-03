@@ -188,29 +188,30 @@ def once(config):
     )
     log.info("Created drop with token %s" % token)
     # fetch submissions from mail server
-    log.debug("Fetching previous submissions from IMAP server")
-    attempts = 0
-    while True:
-        log.info("Waiting {retry_seconds} seconds".format(**config))
-        sleep(int(config["retry_seconds"]))
-        success = fetch_test_submissions(config, token)
-        attempts += 1
-        if success or attempts >= int(config['max_attempts']):
-            break
-        log.info("Retrying fetching %s" % token)
+    if token is not None:
+        log.debug("Fetching previous submissions from IMAP server")
+        attempts = 0
+        while True:
+            log.info("Waiting {retry_seconds} seconds".format(**config))
+            sleep(int(config["retry_seconds"]))
+            success = fetch_test_submissions(config, token)
+            attempts += 1
+            if success or attempts >= int(config['max_attempts']):
+                break
+            log.info("Retrying fetching %s" % token)
 
-    # check for failed test submissions
-    now = datetime.now()
-    age = now - timestamp
-    max_process_secs = int(config['max_process_secs'])
-    if age.seconds > max_process_secs:
-        errors.append(
-            WatchdogError(
-                subject="Submission '%s' not received" % token,
-                message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
-                % (token, timestamp, max_process_secs),
+        # check for failed test submissions
+        now = datetime.now()
+        age = now - timestamp
+        max_process_secs = int(config['max_process_secs'])
+        if age.seconds > max_process_secs:
+            errors.append(
+                WatchdogError(
+                    subject="Submission '%s' not received" % token,
+                    message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
+                    % (token, timestamp, max_process_secs),
+                )
             )
-        )
     send_error_email(errors, config)
     return errors
 
