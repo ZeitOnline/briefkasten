@@ -162,7 +162,7 @@ def push_to_prometheus(errors, config):
     gauge.set_to_current_time()
     push_to_gateway(
         config['prometheus_push_gateway_url'],
-        job="briefkasten_watchdog",
+        job="briefkasten_watchdog_{environment}".format(**config),
         registry=registry)
 
 
