@@ -7,6 +7,7 @@ from datetime import datetime
 from os import environ, path
 from time import sleep
 from zope.testbrowser.browser import Browser
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from pyquery import PyQuery
 
 import configparser as configparser
@@ -149,6 +150,21 @@ def send_error_email(errors, config):
     mailer.send_immediately(message, fail_silently=False)
 
 
+def push_to_prometheus(errors, config):
+    if len(errors) == 0:
+        return
+    registry = CollectorRegistry()
+    gauge = Gauge(
+        'job_last_briefkasten_watchdog_success_unixtime',
+        'Last time a briefkasten watchdog job successfully finished',
+        registry=registry)
+    gauge.set_to_current_time()
+    push_to_gateway(
+        config['prometheus_push_gateway_url'],
+        job="briefkasten_watchdog",
+        registry=registry)
+
+
 def default_config():
     return dict(
         app_url="http://localhost:6543/briefkasten/",
@@ -213,6 +229,7 @@ def once(config):
                 )
             )
     send_error_email(errors, config)
+    push_to_prometheus(errors, config)
     if errors:
         log.error(errors)
     return errors
