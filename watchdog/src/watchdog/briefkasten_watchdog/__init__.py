@@ -232,11 +232,7 @@ def main(fs_config=None):
         stream=sys.stdout, level=getattr(logging, config["log_level"].upper())
     )
 
-    errors = once(config)
-    if len(errors) > 0:
-        exit(1)
-    else:
-        exit(0)
+    once(config)
 
 
 if __name__ == '__main__':
