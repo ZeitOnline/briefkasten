@@ -153,6 +153,7 @@ def send_error_email(errors, config):
 def push_to_prometheus(errors, config):
     if len(errors) == 0:
         return
+    log.info("No Errors were found, pushing success to prometheus/")
     registry = CollectorRegistry()
     gauge = Gauge(
         'job_last_briefkasten_watchdog_success_unixtime',
