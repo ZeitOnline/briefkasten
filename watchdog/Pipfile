@@ -11,6 +11,7 @@ pip = ">=20.1.1"
 setuptools = ">=46.4.0"
 briefkasten_watchdog = {editable = true, path = "src/watchdog/"}
 prometheus-client = "*"
+"zope.testbrowser" = "*"
 
 [requires]
 python_version = "3"
