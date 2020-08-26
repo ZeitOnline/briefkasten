@@ -221,7 +221,15 @@ def once(config):
         now = datetime.now()
         age = now - timestamp
         max_process_secs = int(config['max_process_secs'])
-        if age.seconds > max_process_secs:
+        if success and age.seconds > max_process_secs:
+            errors.append(
+                WatchdogError(
+                    subject="Submission '%s' not received in time" % token,
+                    message=u"The submission with token %s submitted on %s was received, but it took %d seconds instead of %d."
+                    % (token, timestamp, age.seconds, max_process_secs),
+                )
+            )
+        if not success:
             errors.append(
                 WatchdogError(
                     subject="Submission '%s' not received" % token,
