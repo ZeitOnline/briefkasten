@@ -1,0 +1,26 @@
+version: 2
+updates:
+- package-ecosystem: "pip"
+  directory: "/application"
+  schedule:
+    interval: "daily"
+  commit-message:
+    prefix: "MAINT:"
+- package-ecosystem: "pip"
+  directory: "/watchdog"
+  schedule:
+    interval: "daily"
+  commit-message:
+    prefix: "MAINT:"
+- package-ecosystem: "pip"
+  directory: "/deployment/roles/briefkasten/files"
+  schedule:
+    interval: "daily"
+  commit-message:
+    prefix: "MAINT:"
+- package-ecosystem: "pip"
+  directory: "/deployment/roles/watchdog/files"
+  schedule:
+    interval: "daily"
+  commit-message:
+    prefix: "MAINT:"
