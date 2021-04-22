@@ -2,7 +2,7 @@ briefkasten-watchdog==0.1.10
 cssselect==0.9.1
 IMAPClient==0.13
 lxml==4.6.3
-mechanize==0.2.5
+mechanize==0.4.5
 PasteDeploy==1.5.2
 pyquery==1.2.9
 pyramid==1.5.7
