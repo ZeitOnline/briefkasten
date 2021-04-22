@@ -3,7 +3,7 @@ colander==1.7.0
 cssselect==1.1.0
 diazo==1.4.0
 future==0.18.2
-iso8601==0.1.12
+iso8601==0.1.14
 itsdangerous==0.24
 lxml==4.6.3
 Paste==3.4.0
