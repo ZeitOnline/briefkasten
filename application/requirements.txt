@@ -7,7 +7,7 @@ iso8601==0.1.12
 itsdangerous==0.24
 lxml==4.6.3
 Paste==3.4.0
-PasteDeploy==2.1.0
+PasteDeploy==2.1.1
 peppercorn==0.5
 pyramid-chameleon==0.3
 pyramid==1.6.5
