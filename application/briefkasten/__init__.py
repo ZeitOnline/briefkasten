@@ -115,6 +115,10 @@ def configure(global_config, **settings):
         route_name="dropbox_editor",
         request_method='POST',
         renderer='%s:templates/editor_reply.pt' % theme_package)
+    config.add_view(
+        view=views.prometheus_metrics,
+        route_name='metrics',
+        request_method='GET')
 
     config.add_route('fingerprint', '%sfingerprint' % app_route)
     config.add_route('dropbox_form_submit', '%s{token}/submit' % app_route, factory=dropbox_post_factory)
@@ -122,6 +126,7 @@ def configure(global_config, **settings):
     config.add_route('dropbox_editor', '%sdropbox/{drop_id}/{editor_token}' % app_route, factory=dropbox_editor_factory)
     config.add_route('dropbox_view', '%sdropbox/{drop_id}' % app_route, factory=dropbox_factory)
     config.add_route('dropbox_form', app_route)
+    config.add_route('metrics', '/metrics')
     config.scan(ignore=['.testing'])
     config.registry.settings['dropbox_container'] = DropboxContainer(root=config.registry.settings['fs_dropbox_root'])
     config.commit()

@@ -1,6 +1,5 @@
 import click
 from os import path, listdir, rename, remove
-from datetime import datetime
 from sys import exit
 from multiprocessing import Pool
 from signal import signal, SIGINT
@@ -9,7 +8,7 @@ from watchdog.events import FileSystemEventHandler
 from threading import Condition
 
 from .dropbox import DropboxContainer
-
+from .housekeeping import do as housekeeping
 
 class MyHandler(FileSystemEventHandler):
 
@@ -56,40 +55,7 @@ def process_drop(drop):
     default='var/drop_root/',
     help='''location of the dropbox container directory''')
 def janitor(root):     # pragma: no cover
-    drop_root = root = DropboxContainer(root=root)
-
-    # Scan pub keys for expired or soon to expired ones
-    allkeys = root.gpg_context.list_keys()
-    now = datetime.utcnow()
-    report = ''
-
-    for editor in drop_root.settings['editors']:
-        key = [k for k in allkeys if editor in ', '.join(k['uids'])]
-        if not bool(key):
-            report = report + 'Editor %s does not have a public key in keyring.\n' % editor
-            continue
-        key = key[0]
-
-        if not key.get('expires'):
-            report = report + 'Editor %s has a key that never expires.\n' % editor
-            continue
-
-        keyexpiry = datetime.utcfromtimestamp(int(key['expires']))
-        delta = keyexpiry - now
-
-        if delta.days < 0:
-            report = report + 'Editor %s has an expired key.\n' % editor
-        elif delta.days < 60:
-            report = report + 'Editor ' + editor + ' has a key that will expire in %d days.\n' % delta.days
-
-    for drop in drop_root:
-        age = now - drop.last_changed()
-        max_age = 365 if not drop.from_watchdog else 1
-
-        if age.days > max_age:
-            if not drop.from_watchdog:
-                print('drop %s is expired. Removing it.' % drop)
-            drop.destroy()
+    housekeeping(root)
 
 
 @click.command(help='debug processing of drops')

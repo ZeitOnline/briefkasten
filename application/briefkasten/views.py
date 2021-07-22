@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import pkg_resources
+import os
 import colander
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.renderers import get_renderer
+from pyramid.response import FileResponse
 from briefkasten import _, is_equal
 
 title = "ZEIT ONLINE Briefkasten"
@@ -142,3 +144,14 @@ def dropbox_reply_submitted(dropbox, request):
         return appstruct
     dropbox.add_reply(data)
     return HTTPFound(location=request.route_url('dropbox_view', drop_id=dropbox.drop_id))
+
+
+def prometheus_metrics(request):
+    """ Serves the static prometheus metrics from the filesystem.
+    It is updated each time the janitor runs
+    """
+    drop_root = request.registry.settings['dropbox_container']
+    try:
+        return FileResponse(os.path.join(drop_root.fs_root, 'metrics'))
+    except Exception:
+        return HTTPNotFound()
