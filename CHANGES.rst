@@ -1,6 +1,7 @@
 0.3.3 - Unreleased
 ------------------
 
+- ZON-6722: expose all expiry dates instead of just the most imminent one
 - MAINT: fix response type for metrics
 
 

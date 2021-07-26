@@ -8,6 +8,7 @@ def gather_metrics(drop_root):
     allkeys = drop_root.gpg_context.list_keys()
     now = datetime.utcnow()
     report = ''
+    metrics = dict(pgp_key_expiry_unixtime=[])
     age = None
     for editor in drop_root.settings['editors']:
         key = [k for k in allkeys if editor in ', '.join(k['uids'])]
@@ -21,15 +22,16 @@ def gather_metrics(drop_root):
             continue
 
         keyexpiry = datetime.utcfromtimestamp(int(key['expires']))
+        metrics['pgp_key_expiry_unixtime'].append(dict(timestamp=keyexpiry.timestamp(), email=editor))
         delta = keyexpiry - now
 
-        if age is None or delta.days < age:
-            age = delta.days
+        if age is None or delta.seconds < age:
+            age = delta.seconds
         if delta.days < 0:
             report = report + 'Editor %s has a key that expired %d days ago.\n' % (editor, abs(age))
         elif delta.days < 60:
             report = report + 'Editor ' + editor + ' has a key that will expire in %d days.\n' % delta.days
-    return report, dict(soonest_expiry_days=age)
+    return report, metrics
 
 
 def garbage_collection(drop_root):
@@ -49,8 +51,9 @@ def prometheus_metrics(**kw):
     report = """
 # HELP editor_keys_soonest_expiry_days Number of days remaining until the first PGP key expires
 # TYPE  gauge
-editor_keys_soonest_expiry_days {soonest_expiry_days}
-""".format(**kw)
+"""
+    for expiry in kw['pgp_key_expiry_unixtime']:
+        report += """pgp_key_expiry_unixtime{{user="{email}"}} {timestamp:.3f}\n""".format(**expiry)
     return report
 
 
@@ -58,6 +61,7 @@ def do(root):
     drop_root = DropboxContainer(root=root)
     report, metrics = gather_metrics(drop_root)
     garbage_collection(drop_root)
+    # print humanreadable report for commandline warriors :)
     print(report)
     prometheus_report = prometheus_metrics(**metrics)
     with open(os.path.join(drop_root.fs_root, 'metrics'), 'w') as metrics_handle:
