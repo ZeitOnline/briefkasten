@@ -1,3 +1,9 @@
+0.3.3 - Unreleased
+------------------
+
+- MAINT: fix response type for metrics
+
+
 0.3.2 - 2021-07-22
 ------------------
 

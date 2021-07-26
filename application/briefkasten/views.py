@@ -152,6 +152,8 @@ def prometheus_metrics(request):
     """
     drop_root = request.registry.settings['dropbox_container']
     try:
-        return FileResponse(os.path.join(drop_root.fs_root, 'metrics'))
+        return FileResponse(
+            os.path.join(drop_root.fs_root, 'metrics'),
+            content_type='text/plain')
     except Exception:
         return HTTPNotFound()

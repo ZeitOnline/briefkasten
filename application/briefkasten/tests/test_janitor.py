@@ -17,3 +17,4 @@ def test_metrics_view_200(browser, metrics_url, dropbox_container):
     housekeeping.do(dropbox_container.fs_root)
     response = browser.get(metrics_url)
     assert response.status == '200 OK'
+    assert response.content_type == 'text/plain'
