@@ -1,4 +1,4 @@
-0.3.3 - Unreleased
+0.3.3 - 2021-07-26
 ------------------
 
 - ZON-6722: expose all expiry dates instead of just the most imminent one
