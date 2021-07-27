@@ -28,7 +28,7 @@ def gather_metrics(drop_root):
         if age is None or delta.seconds < age:
             age = delta.seconds
         if delta.days < 0:
-            report = report + 'Editor %s has a key that expired %d days ago.\n' % (editor, abs(age))
+            report = report + 'Editor %s has a key that expired %d days ago.\n' % (editor, abs(delta.days))
         elif delta.days < 60:
             report = report + 'Editor ' + editor + ' has a key that will expire in %d days.\n' % delta.days
     return report, metrics
