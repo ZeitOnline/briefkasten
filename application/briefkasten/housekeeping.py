@@ -50,7 +50,6 @@ def prometheus_metrics(**kw):
     """
     report = """
 # HELP pgp_key_expiry_unixtime Expiry date in unix epoch seconds of the given PGP key
-# TYPE  gauge
 """
     for expiry in kw['pgp_key_expiry_unixtime']:
         report += """pgp_key_expiry_unixtime{{user="{email}"}} {timestamp:.3f}\n""".format(**expiry)
