@@ -49,7 +49,7 @@ def prometheus_metrics(**kw):
     """ returns the entirety of the exposed prometheus metrics
     """
     report = """
-# HELP editor_keys_soonest_expiry_days Number of days remaining until the first PGP key expires
+# HELP pgp_key_expiry_unixtime Expiry date in unix epoch seconds of the given PGP key
 # TYPE  gauge
 """
     for expiry in kw['pgp_key_expiry_unixtime']:
