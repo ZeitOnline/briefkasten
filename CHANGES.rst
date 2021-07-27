@@ -1,4 +1,4 @@
-0.3.4 - Unreleased
+0.3.4 - 2021-07-27
 ------------------
 
 - FIX: fix metrics meta data
