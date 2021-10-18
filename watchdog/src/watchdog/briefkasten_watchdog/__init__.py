@@ -237,7 +237,6 @@ def once(config):
                     % (token, timestamp, max_process_secs),
                 )
             )
-    send_error_email(errors, config)
     push_to_prometheus(errors, config)
     if errors:
         log.error(errors)
