@@ -1,5 +1,5 @@
 alabaster==0.7.6
-ansible==1.9.6
+ansible==4.2.0
 apipkg==1.4
 asn1crypto==0.24.0
 Babel==2.0
