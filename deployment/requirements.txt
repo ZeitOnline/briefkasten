@@ -32,7 +32,7 @@ ploy-ezjail==1.5.1
 ploy-fabric==1.1.0
 ploy-virtualbox==1.2.0
 pluggy==0.3.0
-py==1.4.30
+py==1.10.0
 pyasn1==0.4.2
 pycparser==2.18
 pycrypto==2.6.1
