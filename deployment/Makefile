@@ -1,10 +1,7 @@
 build = true
 use_pypi = false
 
-venv/bin/devpi venv/bin/ploy: venv/bin/pip
-	venv/bin/pip install -r requirements.txt
-
-venv/bin/python venv/bin/pip:
+venv/bin/ploy:
 	tox -e develop --notest
 
 bootstrap: venv/bin/ploy
