@@ -9,7 +9,7 @@ pyramid==1.5.7
 pyramid-mailer==0.14.1
 pytz==2015.6
 repoze.lru==0.6
-repoze.sendmail==4.2
+repoze.sendmail==4.4.1
 transaction==1.4.4
 translationstring==1.3
 venusian==1.0
