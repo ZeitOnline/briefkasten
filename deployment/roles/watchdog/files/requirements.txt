@@ -3,7 +3,7 @@ cssselect==0.9.1
 IMAPClient==0.13
 lxml==4.6.5
 mechanize==0.4.7
-PasteDeploy==1.5.2
+PasteDeploy==2.1.1
 pyquery==1.4.3
 pyramid==1.5.7
 pyramid-mailer==0.14.1
