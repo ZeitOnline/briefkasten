@@ -31,7 +31,7 @@ setup(
         'setuptools-git-version'
     ],
     install_requires=[
-        'Pyramid<1.7',
+        'Pyramid<2.1',
         'pyramid_chameleon',
         'click',
         'colander',
