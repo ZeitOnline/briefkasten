@@ -1,4 +1,4 @@
-Chameleon==3.7.1
+Chameleon==3.9.1
 colander==1.7.0
 cssselect==1.1.0
 diazo==1.4.0
