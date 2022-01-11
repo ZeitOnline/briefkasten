@@ -8,9 +8,9 @@ itsdangerous==2.0.1
 lxml==4.6.5
 Paste==3.4.0
 PasteDeploy==2.1.1
-peppercorn==0.5
+peppercorn==0.6
 pyramid-chameleon==0.3
-pyramid==1.6.5
+pyramid==2.0
 python-gnupg==0.4.8
 repoze.lru==0.7
 repoze.xmliter==0.6
