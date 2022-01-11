@@ -6,7 +6,7 @@ future==0.18.2
 iso8601==0.1.12
 lxml==4.6.5
 Paste==3.5.0
-PasteDeploy==2.1.0
+PasteDeploy==2.1.1
 pyramid==2.0
 pyramid-chameleon==0.3
 python-gnupg==0.4.8
