@@ -11,7 +11,7 @@ PasteDeploy==2.1.1
 peppercorn==0.5
 pyramid-chameleon==0.3
 pyramid==1.6.5
-python-gnupg==0.4.6
+python-gnupg==0.4.8
 repoze.lru==0.7
 repoze.xmliter==0.6
 translationstring==1.3
