@@ -7,7 +7,7 @@ iso8601==0.1.12
 lxml==4.6.5
 Paste==3.5.0
 PasteDeploy==2.1.0
-pyramid==1.6.5
+pyramid==2.0
 pyramid-chameleon==0.3
 python-gnupg==0.4.8
 repoze.lru==0.7
