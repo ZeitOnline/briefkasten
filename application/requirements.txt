@@ -14,7 +14,7 @@ pyramid==2.0
 python-gnupg==0.4.8
 repoze.lru==0.7
 repoze.xmliter==0.6
-translationstring==1.3
+translationstring==1.4
 venusian==3.0.0
 watchdog==2.1.6
 WebOb==1.8.6
