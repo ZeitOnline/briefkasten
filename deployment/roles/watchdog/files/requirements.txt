@@ -1,6 +1,6 @@
 briefkasten-watchdog==0.2.1
 cssselect==0.9.1
-IMAPClient==0.13
+IMAPClient==2.2.0
 lxml==4.7.1
 mechanize==0.4.7
 PasteDeploy==2.1.1
