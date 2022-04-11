@@ -1,3 +1,21 @@
+0.3.6 - Unreleased
+------------------
+
+- MAINT: Set up code scanning via CodeQL Analysis
+
+- MAINT: Update `cryptography` to avoid error about "loading libcrypto in an unsafe way"
+
+- MAINT: Update Python library dependencies for application & watchdog
+
+- MAINT: Python dependencies are handled by `tox` now
+
+- MAINT: Build `ploy` before using it
+
+- MAINT: Add requirements
+
+- MAINT: No longer send emails
+
+
 0.3.5 - 2021-07-27
 ------------------
 
