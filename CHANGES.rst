@@ -1,6 +1,8 @@
 0.3.6 - Unreleased
 ------------------
 
+- ZO-1182: Adds metrics for monitoring watchdog test deliveries
+
 - MAINT: Set up code scanning via CodeQL Analysis
 
 - MAINT: Update `cryptography` to avoid error about "loading libcrypto in an unsafe way"
