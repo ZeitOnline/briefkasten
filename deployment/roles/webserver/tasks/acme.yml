@@ -57,6 +57,9 @@
     mode: "644"
     validate: "visudo -cf %s"
 
+- name: renew certificate
+  command: "sudo -u acme /usr/local/sbin/acme.sh --issue -w /letsencrypt -d {{ploy_fqdn}} --force"
+
 - name: install certificate
   command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt --reloadcmd 'sudo /usr/local/bin/reload-nginx'"
   args:
