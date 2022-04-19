@@ -104,10 +104,16 @@ def fetch_test_submissions(config, target_token):
     )
     server.login(config["imap_user"], config["imap_passwd"])
     server.select_folder("INBOX")
-    candidates = server.fetch(
-        server.search(criteria='NOT DELETED SUBJECT "Drop"'),
-        ["BODY[HEADER.FIELDS (SUBJECT)]"],
-    )
+    try:
+        candidates = server.fetch(
+            server.search(criteria='NOT DELETED SUBJECT "Drop"'),
+            ["BODY[HEADER.FIELDS (SUBJECT)]"],
+        )
+    except Exception:
+        push_to_prometheus_imap_fetch_error(config)
+        raise
+
+    number_of_messages = len(candidates.items())
     success = False
     for imap_id, message in candidates.items():
         subject = message.get(b"BODY[HEADER.FIELDS (SUBJECT)]", "Subject: ")
@@ -122,7 +128,7 @@ def fetch_test_submissions(config, target_token):
             log.info("Success! Found %s" % target_token)
             break
     server.logout()
-    return success
+    return success, number_of_messages
 
 
 def send_error_email(errors, config):
@@ -150,7 +156,7 @@ def send_error_email(errors, config):
     mailer.send_immediately(message, fail_silently=False)
 
 
-def push_to_prometheus(errors, config):
+def push_to_prometheus_success(errors, config):
     if len(errors) > 0:
         return
     log.info("No Errors were found, pushing success to prometheus/")
@@ -160,6 +166,33 @@ def push_to_prometheus(errors, config):
         'Last time a briefkasten watchdog job successfully finished',
         registry=registry)
     gauge.set_to_current_time()
+    push_to_gateway(
+        config['prometheus_push_gateway_url'],
+        job="briefkasten_watchdog_{environment}".format(**config),
+        registry=registry)
+
+
+def push_to_prometheus_imap_fetch_error(config):
+    log.warning("IMAP watchdog fetch error")
+    registry = CollectorRegistry()
+    gauge = Gauge(
+        'briefkasten_watchdog_imap_fetch_error',
+        'Can not fetch imap inbox messages',
+        registry=registry)
+    gauge.inc()
+    push_to_gateway(
+        config['prometheus_push_gateway_url'],
+        job="briefkasten_watchdog_{environment}".format(**config),
+        registry=registry)
+
+
+def push_to_prometheus_number_of_inbox_messages(config, num):
+    registry = CollectorRegistry()
+    gauge = Gauge(
+        'briefkasten_watchdog_number_of_inbox_messages',
+        'Number of messages in the watchdog IMAP INBOX',
+        registry=registry)
+    gauge.set(num)
     push_to_gateway(
         config['prometheus_push_gateway_url'],
         job="briefkasten_watchdog_{environment}".format(**config),
@@ -211,11 +244,12 @@ def once(config):
         while True:
             log.info("Waiting {retry_seconds} seconds".format(**config))
             sleep(int(config["retry_seconds"]))
-            success = fetch_test_submissions(config, token)
+            success, number_of_messages = fetch_test_submissions(config, token)
             attempts += 1
             if success or attempts >= int(config['max_attempts']):
                 break
             log.info("Retrying fetching %s" % token)
+        push_to_prometheus_number_of_inbox_messages(config, number_of_messages)
 
         # check for failed test submissions
         now = datetime.now()
@@ -237,7 +271,7 @@ def once(config):
                     % (token, timestamp, max_process_secs),
                 )
             )
-    push_to_prometheus(errors, config)
+    push_to_prometheus_success(errors, config)
     if errors:
         log.error(errors)
     return errors
