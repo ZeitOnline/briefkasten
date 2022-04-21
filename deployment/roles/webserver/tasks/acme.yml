@@ -40,6 +40,14 @@
     group: wheel
     mode: "6555"
 
+- name: ensure letsencrypt directory exists
+  file:
+    path: /letsencrypt
+    state: directory
+    owner: acme
+    group: wheel
+    mode: "0775"
+
 - name: ensure certs directory exists
   file:
     path: /usr/local/etc/nginx/certs
@@ -57,16 +65,13 @@
     mode: "644"
     validate: "visudo -cf %s"
 
-- name: renew certificate
-  command: "sudo -u acme /usr/local/sbin/acme.sh --issue -w /letsencrypt -d {{ploy_fqdn}} --force"
-
 - name: install certificate
   command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt --reloadcmd 'sudo /usr/local/bin/reload-nginx'"
   args:
     creates: /usr/local/etc/nginx/briefkasten.key
 
 - name: install cronjob to run check and renew sites automatically
-  copy:
+  template:
     src: acme_crontab
     dest: /var/cron/tabs/acme
     owner: root
