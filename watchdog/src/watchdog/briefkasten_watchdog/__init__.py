@@ -15,6 +15,8 @@ import configparser as configparser
 find_drop_id = re.compile("Drop\W(\w+)\s.*")
 log = logging.getLogger(__name__)
 
+REGISTRY = CollectorRegistry()
+
 
 class ConfigParser(configparser.ConfigParser):
     """ a ConfigParser that can provide its values as simple dictionary.
@@ -110,7 +112,7 @@ def fetch_test_submissions(config, target_token):
             ["BODY[HEADER.FIELDS (SUBJECT)]"],
         )
     except Exception:
-        push_to_prometheus_imap_fetch_error(config)
+        push_to_prometheus_imap_fetch_error()
         raise
 
     number_of_messages = len(candidates.items())
@@ -156,47 +158,39 @@ def send_error_email(errors, config):
     mailer.send_immediately(message, fail_silently=False)
 
 
+def push_to_prometheus(config):
+    push_to_gateway(
+        config['prometheus_push_gateway_url'],
+        job="briefkasten_watchdog_{environment}".format(**config),
+        registry=REGISTRY)
+
+
 def push_to_prometheus_success(errors, config):
     if len(errors) > 0:
         return
     log.info("No Errors were found, pushing success to prometheus/")
-    registry = CollectorRegistry()
     gauge = Gauge(
         'job_last_briefkasten_watchdog_success_unixtime',
         'Last time a briefkasten watchdog job successfully finished',
-        registry=registry)
+        registry=REGISTRY)
     gauge.set_to_current_time()
-    push_to_gateway(
-        config['prometheus_push_gateway_url'],
-        job="briefkasten_watchdog_{environment}".format(**config),
-        registry=registry)
 
 
-def push_to_prometheus_imap_fetch_error(config):
+def push_to_prometheus_imap_fetch_error():
     log.warning("IMAP watchdog fetch error")
-    registry = CollectorRegistry()
     gauge = Gauge(
         'briefkasten_watchdog_imap_fetch_error',
         'Can not fetch imap inbox messages',
-        registry=registry)
+        registry=REGISTRY)
     gauge.inc()
-    push_to_gateway(
-        config['prometheus_push_gateway_url'],
-        job="briefkasten_watchdog_{environment}".format(**config),
-        registry=registry)
 
 
-def push_to_prometheus_number_of_inbox_messages(config, num):
-    registry = CollectorRegistry()
+def push_to_prometheus_number_of_inbox_messages(num):
     gauge = Gauge(
         'briefkasten_watchdog_number_of_inbox_messages',
         'Number of messages in the watchdog IMAP INBOX',
-        registry=registry)
+        registry=REGISTRY)
     gauge.set(num)
-    push_to_gateway(
-        config['prometheus_push_gateway_url'],
-        job="briefkasten_watchdog_{environment}".format(**config),
-        registry=registry)
 
 
 def default_config():
@@ -231,50 +225,53 @@ def config_from_env(prefix="BKWD_"):
 
 
 def once(config):
-    # perform test submission
-    log.debug("Performing test submissions against {app_url}".format(**config))
-    token, timestamp, errors = perform_submission(
-        app_url=config["app_url"], testing_secret=config["testing_secret"]
-    )
-    log.info("Created drop with token %s" % token)
-    # fetch submissions from mail server
-    if token is not None:
-        log.debug("Fetching previous submissions from IMAP server")
-        attempts = 0
-        while True:
-            log.info("Waiting {retry_seconds} seconds".format(**config))
-            sleep(int(config["retry_seconds"]))
-            success, number_of_messages = fetch_test_submissions(config, token)
-            attempts += 1
-            if success or attempts >= int(config['max_attempts']):
-                break
-            log.info("Retrying fetching %s" % token)
-        push_to_prometheus_number_of_inbox_messages(config, number_of_messages)
+    try:
+        # perform test submission
+        log.debug("Performing test submissions against {app_url}".format(**config))
+        token, timestamp, errors = perform_submission(
+            app_url=config["app_url"], testing_secret=config["testing_secret"]
+        )
+        log.info("Created drop with token %s" % token)
+        # fetch submissions from mail server
+        if token is not None:
+            log.debug("Fetching previous submissions from IMAP server")
+            attempts = 0
+            while True:
+                log.info("Waiting {retry_seconds} seconds".format(**config))
+                sleep(int(config["retry_seconds"]))
+                success, number_of_messages = fetch_test_submissions(config, token)
+                attempts += 1
+                if success or attempts >= int(config['max_attempts']):
+                    break
+                log.info("Retrying fetching %s" % token)
+            push_to_prometheus_number_of_inbox_messages(number_of_messages)
 
-        # check for failed test submissions
-        now = datetime.now()
-        age = now - timestamp
-        max_process_secs = int(config['max_process_secs'])
-        if success and age.seconds > max_process_secs:
-            errors.append(
-                WatchdogError(
-                    subject="Submission '%s' not received in time" % token,
-                    message=u"The submission with token %s submitted on %s was received, but it took %d seconds instead of %d."
-                    % (token, timestamp, age.seconds, max_process_secs),
+            # check for failed test submissions
+            now = datetime.now()
+            age = now - timestamp
+            max_process_secs = int(config['max_process_secs'])
+            if success and age.seconds > max_process_secs:
+                errors.append(
+                    WatchdogError(
+                        subject="Submission '%s' not received in time" % token,
+                        message=u"The submission with token %s submitted on %s was received, but it took %d seconds instead of %d."
+                        % (token, timestamp, age.seconds, max_process_secs),
+                    )
                 )
-            )
-        if not success:
-            errors.append(
-                WatchdogError(
-                    subject="Submission '%s' not received" % token,
-                    message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
-                    % (token, timestamp, max_process_secs),
+            if not success:
+                errors.append(
+                    WatchdogError(
+                        subject="Submission '%s' not received" % token,
+                        message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
+                        % (token, timestamp, max_process_secs),
+                    )
                 )
-            )
-    push_to_prometheus_success(errors, config)
-    if errors:
-        log.error(errors)
-    return errors
+        push_to_prometheus_success(errors)
+        if errors:
+            log.error(errors)
+        return errors
+    finally:
+        push_to_gateway(config)
 
 
 @click.command(help="Performs a test submission and checks it arrived")
