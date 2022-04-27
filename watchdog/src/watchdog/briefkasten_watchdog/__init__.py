@@ -17,6 +17,21 @@ log = logging.getLogger(__name__)
 
 REGISTRY = CollectorRegistry()
 
+last_success = Gauge(
+    'job_last_briefkasten_watchdog_success_unixtime',
+    'Last time a briefkasten watchdog job successfully finished',
+    registry=REGISTRY)
+
+fetch_errors = Gauge(
+    'briefkasten_watchdog_imap_fetch_error',
+    'Can not fetch imap inbox messages',
+    registry=REGISTRY)
+
+inbox_count = Gauge(
+    'briefkasten_watchdog_number_of_inbox_messages',
+    'Number of messages in the watchdog IMAP INBOX',
+    registry=REGISTRY)
+
 
 class ConfigParser(configparser.ConfigParser):
     """ a ConfigParser that can provide its values as simple dictionary.
@@ -112,7 +127,8 @@ def fetch_test_submissions(config, target_token):
             ["BODY[HEADER.FIELDS (SUBJECT)]"],
         )
     except Exception:
-        push_to_prometheus_imap_fetch_error()
+        log.warning("IMAP watchdog fetch error")
+        fetch_errors.inc()
         raise
 
     number_of_messages = len(candidates.items())
@@ -163,34 +179,6 @@ def push_to_prometheus(config):
         config['prometheus_push_gateway_url'],
         job="briefkasten_watchdog_{environment}".format(**config),
         registry=REGISTRY)
-
-
-def push_to_prometheus_success(errors):
-    if len(errors) > 0:
-        return
-    log.info("No Errors were found, pushing success to prometheus/")
-    gauge = Gauge(
-        'job_last_briefkasten_watchdog_success_unixtime',
-        'Last time a briefkasten watchdog job successfully finished',
-        registry=REGISTRY)
-    gauge.set_to_current_time()
-
-
-def push_to_prometheus_imap_fetch_error():
-    log.warning("IMAP watchdog fetch error")
-    gauge = Gauge(
-        'briefkasten_watchdog_imap_fetch_error',
-        'Can not fetch imap inbox messages',
-        registry=REGISTRY)
-    gauge.inc()
-
-
-def push_to_prometheus_number_of_inbox_messages(num):
-    gauge = Gauge(
-        'briefkasten_watchdog_number_of_inbox_messages',
-        'Number of messages in the watchdog IMAP INBOX',
-        registry=REGISTRY)
-    gauge.set(num)
 
 
 def default_config():
@@ -244,7 +232,7 @@ def once(config):
                 if success or attempts >= int(config['max_attempts']):
                     break
                 log.info("Retrying fetching %s" % token)
-            push_to_prometheus_number_of_inbox_messages(number_of_messages)
+            inbox_count.set(number_of_messages)
 
             # check for failed test submissions
             now = datetime.now()
@@ -266,9 +254,11 @@ def once(config):
                         % (token, timestamp, max_process_secs),
                     )
                 )
-        push_to_prometheus_success(errors)
         if errors:
             log.error(errors)
+        else:
+            log.info("No Errors were found, pushing success to prometheus/")
+            last_success.set_to_current_time()
         return errors
     finally:
         push_to_prometheus(config)
