@@ -40,6 +40,14 @@
     group: wheel
     mode: "6555"
 
+- name: ensure letsencrypt directory exists
+  file:
+    path: /letsencrypt
+    state: directory
+    owner: acme
+    group: wheel
+    mode: "0775"
+
 - name: ensure certs directory exists
   file:
     path: /usr/local/etc/nginx/certs
@@ -63,7 +71,7 @@
     creates: /usr/local/etc/nginx/briefkasten.key
 
 - name: install cronjob to run check and renew sites automatically
-  copy:
+  template:
     src: acme_crontab
     dest: /var/cron/tabs/acme
     owner: root
