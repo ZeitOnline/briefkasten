@@ -165,7 +165,7 @@ def push_to_prometheus(config):
         registry=REGISTRY)
 
 
-def push_to_prometheus_success(errors, config):
+def push_to_prometheus_success(errors):
     if len(errors) > 0:
         return
     log.info("No Errors were found, pushing success to prometheus/")
@@ -271,7 +271,7 @@ def once(config):
             log.error(errors)
         return errors
     finally:
-        push_to_gateway(config)
+        push_to_prometheus(config)
 
 
 @click.command(help="Performs a test submission and checks it arrived")
