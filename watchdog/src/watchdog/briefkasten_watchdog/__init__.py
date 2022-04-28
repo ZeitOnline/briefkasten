@@ -213,53 +213,55 @@ def config_from_env(prefix="BKWD_"):
 
 
 def once(config):
-    # perform test submission
-    log.debug("Performing test submissions against {app_url}".format(**config))
-    token, timestamp, errors = perform_submission(
-        app_url=config["app_url"], testing_secret=config["testing_secret"]
-    )
-    log.info("Created drop with token %s" % token)
-    # fetch submissions from mail server
-    if token is not None:
-        log.debug("Fetching previous submissions from IMAP server")
-        attempts = 0
-        while True:
-            log.info("Waiting {retry_seconds} seconds".format(**config))
-            sleep(int(config["retry_seconds"]))
-            success, number_of_messages = fetch_test_submissions(config, token)
-            attempts += 1
-            if success or attempts >= int(config['max_attempts']):
-                break
-            log.info("Retrying fetching %s" % token)
-        inbox_count.set(number_of_messages)
+    try:
+        # perform test submission
+        log.debug("Performing test submissions against {app_url}".format(**config))
+        token, timestamp, errors = perform_submission(
+            app_url=config["app_url"], testing_secret=config["testing_secret"]
+        )
+        log.info("Created drop with token %s" % token)
+        # fetch submissions from mail server
+        if token is not None:
+            log.debug("Fetching previous submissions from IMAP server")
+            attempts = 0
+            while True:
+                log.info("Waiting {retry_seconds} seconds".format(**config))
+                sleep(int(config["retry_seconds"]))
+                success, number_of_messages = fetch_test_submissions(config, token)
+                attempts += 1
+                if success or attempts >= int(config['max_attempts']):
+                    break
+                log.info("Retrying fetching %s" % token)
+            inbox_count.set(number_of_messages)
 
-        # check for failed test submissions
-        now = datetime.now()
-        age = now - timestamp
-        max_process_secs = int(config['max_process_secs'])
-        if success and age.seconds > max_process_secs:
-            errors.append(
-                WatchdogError(
-                    subject="Submission '%s' not received in time" % token,
-                    message=u"The submission with token %s submitted on %s was received, but it took %d seconds instead of %d."
-                    % (token, timestamp, age.seconds, max_process_secs),
+            # check for failed test submissions
+            now = datetime.now()
+            age = now - timestamp
+            max_process_secs = int(config['max_process_secs'])
+            if success and age.seconds > max_process_secs:
+                errors.append(
+                    WatchdogError(
+                        subject="Submission '%s' not received in time" % token,
+                        message=u"The submission with token %s submitted on %s was received, but it took %d seconds instead of %d."
+                        % (token, timestamp, age.seconds, max_process_secs),
+                    )
                 )
-            )
-        if not success:
-            errors.append(
-                WatchdogError(
-                    subject="Submission '%s' not received" % token,
-                    message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
-                    % (token, timestamp, max_process_secs),
+            if not success:
+                errors.append(
+                    WatchdogError(
+                        subject="Submission '%s' not received" % token,
+                        message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
+                        % (token, timestamp, max_process_secs),
+                    )
                 )
-            )
-    if errors:
-        log.error(errors)
-    else:
-        log.info("No Errors were found, pushing success to prometheus/")
-        last_success.set_to_current_time()
-    push_to_prometheus(config)
-    return errors
+        if errors:
+            log.error(errors)
+        else:
+            log.info("No Errors were found, pushing success to prometheus/")
+            last_success.set_to_current_time()
+        return errors
+    finally:
+        push_to_prometheus(config)
 
 
 @click.command(help="Performs a test submission and checks it arrived")
