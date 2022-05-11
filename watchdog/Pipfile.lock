@@ -30,11 +30,11 @@
         },
         "click": {
             "hashes": [
-                "sha256:24e1a4a9ec5bf6299411369b208c1df2188d9eb8d916302fe6bf03faed227f1e",
-                "sha256:479707fe14d9ec9a0757618b7a100a0ae4c4e236fac5b7f80ca68028141a1a72"
+                "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e",
+                "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"
             ],
-            "markers": "python_full_version >= '3.7.0'",
-            "version": "==8.1.2"
+            "markers": "python_version >= '3.7'",
+            "version": "==8.1.3"
         },
         "cssselect": {
             "hashes": [
@@ -207,11 +207,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:26ead7d1f93efc0f8c804d9fafafbe4a44b179580a7105754b245155f9af05a8",
-                "sha256:47c7b0c0f8fc10eec4cf1e71c6fdadf8decaa74ffa087e68cd1c20db7ad6a592"
+                "sha256:5534570b9980fc650d45c62877ff603c7aaaf24893371708736cc016bd221c3c",
+                "sha256:ca6ba73b7fd5f734ae70ece8c4c1f7062b07f3352f6428f6277e27c8f5c64237"
             ],
             "index": "pypi",
-            "version": "==62.1.0"
+            "version": "==62.2.0"
         },
         "six": {
             "hashes": [
@@ -223,11 +223,11 @@
         },
         "soupsieve": {
             "hashes": [
-                "sha256:0bcc6d7432153063e3df09c3ac9442af3eba488715bfcad6a4c38ccb2a523124",
-                "sha256:a714129d3021ec17ce5be346b1007300558b378332c289a1a20e7d4de6ff18a5"
+                "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759",
+                "sha256:fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2.3.2"
+            "version": "==2.3.2.post1"
         },
         "transaction": {
             "hashes": [
@@ -256,7 +256,7 @@
                 "sha256:c549f5b2b4afd44d9d97d7cec79f3ef581e25d832827f415dc175327af674aa8",
                 "sha256:e2e60576cf14a1539da79f7b7ee1e79a71e64f366a0b47db54a15e971f57bb16"
             ],
-            "markers": "python_full_version >= '3.7.0'",
+            "markers": "python_version >= '3.7'",
             "version": "==2.1.1"
         },
         "webob": {
@@ -281,14 +281,6 @@
                 "sha256:37ab414dc568aba8c1fb0660885d05ab7ddde0a3460af90fea415afcdd7dfca8"
             ],
             "version": "==0.5.1"
-        },
-        "zope-testbrowser": {
-            "hashes": [
-                "sha256:035bf63d9f7244e885786c3327448a7d9fff521dba596429698b8474961b05e7",
-                "sha256:4246bb2adeed820f6eb89d04d7b97c6513ea275c5eb1776beeaac35d85130b81"
-            ],
-            "index": "pypi",
-            "version": "==5.6.1"
         },
         "zope.cachedescriptors": {
             "hashes": [
@@ -375,6 +367,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==6.2.0"
+        },
+        "zope.testbrowser": {
+            "hashes": [
+                "sha256:035bf63d9f7244e885786c3327448a7d9fff521dba596429698b8474961b05e7",
+                "sha256:4246bb2adeed820f6eb89d04d7b97c6513ea275c5eb1776beeaac35d85130b81"
+            ],
+            "index": "pypi",
+            "version": "==5.6.1"
         }
     },
     "develop": {
@@ -395,11 +395,11 @@
         },
         "pygments": {
             "hashes": [
-                "sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65",
-                "sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"
+                "sha256:5eb116118f9612ff1ee89ac96437bb6b49e8f04d8a13b514ba26f620208e26eb",
+                "sha256:dc9c10fb40944260f6ed4c688ece0cd2048414940f1cea51b8b226318411c519"
             ],
-            "markers": "python_version >= '3.5'",
-            "version": "==2.11.2"
+            "markers": "python_version >= '3.6'",
+            "version": "==2.12.0"
         },
         "pyrepl": {
             "hashes": [
