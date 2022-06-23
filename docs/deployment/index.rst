@@ -253,3 +253,33 @@ When visiting the page, enter some text into the form and add one or more attach
 You should then see a success message along with a link to the feedback page for this submission.
 
 In addition each editor email configured in ``ploy.conf`` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
+
+Get a python2 ploy instance with Docker
+---------------------------------------
+Copy the briefkasten folder from the briefkaste-config repository into your briefkasten repository because the later build process with `make` includes `pip install` which requires
+the Pipfile under `/briefkasten/watchdog/Pipfile`
+If both repositories are siblings in your projects folder (like the local deployment describes it) you want to excecute::
+
+    $ cp -r  ../briefkasten/ .
+
+Although copy your lokal SSH key, you can do it by::
+
+    $ cp -r ~/.ssh .ssh
+
+Build the image::
+
+    $ docker build -t briefkasten-ploy .
+
+Run the container::
+
+    $ docker run -it briefkasten-ploy  /bin/bash
+    root@79ff1e75dc8b:/briefkasten/deployment#
+
+Start the ssh agent and add your key::
+
+    # ssh-agent /bin/bash
+    # ssh-add ~/.ssh/id_rsa
+
+Be sure, that `.ssh/config` is not configuring UserName to your user, cause Ploy will use your key as root.
+
+    # venv/bin/ploy ssh briefkasten-webserver
