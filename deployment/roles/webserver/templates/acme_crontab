@@ -1,3 +1,3 @@
 #Ansible: check and update outdated letsencrypt certs
 PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
-@weekly /usr/local/sbin/acme.sh --cron --home /var/db/acme/.acme.sh --issue -w /letsencrypt -d {{ploy_fqdn}} --force --reloadcmd "/usr/local/bin/reload-nginx" && sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt --reloadcmd 'sudo /usr/local/bin/reload-nginx'"
+@weekly sudo -u acme /usr/local/sbin/acme.sh --home /var/db/acme/.acme.sh --issue -w /letsencrypt -d {{ploy_fqdn}} --force --reloadcmd "/usr/local/bin/reload-nginx" && sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt --reloadcmd 'sudo /usr/local/bin/reload-nginx'"

@@ -33,6 +33,22 @@
     chdir: "{{apphome}}"
     creates: "{{apphome}}/bin/python"
 
+- name: create .pip directory
+  file:
+    path: "~/.pip"
+    state: directory
+    owner: "root"
+    mode: "775"
+  tags: update-briefkasten
+
+- name: upload pip.conf
+  copy:
+    src: pip.conf
+    dest: "~/.pip/pip.conf"
+    owner: "root"
+    mode: "644"
+  tags: update-briefkasten
+
 - name: upload requirements
   copy:
     src: requirements.txt

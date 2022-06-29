@@ -6,7 +6,7 @@
 # 2. Copy your ssh folder like `~/.ssh .ssh`
 FROM ubuntu:20.04
 RUN apt-get update
-RUN apt-get install -y python2 make tox python-crypto python-dev openssh-client build-essential vim
+RUN apt-get install -y python2 make tox python-crypto python-dev openssh-client build-essential
 COPY .ssh /root/.ssh
 COPY . /briefkasten
 WORKDIR /briefkasten/deployment
