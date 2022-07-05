@@ -18,6 +18,7 @@ class CustomSMTP(SMTP):
     def begin(self):
         """ connects and optionally authenticates a connection."""
         self.connect(self.host, self.port)
+        self.helo()
         if self.user:
             self.starttls()
             self.login(self.user, self.password)
