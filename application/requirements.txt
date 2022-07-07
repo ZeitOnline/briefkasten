@@ -13,7 +13,7 @@ pyramid-chameleon==0.3
 pyramid==2.0
 python-gnupg==0.4.8
 repoze.lru==0.7
-repoze.xmliter==0.6
+repoze.xmliter==0.6.1
 translationstring==1.4
 venusian==3.0.0
 watchdog==2.1.6
