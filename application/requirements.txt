@@ -1,4 +1,4 @@
-Chameleon==3.9.1
+Chameleon==3.10.1
 colander==1.8.3
 cssselect==1.1.0
 diazo==1.4.2
@@ -11,7 +11,7 @@ PasteDeploy==2.1.1
 peppercorn==0.6
 pyramid-chameleon==0.3
 pyramid==2.0
-python-gnupg==0.4.8
+python-gnupg==0.4.9
 repoze.lru==0.7
 repoze.xmliter==0.6.1
 translationstring==1.4
