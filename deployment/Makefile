@@ -1,43 +1,43 @@
 build = true
 use_pypi = false
 
-venv/bin/ploy:
-	tox -e develop --notest
+default:
+	@echo Please explicitly select one of the targets.
 
-bootstrap: venv/bin/ploy
-	venv/bin/ploy bootstrap briefkasten
+bootstrap:
+	ploy bootstrap briefkasten
 
-configure-host: venv/bin/ploy
-	venv/bin/ploy configure briefkasten
+configure-host:
+	ploy configure briefkasten
 
-start-jails: venv/bin/ploy
-	venv/bin/ploy start briefkasten-worker
-	venv/bin/ploy start briefkasten-webserver
-	venv/bin/ploy start briefkasten-appserver
-	venv/bin/ploy start briefkasten-cleanser
+start-jails:
+	ploy start briefkasten-worker
+	ploy start briefkasten-webserver
+	ploy start briefkasten-appserver
+	ploy start briefkasten-cleanser
 
 configure-jails:
-	venv/bin/ploy playbook main.yml
+	ploy playbook main.yml
 
-upload-pgp-keys: venv/bin/ploy
-	venv/bin/ploy do briefkasten-worker upload_pgp_keys
-	venv/bin/ploy playbook main.yml -t update-config -t update-pgp
+upload-pgp-keys:
+	ploy do briefkasten-worker upload_pgp_keys
+	ploy playbook main.yml -t update-config -t update-pgp
 
-reset-host: venv/bin/ploy
-	venv/bin/ploy do briefkasten reset_jails
+reset-host:
+	ploy do briefkasten reset_jails
 
-login-devpi: venv/bin/ploy
-	venv/bin/ploy do briefkasten-appserver login_devpi user=briefkasten
+login-devpi:
+	ploy do briefkasten-appserver login_devpi user=briefkasten
 
-update-app: venv/bin/ploy
-	venv/bin/ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
-	venv/bin/ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
+update-app:
+	ploy do briefkasten-worker update_backend build=$(build) use_pypi=$(use_pypi)
+	ploy do briefkasten-appserver update_backend build=false use_pypi=$(use_pypi)
 
-update-theme: venv/bin/ploy
-	venv/bin/ploy do briefkasten-appserver upload_theme
+update-theme:
+	ploy do briefkasten-appserver upload_theme
 
-update-config: venv/bin/ploy
-	venv/bin/ploy playbook main.yml -t update-config -t update-pgp
+update-config:
+	ploy playbook main.yml -t update-config -t update-pgp
 
 clean:
 	git clean -fXd

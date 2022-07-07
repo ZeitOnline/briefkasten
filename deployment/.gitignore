@@ -1,10 +1,4 @@
-/.tox/
-/venv/
-/bin/
 /etc
-/etc.*
-/include/
-/lib/
 /src/
 /share
 /host
