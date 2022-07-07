@@ -5,9 +5,9 @@
 # added in https://github.com/ZeitOnline/briefkasten-config/commit/05e9da7c
 
 docker build -t briefkasten-ploy .
-docker run -it \
-	-v $PWD:/briefkasten \
-	-v $PWD/../../etc:/briefkasten/etc \
+docker run --interactive --tty \
+	--volume $PWD:/briefkasten \
+	--volume $PWD/../../etc:/briefkasten/etc \
 	--volume /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock:ro \
 	--env SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
 	briefkasten-ploy
