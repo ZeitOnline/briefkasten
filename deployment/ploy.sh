@@ -8,4 +8,6 @@ docker build -t briefkasten-ploy .
 docker run -it \
 	-v $PWD:/briefkasten \
 	-v $PWD/../../etc:/briefkasten/etc \
+	--volume /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock:ro \
+	--env SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
 	briefkasten-ploy
