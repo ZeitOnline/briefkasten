@@ -6,6 +6,9 @@
 # 2. Copy your ssh folder like `~/.ssh .ssh`
 FROM ubuntu:20.04
 RUN apt-get update
-RUN apt-get install -y python2 make tox python-crypto python-dev openssh-client build-essential
+RUN apt-get install -y python2 pipenv python-crypto python-dev openssh-client build-essential
+COPY Pipfile Pipfile.lock /briefkasten/
 WORKDIR /briefkasten
-CMD ["bash"]
+ENV SHELL=/bin/bash
+RUN pipenv sync
+CMD pipenv shell --fancy
