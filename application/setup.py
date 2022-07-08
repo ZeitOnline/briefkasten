@@ -47,7 +47,7 @@ setup(
     ],
     extras_require={
         'development': [
-            'tox<3.0',
+            'tox<4.0',
         ],
     },
     entry_points="""
