@@ -1,11 +1,17 @@
-0.3.6 - Unreleased
+0.3.7 - Unreleased
 ------------------
 
 - MAINT: Remove obsolete deployment data for 'watchdog'
 
+- MAINT: Update python library dependencies
+
 - ZO-1506: Use 'pipenv' to install 'ploy'
 
 - ZO-1542: Let's say "hello" first
+
+
+0.3.6 - 2022-06-21
+------------------
 
 - ZO-1465: Install new certificate in crontab
 
