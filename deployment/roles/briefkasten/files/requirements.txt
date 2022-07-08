@@ -4,9 +4,11 @@ cssselect==1.1.0
 diazo==1.4.2
 future==0.18.2
 iso8601==1.0.2
+itsdangerous==2.0.1
 lxml==4.9.1
 Paste==3.5.0
 PasteDeploy==2.1.1
+peppercorn==0.6
 pyramid-chameleon==0.3
 pyramid==2.0
 python-gnupg==0.4.9
@@ -14,6 +16,7 @@ repoze.lru==0.7
 repoze.xmliter==0.6.1
 translationstring==1.4
 venusian==3.0.0
+watchdog==2.1.6
 WebOb==1.8.7
 zope.deprecation==4.4.0
 zope.interface==5.4.0
