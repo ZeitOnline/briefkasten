@@ -1,9 +1,23 @@
 0.3.6 - Unreleased
 ------------------
 
+- MAINT: Remove obsolete deployment data for 'watchdog'
+
+- ZO-1506: Use 'pipenv' to install 'ploy'
+
+- ZO-1542: Let's say "hello" first
+
+- ZO-1465: Install new certificate in crontab
+
+- ZO-1206: Adds task to renew certificate
+
+- ZO-1182: Collects metrics in one registry and push them once to prometheus
+
 - ZO-1182: Adds metrics for monitoring watchdog test deliveries
 
 - MAINT: Set up code scanning via CodeQL Analysis
+
+- MAINT: Update python library dependencies
 
 - MAINT: Update `cryptography` to avoid error about "loading libcrypto in an unsafe way"
 
