@@ -18,9 +18,3 @@ updates:
     interval: "daily"
   commit-message:
     prefix: "MAINT:"
-- package-ecosystem: "pip"
-  directory: "/deployment/roles/watchdog/files"
-  schedule:
-    interval: "daily"
-  commit-message:
-    prefix: "MAINT:"
