@@ -9,26 +9,6 @@
     - update-app
     - update-config
 
-- name: create .pip directory
-  file:
-    path: "~/.pip"
-    state: directory
-    owner: "root"
-    mode: "775"
-  tags:
-    - update-app
-    - update-config
-
-- name: upload pip.conf
-  copy:
-    src: pip.conf
-    dest: "~/.pip/pip.conf"
-    owner: "root"
-    mode: "644"
-  tags:
-    - update-app
-    - update-config
-
 - name: ensure theme directory exists
   file:
     dest: "{{themes_dir}}/{{ploy_theme_name}}"
