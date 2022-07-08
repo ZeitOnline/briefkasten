@@ -1,4 +1,4 @@
-0.3.7 - Unreleased
+0.3.7 - 2022-07-08
 ------------------
 
 - MAINT: Remove obsolete deployment data for 'watchdog'
