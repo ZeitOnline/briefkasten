@@ -23,8 +23,3 @@ application_port: 6543
 # cleansers
 ploy_cleanser_count: 5
 ploy_cleanser_ssh_baseport: 100
-
-# watchdog
-watchdog_app_dir: /usr/local/watchdog
-watchdog_app_user: pyramid
-
