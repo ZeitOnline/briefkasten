@@ -1,3 +1,9 @@
+0.3.8 - Unreleased
+------------------
+
+- MAINT: Update python library dependencies
+
+
 0.3.7 - 2022-07-08
 ------------------
 
