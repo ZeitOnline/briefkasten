@@ -18,14 +18,6 @@
   command: zpool upgrade tank 
   tags: zfs-layout 
 
-- name: Ensure basejail etc exists
-  file:
-    path: "{{ jails_dir }}/newjail/etc/pkg/repos"
-    state: directory
-  tags: poudriere
-
-- { include: poudriere.yml, tags: poudriere, when: "{{ ploy_use_custom_pkg_repository }}" }
-
 - name: Make sure temporary files are cleared during startup
   sysrc:
     name: clear_tmp_enable

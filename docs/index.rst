@@ -11,7 +11,6 @@ This section contains all the information on how to install, configure and run y
 
    deployment/index
    deployment/monitoring
-   deployment/build-infrastructure
 
 
 Application
