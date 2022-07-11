@@ -23,7 +23,7 @@ python-gnupg==0.4.9
 PyYAML==6.0
 repoze.lru==0.7
 repoze.xmliter==0.6.1
-six==1.14.0
+six==1.16.0
 translationstring==1.4
 venusian==3.0.0
 watchdog==2.1.9
