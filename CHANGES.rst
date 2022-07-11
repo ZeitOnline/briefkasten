@@ -1,6 +1,14 @@
 0.3.8 - Unreleased
 ------------------
 
+- MAINT: Upgrade OS to 12.3-RELEASE
+
+- MAINT: Switch to "webroot mode" as the default ACME mode
+
+- MAINT: Remove obsolete 'poudriere' setup
+    
+- MAINT: Add missing dependencies
+
 - MAINT: Update python library dependencies
 
 
