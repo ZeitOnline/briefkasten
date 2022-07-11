@@ -26,12 +26,6 @@
     owner: acme
     state: touch
 
-- name: request initial certificate (this may take a while)
-  command: "sudo -u acme /usr/local/sbin/acme.sh --issue --dns dns_nsupdate --dnssleep 5 -d {{ploy_fqdn}} --domain-alias {{ploy_acme_domain}}"
-  args:
-    chdir: /var/db/acme
-    creates: "/var/db/acme/certs/{{ploy_fqdn}}/fullchain.cer"
-
 - name: upload nginx reload script
   copy:
     src: reload-nginx.sh
@@ -65,10 +59,17 @@
     mode: "644"
     validate: "visudo -cf %s"
 
-- name: install certificate
-  command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt --reloadcmd 'sudo /usr/local/bin/reload-nginx'"
+- name: request initial certificate (this may take a while)
+  command: "sudo -u acme /usr/local/sbin/acme.sh --server letsencrypt --issue --webroot /letsencrypt --domain {{ploy_fqdn}} --home /var/db/acme/.acme.sh"
   args:
-    creates: /usr/local/etc/nginx/briefkasten.key
+    chdir: /var/db/acme
+    creates: "/var/db/acme/certs/{{ploy_fqdn}}/fullchain.cer"
+
+- name: install certificate
+  command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt"
+  args:
+    creates: /usr/local/etc/nginx/certs/briefkasten.key
+  notify: restart nginx
 
 - name: install cronjob to run check and renew sites automatically
   template:

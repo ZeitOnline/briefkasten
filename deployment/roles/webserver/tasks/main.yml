@@ -12,11 +12,12 @@
     src: nginx.conf
     dest: /usr/local/etc/nginx/nginx.conf
 
-- { include: ssl.yml, when: "not {{ ploy_use_acme }}" }
-- { include: acme.yml, tags: acme, when: "{{ ploy_use_acme }}" }
+- { include: ssl.yml }
 
 - name: make sure nginx is running or reloaded
   service:
     name: nginx
     state: started
     enabled: true
+
+- { include: acme.yml, tags: acme, when: "{{ ploy_use_acme }}" }
