@@ -50,6 +50,17 @@
     group: wheel
     mode: "0775"
 
+- name: ensure cert & key permissions
+  file:
+    path: "/usr/local/etc/nginx/certs/{{ item }}"
+    state: touch
+    owner: acme
+    group: wheel
+    mode: "644"
+  with_items:
+    - briefkasten.crt
+    - briefkasten.key
+
 - name: let acme user reload nginx
   copy:
     src: acme
@@ -67,8 +78,6 @@
 
 - name: install certificate
   command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt"
-  args:
-    creates: /usr/local/etc/nginx/certs/briefkasten.key
   notify: restart nginx
 
 - name: install cronjob to run check and renew sites automatically
