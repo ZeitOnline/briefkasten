@@ -4,7 +4,7 @@ colander==1.8.3
 cssselect==1.1.0
 diazo==1.4.2
 future==0.18.2
-humanfriendly==8.2
+humanfriendly==10.0
 hupper==1.10.3
 iso8601==1.0.2
 itsdangerous==2.1.2
