@@ -6,15 +6,24 @@ updates:
     interval: "daily"
   commit-message:
     prefix: "MAINT:"
+  labels:
+  - "dependencies"
+  - "team-zoe"
 - package-ecosystem: "pip"
   directory: "/watchdog"
   schedule:
     interval: "daily"
   commit-message:
     prefix: "MAINT:"
+  labels:
+  - "dependencies"
+  - "team-zoe"
 - package-ecosystem: "pip"
   directory: "/deployment/roles/briefkasten/files"
   schedule:
     interval: "daily"
   commit-message:
     prefix: "MAINT:"
+  labels:
+  - "dependencies"
+  - "team-zoe"
