@@ -1,0 +1,22 @@
+name: Trigger docs main build
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+      - '.github/workflow/docs-trigger-build.yaml'
+
+jobs:
+  trigger:
+    name: Trigger
+    runs-on: [self-hosted,linux]
+
+    steps:
+      - name: Trigger Repository Dispatch in docs
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PRIVATE_REPO_ACCESS_PAT }}
+          repository: ZeitOnline/docs
+          event-type: module-commit
+          client-payload: '{"repo": "${{ github.repository }}", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+
