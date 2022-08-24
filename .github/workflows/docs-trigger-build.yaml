@@ -4,12 +4,13 @@ on:
   push:
     paths:
       - 'docs/**'
-      - '.github/workflow/docs-trigger-build.yaml'
+      - '.github/workflows/docs-trigger-build.yaml'
 
 jobs:
   trigger:
     name: Trigger
     runs-on: [self-hosted,linux]
+    if: contains(github.repository, 'ZeitOnline')
 
     steps:
       - name: Trigger Repository Dispatch in docs
