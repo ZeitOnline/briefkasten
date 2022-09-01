@@ -2,9 +2,12 @@ name: Trigger docs main build
 
 on:
   push:
+    branches:
+      - main
+      - master
     paths:
-      - 'docs/**'
-      - '.github/workflows/docs-trigger-build.yaml'
+      - docs/**
+      - .github/workflows/docs-trigger-build.yaml
 
 jobs:
   trigger:
