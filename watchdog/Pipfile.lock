@@ -21,7 +21,7 @@
                 "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30",
                 "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"
             ],
-            "markers": "python_full_version >= '3.6.0'",
+            "markers": "python_version >= '3.6'",
             "version": "==4.11.1"
         },
         "briefkasten-watchdog": {
@@ -33,7 +33,7 @@
                 "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e",
                 "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"
             ],
-            "markers": "python_full_version >= '3.7.0'",
+            "markers": "python_version >= '3.7'",
             "version": "==8.1.3"
         },
         "cssselect": {
@@ -186,7 +186,7 @@
                 "sha256:45431b387587ed0fac6213b54d6e9f0936f0cc85238a8f5af7852fc9484c5c77",
                 "sha256:de7f097fa2fa43bead1f690761e56594d24954ae7dc7cbf69a5d84bb75c5a099"
             ],
-            "markers": "python_full_version >= '3.6.0'",
+            "markers": "python_version >= '3.6'",
             "version": "==2.0"
         },
         "pyramid-mailer": {
@@ -216,11 +216,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:101bf15ca723beef42c8db91a761f3748d4d697e17fae904db60c0b619d8d094",
-                "sha256:39275e7aafa4a4f0f4308f2302c6ee384dcdacdbaacc1e30dcbb6fd824c625bb"
+                "sha256:a8f6e213b4b0661f590ccf40de95d28a177cd747d098624ad3f69c40287297e9",
+                "sha256:c2d2709550f15aab6c9110196ea312f468f41cd546bceb24127a1be6fdcaeeb1"
             ],
             "index": "pypi",
-            "version": "==65.0.2"
+            "version": "==65.4.0"
         },
         "six": {
             "hashes": [
@@ -235,7 +235,7 @@
                 "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759",
                 "sha256:fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"
             ],
-            "markers": "python_full_version >= '3.6.0'",
+            "markers": "python_version >= '3.6'",
             "version": "==2.3.2.post1"
         },
         "transaction": {
@@ -265,7 +265,7 @@
                 "sha256:7500c9625927c8ec60f54377d590f67b30c8e70ef4b8894214ac6e4cad233d2a",
                 "sha256:780a4082c5fbc0fde6a2fcfe5e26e6efc1e8f425730863c04085769781f51eba"
             ],
-            "markers": "python_full_version >= '3.7.0'",
+            "markers": "python_version >= '3.7'",
             "version": "==2.1.2"
         },
         "webob": {
@@ -281,7 +281,7 @@
                 "sha256:2a001a9efa40d2a7e5d9cd8d1527c75f41814eb6afce2c3d207402547b1e5ead",
                 "sha256:54bd969725838d9861a9fa27f8d971f79d275d94ae255f5c501f53bb6d9929eb"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.6.0'",
+            "markers": "python_version >= '3.6' and python_version < '4'",
             "version": "==3.0.0"
         },
         "wsgiproxy2": {
@@ -301,10 +301,10 @@
         },
         "zope.cachedescriptors": {
             "hashes": [
-                "sha256:1f4d1a702f2ea3d177a1ffb404235551bb85560100ec88e6c98691734b1d194a",
-                "sha256:ebf5d6768a7ef0a9e59bdc8a5416ce0e0ae2df86817bdb3b352defc410c9bf6d"
+                "sha256:d45c487486f7df81f2992f1a00912624bf77259d83c5d98aa76b678716e3d11a",
+                "sha256:f798725081d3b760c3f60691cfb44751186994bbd66f799bb60ce908c7ad6149"
             ],
-            "version": "==4.3.1"
+            "version": "==4.4"
         },
         "zope.deprecation": {
             "hashes": [
@@ -379,11 +379,11 @@
         },
         "zope.schema": {
             "hashes": [
-                "sha256:03150d8670549590b45109e06b7b964f4e751fa9cb5297ec4985c3bc38641b07",
-                "sha256:2201aef8ad75ee5a881284d7a6acd384661d6dca7bde5e80a22839a77124595b"
+                "sha256:843c6fce13886333f707246f135a832f4408555ca9650f07ed6e4d429302f349",
+                "sha256:e3b33c8bc8ba9d85a56713ab8f0a3c2615d54a8085f1e415ce0c8dfb5e540be6"
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==6.2.0"
+            "version": "==6.2.1"
         }
     },
     "develop": {
