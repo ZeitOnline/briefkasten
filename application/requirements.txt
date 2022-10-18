@@ -12,7 +12,7 @@ Jinja2==3.1.2
 lxml==4.9.1
 MarkupSafe==2.1.1
 Paste==3.5.1
-PasteDeploy==2.1.1
+PasteDeploy==3.0.1
 pathtools==0.1.2
 peppercorn==0.6
 plaster-pastedeploy==0.7
