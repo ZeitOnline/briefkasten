@@ -4,8 +4,10 @@ import re
 import sys
 from imapclient import IMAPClient
 from datetime import datetime
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from json import load
 from os import environ, path
-from time import sleep
+from signal import alarm
 from zope.testbrowser.browser import Browser
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from pyquery import PyQuery
@@ -105,6 +107,20 @@ def perform_submission(app_url, testing_secret):
             )
         )
     return token, now, errors
+
+
+def receive_test_submissions(target_token):
+    """ Receive a test mail via MailJet's "Parse API" webhook (ee
+        https://dev.mailjet.com/email/guides/parse-api/). The mail must
+        contain the expected submission token. """
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            payload = load(self.rfile)
+            log.info('Received mail from {From}: "{Subject}"'.format(**payload))
+            assert target_token in payload['Subject']
+
+    with HTTPServer(('', 8000), Handler) as httpd:
+        httpd.handle_request()
 
 
 def fetch_test_submissions(config, target_token):
@@ -222,31 +238,12 @@ def once(config):
         log.info("Created drop with token %s" % token)
         # fetch submissions from mail server
         if token is not None:
-            log.debug("Fetching previous submissions from IMAP server")
-            attempts = 0
-            while True:
-                log.info("Waiting {retry_seconds} seconds".format(**config))
-                sleep(int(config["retry_seconds"]))
-                success, number_of_messages = fetch_test_submissions(config, token)
-                attempts += 1
-                if success or attempts >= int(config['max_attempts']):
-                    break
-                log.info("Retrying fetching %s" % token)
-            inbox_count.set(number_of_messages)
-
-            # check for failed test submissions
-            now = datetime.now()
-            age = now - timestamp
             max_process_secs = int(config['max_process_secs'])
-            if success and age.seconds > max_process_secs:
-                errors.append(
-                    WatchdogError(
-                        subject="Submission '%s' not received in time" % token,
-                        message=u"The submission with token %s submitted on %s was received, but it took %d seconds instead of %d."
-                        % (token, timestamp, age.seconds, max_process_secs),
-                    )
-                )
-            if not success:
+            log.info(f"Waiting {max_process_secs} seconds")
+            alarm(max_process_secs)
+            try:
+                receive_test_submissions(token)
+            except AssertionError:
                 errors.append(
                     WatchdogError(
                         subject="Submission '%s' not received" % token,
