@@ -1,8 +1,6 @@
 import click
 import logging
-import re
 import sys
-from imapclient import IMAPClient
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from json import load
@@ -14,7 +12,7 @@ from pyquery import PyQuery
 
 import configparser as configparser
 
-find_drop_id = re.compile("Drop\W(\w+)\s.*")
+
 log = logging.getLogger(__name__)
 
 REGISTRY = CollectorRegistry()
@@ -22,16 +20,6 @@ REGISTRY = CollectorRegistry()
 last_success = Gauge(
     'job_last_briefkasten_watchdog_success_unixtime',
     'Last time a briefkasten watchdog job successfully finished',
-    registry=REGISTRY)
-
-fetch_errors = Gauge(
-    'briefkasten_watchdog_imap_fetch_error',
-    'Can not fetch imap inbox messages',
-    registry=REGISTRY)
-
-inbox_count = Gauge(
-    'briefkasten_watchdog_number_of_inbox_messages',
-    'Number of messages in the watchdog IMAP INBOX',
     registry=REGISTRY)
 
 
@@ -121,73 +109,6 @@ def receive_test_submissions(target_token):
 
     with HTTPServer(('', 8000), Handler) as httpd:
         httpd.handle_request()
-
-
-def fetch_test_submissions(config, target_token):
-    """ fetch emails from IMAP server using the given configuration
-        each email is parsed to see whether it matches a submission
-        if so, its token is extracted and checked against the given
-        one.
-        if found, the email is deleted from the server and True is returned
-    """
-    from distutils import util
-    use_ssl = bool(util.strtobool(config.get('imap_ssl', True)))
-    server = IMAPClient(
-        config["imap_host"], port=int(config.get("imap_port", 143)), use_uid=True, ssl=use_ssl,
-    )
-    server.login(config["imap_user"], config["imap_passwd"])
-    server.select_folder("INBOX")
-    try:
-        candidates = server.fetch(
-            server.search(criteria='NOT DELETED SUBJECT "Drop"'),
-            ["BODY[HEADER.FIELDS (SUBJECT)]"],
-        )
-    except Exception:
-        log.warning("IMAP watchdog fetch error")
-        fetch_errors.inc()
-        raise
-
-    number_of_messages = len(candidates.items())
-    success = False
-    for imap_id, message in candidates.items():
-        subject = message.get(b"BODY[HEADER.FIELDS (SUBJECT)]", "Subject: ")
-        try:
-            drop_id = find_drop_id.findall(subject.decode('utf-8'))[0]
-        except IndexError:
-            # ignore emails that are not test submissions
-            continue
-        if drop_id == target_token:
-            server.delete_messages([imap_id])
-            success = True
-            log.info("Success! Found %s" % target_token)
-            break
-    server.logout()
-    return success, number_of_messages
-
-
-def send_error_email(errors, config):
-    if len(errors) == 0:
-        return
-    log.warning("Errors were found.")
-    from pyramid_mailer import mailer_factory_from_settings
-    from pyramid_mailer.message import Message
-    from urllib.parse import urlparse
-
-    mailer = mailer_factory_from_settings(config, prefix="smtp_")
-    hostname = urlparse(config["app_url"]).hostname
-    recipients = [
-        recipient
-        for recipient in config["notify_email"].split()
-        if recipient
-    ]
-    body = "\n".join([str(error) for error in errors])
-    message = Message(
-        subject="[Briefkasten %s] Submission failure" % hostname,
-        sender=config["the_sender"],
-        recipients=recipients,
-        body=body,
-    )
-    mailer.send_immediately(message, fail_silently=False)
 
 
 def push_to_prometheus(config):
