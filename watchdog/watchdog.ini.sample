@@ -1,13 +1,8 @@
 [briefkasten]
 app_url = http://localhost:6543/briefkasten/
 max_process_secs = 60
-imap_recipient = 
-imap_host = 
-imap_user = 
-imap_passwd = 
 testing_secret = 
 the_sender= 
-notify_email = 
 # smtp settings for pyramid_mailer, see
 # http://docs.pylonsproject.org/projects/pyramid_mailer/en/latest/
 smtp_host = localhost
