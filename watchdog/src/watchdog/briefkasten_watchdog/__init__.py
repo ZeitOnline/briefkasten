@@ -3,7 +3,7 @@ import logging
 import sys
 from datetime import datetime
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from json import load
+from json import load, dumps
 from os import environ, path
 from signal import alarm
 from zope.testbrowser.browser import Browser
@@ -105,6 +105,7 @@ def receive_test_submissions(target_token):
         def do_POST(self):
             payload = load(self.rfile)
             log.info('Received mail from {From}: "{Subject}"'.format(**payload))
+            log.info(dumps(payload, sort_keys=True, indent=2))
             assert target_token in payload['Subject']
 
     with HTTPServer(('', 8000), Handler) as httpd:
