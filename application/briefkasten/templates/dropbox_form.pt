@@ -20,7 +20,7 @@
             <input type="file" name="upload">
             <input type="hidden" name="testing_secret" value="" />
             <button id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
-            <label for="submit">Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
+            <label for="submit">Beim Versenden wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
         </form>
     </tal:content>
   </body>
