@@ -20,16 +20,21 @@
             <h1 id="title">Briefkasten</h1>
             <form role="form" id="briefkasten-form">
                 <div class="form-group">
-                    <label for="message">Anonymisierte Nachricht an die Redaktion</label>
                     <textarea id="message" class="form-control" name="message" rows="10" cols="60"></textarea>
+                    <p>
+                    Sie können zusätzlich zur Ihrer Nachricht auch eine Datei an uns schicken.
+                    Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.<br>
+                    </p>
                     <!-- The fileinput-button span is used to style the file input field as button -->
                 </div>
                 <div class="form-group">
                     <span class="btn btn-success fileinput-button">
                         <i class="glyphicon glyphicon-plus"></i>
-                        <span>Datei(en) ausw&auml;hlen...</span>
                         <!-- The file input field used as target for the file upload widget -->
+                        <div>
                         <input id="fileupload" type="file" name="attachment" multiple>
+                        <button class="btn btn-default" id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
+                        </div>
                     </span>
                     <!-- The global progress bar -->
                     <div id="progress" class="progress">
@@ -39,10 +44,6 @@
                     <div id="files" class="files"></div>
                 </div>
                 <input type="hidden" name="testing_secret" value="" />
-                <div class="form-group">
-                    <button class="btn btn-default"id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
-                    <label for="submit">Beim Abschicken und Versenden werden die hochgeladenen Dateien zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
-                </div>
             </form>
         </div>
         <script src="assets/jquery.min.js"></script>
