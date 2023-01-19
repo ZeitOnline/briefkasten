@@ -1,5 +1,9 @@
-0.3.8 - Unreleased
+0.3.8 - 2022-01-18
 ------------------
+
+- MAINT: Make some template form text changes
+
+- MAINT: Fix certificate cronjob
 
 - MAINT: Upgrade OS to 12.3-RELEASE
 
