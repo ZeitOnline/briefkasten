@@ -14,13 +14,20 @@
             accept-charset="utf-8"
             data-fileupload_url='${fileupload_url}'
             action="${action}">
-            <label for="message">Anonymisierte Nachricht an die Redaktion</label>
-            <textarea id="message" name="message" rows="10" cols="60"></textarea>
-            <p>Datei anh&auml;ngen</p>
-            <input type="file" name="upload">
+          <textarea
+            id="message"
+            name="message"
+            rows="10"
+            cols="60"
+            placeholder="Ihre anonymisierte Nachricht an das Investigativteam">
+          </textarea>
+            <p>Sie können zusätzlich zur Ihrer Nachricht auch eine Datei zu uns schicken.
+               Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und
+               anonymisiert and die Redaktion übermittelt.
+            </p>
             <input type="hidden" name="testing_secret" value="" />
+            <input type="file" name="upload">
             <button id="briefkasten-formsubmit" name="submit" type="submit">Abschicken</button>
-            <label for="submit">Beim Versenden wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und anonymisiert an die Redaktion uebermittelt.</label>
         </form>
     </tal:content>
   </body>
