@@ -1,6 +1,12 @@
-0.3.11 - Unreleased
+0.3.12 - Unreleased
 -------------------
 
+
+
+0.3.11 - 2023-01-20
+-------------------
+
+- FIX: Removes whitespaces in textarea
 
 
 0.3.10 - 2023-01-20
