@@ -18,8 +18,7 @@
             id="message"
             name="message"
             rows="10"
-            cols="60">
-          </textarea>
+            cols="60"></textarea>
             <p>Sie können zusätzlich zur Ihrer Nachricht auch eine Datei zu uns schicken.
                Beim Abschicken wird die hochgeladene Datei zusammen mit Ihrer Textnachricht bereinigt und
                anonymisiert and die Redaktion übermittelt.
