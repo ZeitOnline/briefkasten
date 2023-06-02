@@ -1,7 +1,7 @@
 0.3.12 - Unreleased
 -------------------
 
-
+- MAINT: Log submission requests more verbose
 
 0.3.11 - 2023-01-20
 -------------------
