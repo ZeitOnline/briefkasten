@@ -103,12 +103,21 @@ def receive_test_submissions(target_token):
         contain the expected submission token. """
     class Handler(BaseHTTPRequestHandler):
         def do_POST(self):
+            log.info('do_POST')
             payload = load(self.rfile)
             log.info('Received mail from {From}: "{Subject}"'.format(**payload))
             log.info(dumps(payload, sort_keys=True, indent=2))
             assert target_token in payload['Subject']
 
+        def process_request(self, request, client_address):
+            log.info('Finish request on client {}'.format(client_adress))
+            self.finish_request(request, client_address)
+            log.info('Shutdown request')
+            self.shutdown_request(request)
+
+
     with HTTPServer(('', 8000), Handler) as httpd:
+        log.info('HTTPServer handle_request')
         httpd.handle_request()
 
 
