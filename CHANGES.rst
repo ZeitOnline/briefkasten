@@ -1,4 +1,9 @@
-0.3.12 - Unreleased
+0.3.13 - Unreleased
+-------------------
+
+
+
+0.3.12 - 2023-06-02
 -------------------
 
 - MAINT: Log submission requests more verbose
