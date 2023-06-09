@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      target: backend-testing
+    restart: always
+    volumes:
+      - ./testing:/testing
+networks:
+  default: {}

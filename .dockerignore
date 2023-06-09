@@ -1,0 +1,4 @@
+application/**/*.pyc
+application/**/__pycache__/
+application/.tox
+application/venv
