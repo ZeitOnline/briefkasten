@@ -1,0 +1,7 @@
+application/**/*.pyc
+application/**/__pycache__/
+application/*.egg-info/
+application/.eggs/
+application/.tox
+application/build/lib/
+application/venv

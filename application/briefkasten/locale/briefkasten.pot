@@ -88,4 +88,3 @@ msgstr ""
 #: briefkasten/templates/fingerprint.pt:12
 msgid "Submit documents"
 msgstr ""
-

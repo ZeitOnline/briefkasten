@@ -67,8 +67,7 @@ def dropbox_editor_factory(request):
     dropbox = dropbox_factory(request)
     if is_equal(dropbox.editor_token, request.matchdict['editor_token']):
         return dropbox
-    else:
-        raise HTTPNotFound('invalid editor token')
+    raise HTTPNotFound('invalid editor token')
 
 
 def german_locale(request):

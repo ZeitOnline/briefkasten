@@ -93,8 +93,7 @@ def test_message_permissions(dropbox):
 
 def test_editor_token_created(dropbox_container, dropbox):
     assert (dropbox_container.get_dropbox(
-        dropbox.drop_id).editor_token ==
-        open(dropbox.paths_created[1], 'r').readline())
+        dropbox.drop_id).editor_token == open(dropbox.paths_created[1], 'r').readline())
     assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0o660
 
 
@@ -114,7 +113,7 @@ def test_attachment_creation_and_permissions(dropbox_container, drop_id, testing
     assert not dropbox.paths_created[-1].endswith("/attach/attachment.txt")
     # but preserve the file ending
     assert dropbox.paths_created[-1].endswith(".txt")
-    assert open(dropbox.paths_created[-1]).read() == u'Schönen Guten Tag!'  # contents of attachment.txt
+    assert open(dropbox.paths_created[-1]).read() == u'Schönen Guten Tag!\n'  # contents of attachment.txt
 
 
 def test_attachment_creation_outside_container(dropbox_container, drop_id, testing):

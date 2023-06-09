@@ -74,7 +74,7 @@ Create a copy from the provided example::
 
   $ cp etc.sample/plain.conf etc/ploy.conf
 
-If you want to use VirtualBox to try out the installation on a local virtual machine, you can copy ``etc.sample/vbox.conf`` instead, which contains a ready-to-use setup. 
+If you want to use VirtualBox to try out the installation on a local virtual machine, you can copy ``etc.sample/vbox.conf`` instead, which contains a ready-to-use setup.
 
 You will (at least) need to provide values in the ``[ez-master:briefkasten]`` section for the following keys:
 
@@ -241,7 +241,7 @@ In some cases the URL above does not work on VirtualBox based systems, in that c
     em0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> metric 0 mtu 1500
             options=9b<RXCSUM,TXCSUM,VLAN_MTU,VLAN_HWTAGGING,VLAN_HWCSUM>
             ether 08:00:27:02:07:9b
-            inet 192.168.56.160 netmask 0xffffff00 broadcast 192.168.56.255 
+            inet 192.168.56.160 netmask 0xffffff00 broadcast 192.168.56.255
             nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
             media: Ethernet autoselect (1000baseT <full-duplex>)
             status: active

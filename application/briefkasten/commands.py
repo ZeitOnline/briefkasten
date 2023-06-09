@@ -10,6 +10,7 @@ from threading import Condition
 from .dropbox import DropboxContainer
 from .housekeeping import do as housekeeping
 
+
 class MyHandler(FileSystemEventHandler):
 
     def __init__(self, main_loop_cond):
@@ -39,7 +40,7 @@ def process_drop(drop):
             path.join(drop.container.fs_submission_queue, drop.drop_id),
             path.join(drop.container.fs_scratch, drop.drop_id)
         )
-    except:
+    except Exception:
         return
 
     drop.process()

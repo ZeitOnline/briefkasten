@@ -11,7 +11,7 @@ pyramid.debug_notfound = false
 pyramid.debug_routematch = false
 pyramid.debug_templates = false
 pyramid.default_locale_name = de
-pyramid.includes = 
+pyramid.includes =
 fs_dropbox_root = /var/briefkasten/drop_root
 fs_pgp_pubkeys = /var/briefkasten/pgp_pubkeys
 fs_bin_path = {{apphome}}/middleware_scripts
@@ -52,10 +52,9 @@ pipeline = theme
 {% else %}
 [app:assets]
 use = egg:Paste#static
-document_root = {{apphome}}/lib/python2.7/site-packages/{{ploy_theme_package}}/static/assets/ 
+document_root = {{apphome}}/lib/python2.7/site-packages/{{ploy_theme_package}}/static/assets/
 
 [pipeline:default]
 pipeline =
    briefkasten
 {% endif %}
-

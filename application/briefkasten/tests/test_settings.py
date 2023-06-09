@@ -1,4 +1,4 @@
-from py.test import fixture
+from pytest import fixture
 
 size_values = {
     '200': 200,

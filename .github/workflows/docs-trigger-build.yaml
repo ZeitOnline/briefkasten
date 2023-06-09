@@ -23,4 +23,3 @@ jobs:
           repository: ZeitOnline/docs
           event-type: module-commit
           client-payload: '{"repo": "${{ github.repository }}", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
-

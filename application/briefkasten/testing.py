@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
+
 import shutil
 from cgi import FieldStorage
 from jinja2 import Environment, FileSystemLoader
 from os.path import abspath, dirname, join
 from mock import Mock
+from pkg_resources import register_loader_type, DefaultProvider
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pytest import fixture
+from _pytest.assertion.rewrite import AssertionRewritingHook
 from urllib.parse import unquote
 from webtest import TestApp
+
+# XXX Pytest somehow breaks `pkg_resources.get_provider` by preventing its
+# `DefaultProvider` to be returned. To fix this it needs to be registered again
+register_loader_type(AssertionRewritingHook, DefaultProvider)
 
 
 def asset_path(*parts):

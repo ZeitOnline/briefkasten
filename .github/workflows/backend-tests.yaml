@@ -1,0 +1,18 @@
+name: Test backend
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/backend-*.yaml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - 'testing.yaml'
+      - 'application/briefkasten/**'
+      - 'application/Pipfile**'
+      - 'application/requirements.txt'
+      - 'application/setup.*'
+      - 'application/tox.ini'
+jobs:
+  build:
+    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@1.0
