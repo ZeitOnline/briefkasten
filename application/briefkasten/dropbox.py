@@ -6,7 +6,7 @@ from humanfriendly import parse_size
 from jinja2 import Environment, PackageLoader
 from json import load, dumps
 from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
-from os.path import exists, isdir, join, splitext, getmtime, split
+from os.path import exists, isdir, join, splitext, getmtime, split, expanduser
 from datetime import datetime
 from random import SystemRandom
 from zipfile import ZipFile, ZIP_STORED
@@ -71,8 +71,11 @@ class DropboxContainer(object):
             self.settings['smtp'] = setup_smtp_factory(**self.settings)
 
         # setup GPG
+        gnupghome = self.settings['fs_pgp_pubkeys']
+        if gnupghome is not None:
+            gnupghome = expanduser(gnupghome)
         self.gpg_context = gnupg.GPG(
-            gnupghome=self.settings['fs_pgp_pubkeys'],
+            gnupghome=gnupghome,
             gpgbinary=self.settings.get('fs_gpg_path', 'gpg'),
         )
 
