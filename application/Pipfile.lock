@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4e42918700775e6d23ffa59b0db3610adbd5ac802961342ef6d4a283f47ce675"
+            "sha256": "77493900e16c73becc874935a975ccdfc7911dd1ce3af6cab6ec00d2e9ef6da2"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,10 @@
         ]
     },
     "default": {
+        "briefkasten": {
+            "editable": true,
+            "path": "."
+        },
         "chameleon": {
             "hashes": [
                 "sha256:4cfc1ba46a6793b8ec4c72dd324dc647a916bcf588ab0df6f6b57f33ac3a4bb7"
@@ -257,21 +261,6 @@
             "index": "pypi",
             "version": "==3.0.1"
         },
-        "pathtools": {
-            "hashes": [
-                "sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"
-            ],
-            "index": "pypi",
-            "version": "==0.1.2"
-        },
-        "peppercorn": {
-            "hashes": [
-                "sha256:46125cad688a9cf3b08e463bcb797891ee73ece93602a8ea6f14e40d1042d454",
-                "sha256:96d7681d7a04545cfbaf2c6fb66de67b29cfc42421aa263e4c78f2cbb85be4c6"
-            ],
-            "index": "pypi",
-            "version": "==0.6"
-        },
         "plaster": {
             "hashes": [
                 "sha256:42992ab1f4865f1278e2ad740e8ad145683bb4022e03534265528f0c23c0df2d",
@@ -356,14 +345,6 @@
             ],
             "index": "pypi",
             "version": "==6.0"
-        },
-        "repoze.lru": {
-            "hashes": [
-                "sha256:0429a75e19380e4ed50c0694e26ac8819b4ea7851ee1fc7583c8572db80aff77",
-                "sha256:f77bf0e1096ea445beadd35f3479c5cff2aa1efe604a133e67150bc8630a62ea"
-            ],
-            "index": "pypi",
-            "version": "==0.7"
         },
         "repoze.xmliter": {
             "hashes": [

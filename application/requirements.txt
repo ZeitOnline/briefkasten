@@ -13,15 +13,12 @@ lxml==4.9.2
 MarkupSafe==2.1.3
 Paste==3.5.3
 PasteDeploy==3.0.1
-pathtools==0.1.2
-peppercorn==0.6
 plaster==1.1.2
 plaster-pastedeploy==1.0.1
 pyramid==2.0.1
 pyramid-chameleon==0.3
 python-gnupg==0.5.0
 PyYAML==6.0
-repoze.lru==0.7
 repoze.xmliter==0.6.1
 six==1.16.0
 translationstring==1.4
