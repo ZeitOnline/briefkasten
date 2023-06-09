@@ -7,4 +7,3 @@
     line: "root: {{ploy_root_email}}"
   tags: root_email
   when: ploy_root_email is defined
-

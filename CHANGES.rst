@@ -38,7 +38,7 @@
 - MAINT: Switch to "webroot mode" as the default ACME mode
 
 - MAINT: Remove obsolete 'poudriere' setup
-    
+
 - MAINT: Add missing dependencies
 
 - MAINT: Update python library dependencies
@@ -200,7 +200,7 @@ This is the first public release of the 0.2 branch after some extensive developm
 
 - Remove all ZEIT ONLINE specific branding and assets from markup
   This addresses issues `#3 <https://github.com/ZeitOnline/briefkasten/issues/3>`_
-  and `#10 <https://github.com/ZeitOnline/briefkasten/issues/10>`_ 
+  and `#10 <https://github.com/ZeitOnline/briefkasten/issues/10>`_
   thanks to @residuum and @Mandalka for raising the issue.
 
 - Added BSD 3-clause license.
@@ -241,7 +241,7 @@ This is the first public release of the 0.2 branch after some extensive developm
 ------------------
 
 - Use a `cryptographically suitable random generator <http://docs.python.org/library/os.html#os.urandom>`_
-  This addresses `issue #2 <https://github.com/ZeitOnline/briefkasten/issues/2>`_ 
+  This addresses `issue #2 <https://github.com/ZeitOnline/briefkasten/issues/2>`_
   thanks to @alech (Alexander Klink) for reporting this.
 
 - Use a `constant time comparison algorithm <http://codahale.com/a-lesson-in-timing-attacks/>`_ to avoid

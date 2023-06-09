@@ -34,5 +34,3 @@ Now we are left with three possible outcomes: success, failure during cleansing 
 - `900 success`
 
 In all cases except `900` the attachments will have been deleted from the fileystem of the briefkasten host.
-
-

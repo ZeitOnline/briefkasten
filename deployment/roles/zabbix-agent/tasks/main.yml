@@ -8,7 +8,7 @@
 - name: configure agent
   template:
     src: zabbix_agentd.conf
-    dest: /usr/local/etc/zabbix3/zabbix_agentd.conf 
+    dest: /usr/local/etc/zabbix3/zabbix_agentd.conf
 
 - name: enable agent
   service:

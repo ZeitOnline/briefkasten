@@ -15,8 +15,8 @@
     - zfs-layout
 
 - name: upgrade ZFS version
-  command: zpool upgrade tank 
-  tags: zfs-layout 
+  command: zpool upgrade tank
+  tags: zfs-layout
 
 - name: Make sure temporary files are cleared during startup
   sysrc:

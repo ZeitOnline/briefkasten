@@ -1,4 +1,4 @@
 PermitRootLogin without-password
 Subsystem sftp /usr/libexec/sftp-server
 UseDNS no
-Port {{ploy_cleanser_ssh_baseport}}{{item}} 
+Port {{ploy_cleanser_ssh_baseport}}{{item}}
