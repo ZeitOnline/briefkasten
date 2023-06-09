@@ -1,6 +1,4 @@
-from os import path
 import click
-import requests
 from webtest.app import TestApp, AppError
 
 
@@ -28,10 +26,10 @@ def submit_attachment(url, message, attachments):
     submit_form['message'] = u'Hello there'
     try:
         response = submit_form.submit()
-        import pdb; pdb.set_trace()
         click.echo(u'Got %s' % response.url)
     except AppError as exc:
         click.echo(u'Oops %s' % exc)
+
 
 if __name__ == '__main__':
     submit_attachment()

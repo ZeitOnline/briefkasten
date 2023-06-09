@@ -93,8 +93,7 @@ def test_message_permissions(dropbox):
 
 def test_editor_token_created(dropbox_container, dropbox):
     assert (dropbox_container.get_dropbox(
-        dropbox.drop_id).editor_token ==
-        open(dropbox.paths_created[1], 'r').readline())
+        dropbox.drop_id).editor_token == open(dropbox.paths_created[1], 'r').readline())
     assert stat.S_IMODE(os.stat(dropbox.paths_created[1]).st_mode) == 0o660
 
 

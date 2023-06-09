@@ -1,4 +1,5 @@
 import click
+import configparser
 import logging
 import sys
 from datetime import datetime
@@ -9,9 +10,6 @@ from signal import alarm
 from zope.testbrowser.browser import Browser
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from pyquery import PyQuery
-
-import configparser as configparser
-
 
 log = logging.getLogger(__name__)
 
@@ -110,11 +108,10 @@ def receive_test_submissions(target_token):
             assert target_token in payload['Subject']
 
         def process_request(self, request, client_address):
-            log.info('Finish request on client {}'.format(client_adress))
+            log.info('Finish request on client {}'.format(client_address))
             self.finish_request(request, client_address)
             log.info('Shutdown request')
             self.shutdown_request(request)
-
 
     with HTTPServer(('', 8000), Handler) as httpd:
         log.info('HTTPServer handle_request')
@@ -166,11 +163,11 @@ def once(config):
         token, timestamp, errors = perform_submission(
             app_url=config["app_url"], testing_secret=config["testing_secret"]
         )
-        log.info("Created drop with token %s" % token)
+        log.info("Created drop with token %s", token)
         # fetch submissions from mail server
         if token is not None:
             max_process_secs = int(config['max_process_secs'])
-            log.info(f"Waiting {max_process_secs} seconds")
+            log.info("Waiting %s seconds", max_process_secs)
             alarm(max_process_secs)
             try:
                 receive_test_submissions(token)

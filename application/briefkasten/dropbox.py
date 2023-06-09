@@ -11,7 +11,6 @@ from datetime import datetime
 from random import SystemRandom
 from zipfile import ZipFile, ZIP_STORED
 from subprocess import call
-
 from .notifications import (
     checkRecipient,
     sendMultiPart,
@@ -24,7 +23,7 @@ allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
 def generate_drop_id(length=8):
     rng = SystemRandom()
     drop_id = ""
-    for i in range(length):
+    for _ in range(length):
         drop_id += rng.choice(allchars)
     return drop_id
 
@@ -95,7 +94,7 @@ class DropboxContainer(object):
         fs_settings = join(self.fs_root, 'settings.yaml')
         if exists(fs_settings):
             with open(fs_settings, 'r') as settings:
-                return yaml.load(settings, Loader=yaml.FullLoader)
+                return yaml.safe_load(settings)
         else:
             return dict()
 
@@ -205,7 +204,7 @@ class Dropbox(object):
             # calling _process_attachments has the side-effect of updating `send_attachments`
             self._process_attachments()
             if self.status_int < 500 and not self.send_attachments:
-                    self._create_archive()
+                self._create_archive()
 
         if self.status_int >= 500 and self.status_int < 600:
             # cleansing failed
@@ -371,7 +370,7 @@ class Dropbox(object):
         """returns the number of bytes that the cleansed attachments take up on disk"""
         total_size = 0
         for attachment in self.fs_cleansed_attachments:
-                total_size += stat(attachment).st_size
+            total_size += stat(attachment).st_size
         return total_size
 
     @property
@@ -389,7 +388,7 @@ class Dropbox(object):
         """
         try:
             with open(join(self.fs_path, u'message')) as message_file:
-                return u''.join([line for line in message_file.readlines()])
+                return u''.join(message_file.readlines())
         except IOError:
             return ''
 

@@ -43,6 +43,6 @@ repos:
       housekeeping.py:IF100
       jailhost.py:E800
       notifications.py:N802
-      */briefkasten/testing.py:S701
+      */briefkasten/testing.py:S701,T102
       */briefkasten/tests/test_*.py:S105,S106,S324,ECE001
       */briefkasten_watchdog/__init__.py:G001,N802"

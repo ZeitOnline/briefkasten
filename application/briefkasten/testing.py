@@ -12,7 +12,6 @@ from _pytest.assertion.rewrite import AssertionRewritingHook
 from urllib.parse import unquote
 from webtest import TestApp
 
-
 # XXX Pytest somehow breaks `pkg_resources.get_provider` by preventing its
 # `DefaultProvider` to be returned. To fix this it needs to be registered again
 register_loader_type(AssertionRewritingHook, DefaultProvider)
