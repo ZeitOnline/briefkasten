@@ -15,10 +15,10 @@ Paste==3.5.1
 PasteDeploy==2.1.1
 pathtools==0.1.2
 peppercorn==0.6
-plaster-pastedeploy==0.7
 plaster==1.0
-pyramid-chameleon==0.3
+plaster-pastedeploy==0.7
 pyramid==2.0
+pyramid-chameleon==0.3
 python-gnupg==0.4.9
 PyYAML==6.0
 repoze.lru==0.7
