@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='briefkasten',
-    version_format="{tag}.{commitcount}+{gitsha}",
+    version="0.3.13dev",
     description='a reasonably secure web application for submitting content anonymously',
     long_description="",
     maintainer=u'Tom Lazar',
@@ -26,8 +26,7 @@ setup(
     },
     zip_safe=False,
     setup_requires=[
-        'setuptools-git >= 0',
-        'setuptools-git-version'
+        'setuptools-git',
     ],
     install_requires=[
         'Pyramid<2.1',
