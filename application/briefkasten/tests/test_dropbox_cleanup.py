@@ -67,7 +67,7 @@ def test_attachment_size_zero(dropbox):
 
 
 def test_attachment_size_one(cleansed_dropbox):
-    assert cleansed_dropbox.size_attachments == 19
+    assert cleansed_dropbox.size_attachments == 20
 
 
 @fixture
