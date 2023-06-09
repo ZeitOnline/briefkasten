@@ -2,7 +2,7 @@ FROM python:3.11.3-slim AS python
 
 FROM python AS app
 RUN apt update
-RUN apt install --yes gnupg
+RUN apt install --yes gnupg git
 WORKDIR /application
 COPY /application/requirements.txt .
 RUN pip install --upgrade setuptools pip wheel
