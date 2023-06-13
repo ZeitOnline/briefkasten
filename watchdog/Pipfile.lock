@@ -152,11 +152,11 @@
         },
         "pip": {
             "hashes": [
-                "sha256:3fd1929db052f056d7a998439176d3333fa1b3f6c1ad881de1885c0717608a4b",
-                "sha256:b61a374b5bc40a6e982426aede40c9b5a08ff20e640f5b56977f4f91fed1e39a"
+                "sha256:0e7c86f486935893c708287b30bd050a36ac827ec7fe5e43fe7cb198dd835fba",
+                "sha256:3ef6ac33239e4027d9a5598a381b9d30880a1477e50039db2eac6e8a8f6d1b18"
             ],
             "index": "pypi",
-            "version": "==22.2.2"
+            "version": "==23.1.2"
         },
         "plaster": {
             "hashes": [
