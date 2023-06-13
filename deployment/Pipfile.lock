@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cc80c5f4e434329712342daf37d89268e87586efab817ea06d4a8436a9af8f9b"
+            "sha256": "57d53a49beec0e553151d454cf83daea8acf87d1bff41030480f9cc5c55b648a"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.9"
+            "python_version": "3"
         },
         "sources": [
             {
@@ -87,13 +87,6 @@
             ],
             "index": "pypi",
             "version": "==3.0.0"
-        },
-        "cachepath": {
-            "hashes": [
-                "sha256:8a92ec61cc2bc40401bda656b47bdb3b16234e500357ff66edd8f8a2c7524b7c",
-                "sha256:a9a511a5c2e12f1b0ed53111446851e8843bd895a1055356a179a679a9f21bcc"
-            ],
-            "version": "==1.1.1"
         },
         "cachetools": {
             "hashes": [
@@ -243,14 +236,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==3.12.0"
         },
-        "importlib-resources": {
-            "hashes": [
-                "sha256:2238159eb743bd85304a16e0536048b3e991c531d1cd51c4a834d1ccf2829057",
-                "sha256:4df460394562b4581bb4e4087ad9447bd433148fba44241754ec3152499f1d1b"
-            ],
-            "markers": "python_version < '3.10'",
-            "version": "==5.0.7"
-        },
         "jinja2": {
             "hashes": [
                 "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852",
@@ -266,15 +251,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.5"
-        },
-        "magicinvoke": {
-            "hashes": [
-                "sha256:927b2a2d1445529586a0ffdecb80e5f53abafb6a0718d75bb799f2caae07c2d5",
-                "sha256:c24e98729d0e15faabb9092efbd9983b1096a940516a9acb44c6d92958ae418a",
-                "sha256:ca3b273e17e53486bf2275c5839c1e552b9860f9083899ef714b271d109b9e04"
-            ],
-            "index": "pypi",
-            "version": "==2.4.6"
         },
         "markupsafe": {
             "hashes": [
@@ -553,14 +529,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.16.0"
-        },
-        "tomli": {
-            "hashes": [
-                "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
-                "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"
-            ],
-            "markers": "python_version < '3.11'",
-            "version": "==2.0.1"
         },
         "tox": {
             "hashes": [
