@@ -45,7 +45,7 @@
       with_items:
       - zip
       - netpbm
-      - ghostscript9-base
+      - ghostscript9-agpl-base
       - libreoffice
     - name: create cleanser user
       user:
