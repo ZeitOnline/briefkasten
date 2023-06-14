@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-ansible = "<5"
+ansible = "<8"
 bsdploy = {ref = "use-extra-zfs-properties", git = "https://github.com/witsch/bsdploy.git"}
 ploy = "*"
 ploy-ec2 = "*"
