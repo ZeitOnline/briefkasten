@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3cef1a4ef0d952f068fb26bcdb18e5dd880c9a495c000a04ff2099d8ff02af2c"
+            "sha256": "c3a98141ae3bf2a9a65717176a75fa0cea79b8c5618d963b8390265ac51f5e8d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -79,12 +79,8 @@
             "version": "==2.49.0"
         },
         "bsdploy": {
-            "hashes": [
-                "sha256:2954a2f348c313e609f77d98a85116bff907483900261d0fc9301e26bfe811d0",
-                "sha256:a217d2ec5806a00c85592308fb4037c79ea024be4c4d32f02609513ab81f1aed"
-            ],
-            "index": "pypi",
-            "version": "==3.0.0"
+            "git": "https://github.com/witsch/bsdploy.git",
+            "ref": "be81c5b1863e2114433a0102c781918b09993b17"
         },
         "cffi": {
             "hashes": [

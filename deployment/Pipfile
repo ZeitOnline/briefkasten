@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 ansible = "<5"
-bsdploy = "*"
+bsdploy = {ref = "use-extra-zfs-properties", git = "https://github.com/witsch/bsdploy.git"}
 ploy = "*"
 ploy-ec2 = "*"
 

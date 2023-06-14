@@ -10,7 +10,8 @@
   zfs:
     name: tank/data/briefkasten
     state: present
-    mountpoint: /var/briefkasten
+    extra_zfs_properties:
+      mountpoint: /var/briefkasten
   tags:
     - zfs-layout
 
