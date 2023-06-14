@@ -342,7 +342,7 @@
                 "sha256:9cb9db34b49a4855338ed277b9ba05c0d50137b0c357eabdcdc797f79e427cb1",
                 "sha256:d324092248a350cb8e3be93f2a616d9de86cef7d0dd764d0103853dccc8a0021"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
             "version": "==2.0.0"
         },
         "ploy-ec2": {
@@ -358,7 +358,7 @@
                 "sha256:5a35cfd48d7d8053aadca3c9d5fc0475ae09bd7a29ddd7a23ea1dbded0fa1085",
                 "sha256:c6b67c04a1642a33c49079b180846ce8c515d769f683ba4e923fd55c876222a7"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
             "version": "==2.0.0"
         },
         "ploy-fabric": {
@@ -366,7 +366,7 @@
                 "sha256:bebf604fb23573d6e28e3ebfbd555aca4353a24973d21fd85110d40e8b141551",
                 "sha256:dd006b4c34cc0640f4dd60ce88c6258ce7130892394e6894192ac4c61fbcdc38"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
             "version": "==2.0.0"
         },
         "pluggy": {

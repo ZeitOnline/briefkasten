@@ -7,10 +7,7 @@ name = "pypi"
 ansible = "<5"
 bsdploy = "*"
 ploy = "*"
-ploy-ansible = "*"
 ploy-ec2 = "*"
-ploy-ezjail = "*"
-ploy-fabric = "*"
 tox = "*"
 
 [dev-packages]
