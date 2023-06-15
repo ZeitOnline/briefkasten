@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 bsdploy = {ref = "use-extra-zfs-properties", git = "https://github.com/witsch/bsdploy.git"}
-ploy = "*"
+ploy = {ref = "fix-timeout-handling", git = "https://github.com/witsch/ploy.git"}
 ploy-ec2 = "*"
 
 [dev-packages]
