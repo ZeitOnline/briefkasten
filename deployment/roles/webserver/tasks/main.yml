@@ -20,4 +20,4 @@
     state: started
     enabled: true
 
-- { include: acme.yml, tags: acme, when: "{{ ploy_use_acme }}" }
+- { include: acme.yml, tags: acme, when: ploy_use_acme == "true" }

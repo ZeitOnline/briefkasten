@@ -13,7 +13,7 @@
   file:
     dest: "{{themes_dir}}/{{ploy_theme_name}}"
     state: directory
-  when: ploy_use_diazo
+  when: ploy_use_diazo == "true"
 
 - name: upload frontend theme
   # requires ploy-ssh to be in $PATH
@@ -24,7 +24,7 @@
       - "-e ploy-ssh"
   notify: restart application
   tags: update-theme
-  when: "{{ ploy_use_diazo }}"
+  when: ploy_use_diazo == "true"
 
 - name: configure supervisor
   template:

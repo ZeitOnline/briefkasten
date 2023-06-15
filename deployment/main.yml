@@ -191,4 +191,7 @@
       tags:
       - jdispatch
   roles:
-    - { role: zabbix-agent, when: ploy_enable_zabbix, tags: [zabbix-agent] }
+    - role: zabbix-agent
+      when: ploy_enable_zabbix == "true"
+      tags:
+      - zabbix-agent
