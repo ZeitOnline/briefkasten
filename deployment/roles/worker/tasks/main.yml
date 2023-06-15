@@ -49,7 +49,6 @@
     mode: "600"
   with_items:
     - { the_editors: "{{ploy_editors}}", the_admins: "{{ploy_admins}}", dest: briefkasten.conf }
-    - { the_editors: "{{watchdog_imap_recipient}}", the_admins: "{{watchdog_imap_recipient}}", dest: briefkasten_test.conf }
   tags: update-middleware
 
 - name: ssh config for the the cleanser script
