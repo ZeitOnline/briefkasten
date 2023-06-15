@@ -5,4 +5,4 @@ set -e
 set -x
 pkg bootstrap
 pkg update
-pkg install python2
+pkg install python3

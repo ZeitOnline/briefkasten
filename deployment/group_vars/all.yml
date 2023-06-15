@@ -1,6 +1,5 @@
 ---
 # FreeBSD
-ansible_python_interpreter: /usr/local/bin/python2.7
 apphome: /usr/local/briefkasten
 appuser: pyramid
 appuserid: 1001
