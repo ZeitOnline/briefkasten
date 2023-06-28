@@ -1,5 +1,2 @@
-/bin/
-/dist/
-/include/
-/lib/
-/watchdog.ini
+*.egg-info/
+/drops.db

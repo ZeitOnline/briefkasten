@@ -1,40 +1,25 @@
-import click
-import configparser
-import logging
-import sys
 from click import group, option
 from datetime import datetime
 from dbm import open as dbm_open
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from json import loads, dumps
-from os import environ, path
+from logging import getLogger, basicConfig
+from os import environ
 from re import search
 from time import time
 from zope.testbrowser.browser import Browser
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from pyquery import PyQuery
 
-log = logging.getLogger(__name__)
+basicConfig(format='%(asctime)s %(levelname)s %(message)s')
+log = getLogger(__name__)
+log.setLevel(environ.get('BKWD_LOG_LEVEL', 'info').upper())
 
 REGISTRY = CollectorRegistry()
-
 last_success = Gauge(
     'job_last_briefkasten_watchdog_success_unixtime',
     'Last time a briefkasten watchdog job successfully finished',
     registry=REGISTRY)
-
-
-class ConfigParser(configparser.ConfigParser):
-    """ a ConfigParser that can provide its values as simple dictionary.
-    taken from http://stackoverflow.com/questions/3220670
-    """
-
-    def as_dict(self):
-        d = dict(self._sections)
-        for k in d:
-            d[k] = dict(self._defaults, **d[k])
-            d[k].pop("__name__", None)
-        return d
 
 
 def perform_submission(app_url, testing_secret):
@@ -73,12 +58,11 @@ def receive_test_submissions(handler):
         the given handle function. """
     class Handler(BaseHTTPRequestHandler):
         def do_POST(self):
-            log.info('do_POST')
             content_length = self.headers['Content-Length']
             data = self.rfile.read(int(content_length))
             payload = loads(data)
             log.info('Received mail from {From}: "{Subject}"'.format(**payload))
-            log.info(dumps(payload, sort_keys=True, indent=2))
+            log.debug(dumps(payload, sort_keys=True, indent=2))
             handler(payload)
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
@@ -95,37 +79,6 @@ def push_to_prometheus(config):
         config['prometheus_push_gateway_url'],
         job="briefkasten_watchdog_{environment}".format(**config),
         registry=REGISTRY)
-
-
-def default_config():
-    return dict(
-        app_url="http://localhost:6543/briefkasten/",
-        max_process_secs=60,
-        smtp_host="localhost",
-        smtp_port=25,
-        log_level="INFO",
-        sleep_seconds=0,
-        retry_seconds=20,
-        max_attempts=3,
-    )
-
-
-def config_from_file(fs_config):
-    parser = ConfigParser(allow_no_value=True)
-    parser.read(fs_config)
-    try:
-        return parser.as_dict()["briefkasten"]
-    except KeyError:
-        return dict()
-
-
-def config_from_env(prefix="BKWD_"):
-    keys = [e for e in environ.keys() if e.startswith(prefix)]
-    config = dict()
-    for key in keys:
-        target_key = key.split(prefix)[-1].lower()
-        config[target_key] = environ[key]
-    return config
 
 
 @group()
@@ -173,23 +126,6 @@ def receive(dbm_path, pattern, max_process_secs):
                                     token.decode(), datetime.fromtimestamp(sent), max_process_secs)
     # start http server passing the handler
     receive_test_submissions(handler)
-
-
-@click.command(help="Performs a test submission and checks it arrived")
-@click.argument(
-    "fs_config", required=False, default="watchdog.ini",
-)
-def main(fs_config=None):
-    config = default_config()
-    if fs_config is not None:
-        fs_config = path.abspath(fs_config)
-        config.update(config_from_file(fs_config))
-    config.update(config_from_env())
-    logging.basicConfig(
-        stream=sys.stdout, level=getattr(logging, config["log_level"].upper())
-    )
-
-    once(config)
 
 
 if __name__ == '__main__':
