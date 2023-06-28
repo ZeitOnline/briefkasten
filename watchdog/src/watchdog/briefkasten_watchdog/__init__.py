@@ -35,20 +35,18 @@ class ConfigParser(configparser.ConfigParser):
 
 
 def perform_submission(app_url, testing_secret):
-    token = None
-    now = datetime.now()
     browser = Browser()
     try:
         browser.open(app_url)
     except Exception as exc:
         log.error("[Couldn't open submission page] The attempt to access the "
                   "submission form resulted in an exception (%s)", exc)
-        return token, now
+        return None
     try:
         submit_form = browser.getForm(id="briefkasten-form")
     except LookupError:
         log.error("[Couldn't find submission form] The contact form was not accessible")
-        return token, now
+        return None
     submit_form.getControl(
         name="message"
     ).value = u"This is an automated test submission from the watchdog instance."
@@ -63,7 +61,7 @@ def perform_submission(app_url, testing_secret):
     if not bool(token):
         log.error("[Couldn't get feedback token] The form submission was successful, "
                   "but no feedback-token was given at %s", browser.url)
-    return token, now
+    return token
 
 
 def receive_test_submissions(target_token):
@@ -131,7 +129,8 @@ def once(config):
     try:
         # perform test submission
         log.debug("Performing test submissions against {app_url}".format(**config))
-        token, timestamp = perform_submission(
+        timestamp = datetime.now()
+        token = perform_submission(
             app_url=config["app_url"], testing_secret=config["testing_secret"]
         )
         log.info("Created drop with token %s", token)
