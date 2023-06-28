@@ -2,11 +2,14 @@ import click
 import configparser
 import logging
 import sys
+from click import group, option
 from datetime import datetime
+from dbm import open as dbm_open
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from json import load, dumps
+from json import loads, dumps
 from os import environ, path
-from signal import alarm
+from re import search
+from time import time
 from zope.testbrowser.browser import Browser
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from pyquery import PyQuery
@@ -64,27 +67,27 @@ def perform_submission(app_url, testing_secret):
     return token
 
 
-def receive_test_submissions(target_token):
-    """ Receive a test mail via MailJet's "Parse API" webhook (ee
-        https://dev.mailjet.com/email/guides/parse-api/). The mail must
-        contain the expected submission token. """
+def receive_test_submissions(handler):
+    """ Receive test mails via MailJet's "Parse API" webhook (ee
+        https://dev.mailjet.com/email/guides/parse-api/) and calls
+        the given handle function. """
     class Handler(BaseHTTPRequestHandler):
         def do_POST(self):
             log.info('do_POST')
-            payload = load(self.rfile)
+            content_length = self.headers['Content-Length']
+            data = self.rfile.read(int(content_length))
+            payload = loads(data)
             log.info('Received mail from {From}: "{Subject}"'.format(**payload))
             log.info(dumps(payload, sort_keys=True, indent=2))
-            assert target_token in payload['Subject']
-
-        def process_request(self, request, client_address):
-            log.info('Finish request on client {}'.format(client_address))
-            self.finish_request(request, client_address)
-            log.info('Shutdown request')
-            self.shutdown_request(request)
+            handler(payload)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(b'Thank you')
 
     with HTTPServer(('', 8000), Handler) as httpd:
-        log.info('HTTPServer handle_request')
-        httpd.handle_request()
+        log.info('receiver ready')
+        httpd.serve_forever()
 
 
 def push_to_prometheus(config):
@@ -125,31 +128,51 @@ def config_from_env(prefix="BKWD_"):
     return config
 
 
-def once(config):
-    try:
-        # perform test submission
-        log.debug("Performing test submissions against {app_url}".format(**config))
-        timestamp = datetime.now()
-        token = perform_submission(
-            app_url=config["app_url"], testing_secret=config["testing_secret"]
-        )
-        log.info("Created drop with token %s", token)
-        # fetch submissions from mail server
-        if token is not None:
-            max_process_secs = int(config['max_process_secs'])
-            log.info("Waiting %s seconds", max_process_secs)
-            alarm(max_process_secs)
-            try:
-                receive_test_submissions(token)
-            except AssertionError:
-                log.error("[Submission '%s' not received] The submission with token %s "
-                          "which was submitted on %s was not received after %d seconds.",
-                          token, token, timestamp, max_process_secs)
-            else:
-                log.info("No errors were found, pushing success to prometheus/")
-                last_success.set_to_current_time()
-    finally:
-        push_to_prometheus(config)
+@group()
+def cli():
+    pass
+
+
+@cli.command(context_settings=dict(auto_envvar_prefix='BKWD_'))
+@option('--app-url', default='http://localhost:6543/briefkasten/', help='application URL')
+@option('--testing-secret', default='', help='secret used to distinguish test submissions')
+@option('--dbm-path', default='drops', help='path to dbm database for storing drops')
+def submit(app_url, testing_secret, dbm_path):
+    """ Perform test submission """
+    log.debug("Performing test submissions against %s", app_url)
+    token = perform_submission(app_url, testing_secret)
+    with dbm_open(dbm_path, 'c') as db:
+        db[token] = str(time())
+    log.info("Created drop with token %s", token)
+
+
+@cli.command(context_settings=dict(auto_envvar_prefix='BKWD_'))
+@option('--dbm-path', default='drops', help='path to dbm database for storing drops')
+@option('--pattern', default=r'^Drop (?P<token>[0-9A-z]+)$', help='pattern mail subjects must match')
+@option('--max-process-secs', default=300, help='time allowed for test submission to arrive')
+def receive(dbm_path, pattern, max_process_secs):
+    """ Receive test submissions """
+    def handler(payload):
+        match = search(pattern, payload.get('Subject', ''))
+        if match is not None:
+            now = time()
+            token = match.group('token')
+            with dbm_open(dbm_path, 'c') as db:
+                if token in db:
+                    elapsed = now - float(db[token])
+                    log.info(f'Received token {token} after {elapsed:.1f} seconds')
+                    last_success.set_to_current_time()
+                    del db[token]
+                else:
+                    log.warning(f'Received unknown token "{token}"')
+                for token in db.keys():
+                    sent = float(db[token])
+                    if now - sent > max_process_secs:
+                        log.warning("[Slow test submission] The submission with token '%s' "
+                                    "which was submitted on %s was not received after %d seconds.",
+                                    token.decode(), datetime.fromtimestamp(sent), max_process_secs)
+    # start http server passing the handler
+    receive_test_submissions(handler)
 
 
 @click.command(help="Performs a test submission and checks it arrived")
@@ -170,4 +193,4 @@ def main(fs_config=None):
 
 
 if __name__ == '__main__':
-    main()
+    cli()
