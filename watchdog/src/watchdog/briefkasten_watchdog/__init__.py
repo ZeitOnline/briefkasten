@@ -34,45 +34,21 @@ class ConfigParser(configparser.ConfigParser):
         return d
 
 
-class WatchdogError(object):
-
-    subject = ""
-    message = ""
-
-    def __init__(self, subject, message):
-        self.subject = subject
-        self.message = message
-
-    def __repr__(self):
-        return "[%s] %s" % (self.subject, self.message)
-
-
 def perform_submission(app_url, testing_secret):
     token = None
-    errors = []
     now = datetime.now()
     browser = Browser()
     try:
         browser.open(app_url)
     except Exception as exc:
-        errors.append(
-            WatchdogError(
-                subject="Couldn't open submission page",
-                message=u"The attempt to access the submission form resulted in an exception (%s)"
-                % exc,
-            )
-        )
-        return token, now, errors
+        log.error("[Couldn't open submission page] The attempt to access the "
+                  "submission form resulted in an exception (%s)", exc)
+        return token, now
     try:
         submit_form = browser.getForm(id="briefkasten-form")
     except LookupError:
-        errors.append(
-            WatchdogError(
-                subject=u"Couldn't find submission form",
-                message=u"""The contact form was not accessible""",
-            )
-        )
-        return token, now, errors
+        log.error("[Couldn't find submission form] The contact form was not accessible")
+        return token, now
     submit_form.getControl(
         name="message"
     ).value = u"This is an automated test submission from the watchdog instance."
@@ -85,14 +61,9 @@ def perform_submission(app_url, testing_secret):
     if token_element is not None:
         token = token_element.text()
     if not bool(token):
-        errors.append(
-            WatchdogError(
-                subject="Couldn't get feedback token",
-                message=u"The form submission was successful, but no feedback-token was given at %s"
-                % browser.url,
-            )
-        )
-    return token, now, errors
+        log.error("[Couldn't get feedback token] The form submission was successful, "
+                  "but no feedback-token was given at %s", browser.url)
+    return token, now
 
 
 def receive_test_submissions(target_token):
@@ -160,7 +131,7 @@ def once(config):
     try:
         # perform test submission
         log.debug("Performing test submissions against {app_url}".format(**config))
-        token, timestamp, errors = perform_submission(
+        token, timestamp = perform_submission(
             app_url=config["app_url"], testing_secret=config["testing_secret"]
         )
         log.info("Created drop with token %s", token)
@@ -172,19 +143,12 @@ def once(config):
             try:
                 receive_test_submissions(token)
             except AssertionError:
-                errors.append(
-                    WatchdogError(
-                        subject="Submission '%s' not received" % token,
-                        message=u"The submission with token %s which was submitted on %s was not received after %d seconds."
-                        % (token, timestamp, max_process_secs),
-                    )
-                )
-        if errors:
-            log.error(errors)
-        else:
-            log.info("No Errors were found, pushing success to prometheus/")
-            last_success.set_to_current_time()
-        return errors
+                log.error("[Submission '%s' not received] The submission with token %s "
+                          "which was submitted on %s was not received after %d seconds.",
+                          token, token, timestamp, max_process_secs)
+            else:
+                log.info("No errors were found, pushing success to prometheus/")
+                last_success.set_to_current_time()
     finally:
         push_to_prometheus(config)
 
