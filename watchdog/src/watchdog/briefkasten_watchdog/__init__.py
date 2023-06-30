@@ -86,7 +86,7 @@ def cli():
     pass
 
 
-@cli.command(context_settings=dict(auto_envvar_prefix='BKWD_'))
+@cli.command(context_settings=dict(auto_envvar_prefix='BKWD'))
 @option('--app-url', default='http://localhost:6543/briefkasten/', help='application URL')
 @option('--testing-secret', default='', help='secret used to distinguish test submissions')
 @option('--dbm-path', default='drops', help='path to dbm database for storing drops')
@@ -99,7 +99,7 @@ def submit(app_url, testing_secret, dbm_path):
     log.info("Created drop with token %s", token)
 
 
-@cli.command(context_settings=dict(auto_envvar_prefix='BKWD_'))
+@cli.command(context_settings=dict(auto_envvar_prefix='BKWD'))
 @option('--dbm-path', default='drops', help='path to dbm database for storing drops')
 @option('--pattern', default=r'^Drop (?P<token>[0-9A-z]+)$', help='pattern mail subjects must match')
 @option('--max-process-secs', default=300, help='time allowed for test submission to arrive')
