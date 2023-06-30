@@ -1,0 +1,19 @@
+[project]
+name = "briefkasten_watchdog"
+version = '0.3.0.dev'
+description = "Perform functional testing of a Briefkasten instance"
+dependencies = [
+    "click",
+    "zope.testbrowser",
+    "pyquery",
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Framework :: Pylons",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+    "License :: OSI Approved :: BSD License",
+]
+
+[tool.setuptools]
+packages = ["briefkasten_watchdog"]
