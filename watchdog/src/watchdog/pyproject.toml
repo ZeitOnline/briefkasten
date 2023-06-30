@@ -6,6 +6,7 @@ dependencies = [
     "click",
     "zope.testbrowser",
     "pyquery",
+    "prometheus-client",
 ]
 classifiers = [
     "Programming Language :: Python",
