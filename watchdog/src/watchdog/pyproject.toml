@@ -1,6 +1,6 @@
 [project]
 name = "briefkasten_watchdog"
-version = '0.3.0.dev'
+version = '0.4'
 description = "Perform functional testing of a Briefkasten instance"
 dependencies = [
     "click",
