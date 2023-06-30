@@ -126,7 +126,3 @@ def receive(dbm_path, pattern, max_process_secs):
                                     token.decode(), datetime.fromtimestamp(sent), max_process_secs)
     # start http server passing the handler
     receive_test_submissions(handler)
-
-
-if __name__ == '__main__':
-    cli()
