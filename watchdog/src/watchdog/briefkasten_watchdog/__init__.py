@@ -95,7 +95,7 @@ def submit(app_url, testing_secret, dbm_path):
     log.debug("Performing test submissions against %s", app_url)
     token = perform_submission(app_url, testing_secret)
     with dbm_open(dbm_path, 'c') as db:
-        db[token] = str(time())
+        db[token.encode()] = str(time())
     log.info("Created drop with token %s", token)
 
 
