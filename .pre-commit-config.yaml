@@ -45,4 +45,4 @@ repos:
       notifications.py:N802
       */briefkasten/testing.py:S701,T102
       */briefkasten/tests/test_*.py:S105,S106,S324,ECE001
-      */briefkasten_watchdog/__init__.py:G001,N802"
+      */briefkasten_watchdog/__init__.py:G001,G004,G200,N802"

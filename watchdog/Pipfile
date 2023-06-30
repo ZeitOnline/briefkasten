@@ -15,6 +15,3 @@ prometheus-client = "*"
 
 [requires]
 python_version = "3"
-
-[scripts]
-watchdog = "python src/watchdog/briefkasten_watchdog/__init__.py"
