@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "briefkasten"
+version = "0.3.13dev"
+maintainers = [{name = 'Tom Lazar', email = 'tom@tomster.org'}]
+description = "a reasonably secure web application for submitting content anonymously"
+dependencies = [
+    "Pyramid <2.1",
+    "pyramid_chameleon",
+    "click",
+    "colander",
+    "diazo",
+    "humanfriendly",
+    "itsdangerous",
+    "jinja2",
+    "python-gnupg",
+    "repoze.xmliter",
+    "Paste",
+    "watchdog",
+    "PyYAML",
+]
+
+[project.entry-points."paste.app_factory"]
+main = "briefkasten:main"
+
+[project.scripts]
+debug = "briefkasten.commands:debug"
+worker = "briefkasten.commands:worker"
+janitor = "briefkasten.commands:janitor"
+
+[project.entry-points.pytest11]
+briefkasten = "briefkasten.testing"
+
+[tool.setuptools]
+packages = ["briefkasten"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers --cov=briefkasten --cov-report=term --cov-report=html --doctest-modules"
