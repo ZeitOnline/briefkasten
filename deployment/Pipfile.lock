@@ -29,7 +29,7 @@
                 "sha256:261bc01a15274fc5a6950d5b92b9aa1b7d7c6e8f7543c914505e5bfd9744793a",
                 "sha256:bc2f5ab74e1c81609aaa9bc8f7f92d939d8e1c847923290301231bdf4dadc812"
             ],
-            "markers": "python_version >= '3.9'",
+            "markers": "python_version >= '3.10'",
             "version": "==2.15.3"
         },
         "attrs": {
@@ -82,6 +82,7 @@
         },
         "bsdploy": {
             "git": "https://github.com/witsch/bsdploy.git",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
             "ref": "be81c5b1863e2114433a0102c781918b09993b17"
         },
         "cffi": {
@@ -286,6 +287,7 @@
         },
         "ploy": {
             "git": "https://github.com/witsch/ploy.git",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
             "ref": "953b8a0a0606e10b282c0bf201dfc00f14466287"
         },
         "ploy-ansible": {
@@ -302,6 +304,7 @@
                 "sha256:b91edcf89e88e52d9b70604cde2893122f9f2d85abf48783c43e325694dc3258"
             ],
             "index": "pypi",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
             "version": "==2.0.0"
         },
         "ploy-ezjail": {
@@ -457,11 +460,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:d59c97e7b774979a5ccb96388efc9eb65518004537e85d52e81eaee89ab6dd91",
-                "sha256:e13e1b0bc760e9b0127eda042845999b2f913e12437046e663b833aa96d89715"
+                "sha256:3d4dfa6d95f1b101d695a6160a7626e15583af71a5f52176efa5d39a054d475d",
+                "sha256:3d8083eed2d13afc9426f227b24fd1659489ec107c0e86cec2ffdde5c92e790b"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==68.1.0"
+            "version": "==68.1.2"
         },
         "six": {
             "hashes": [
