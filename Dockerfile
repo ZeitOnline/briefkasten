@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim AS python
+FROM python:3.11.5-slim AS python
 
 FROM python AS app
 RUN apt update
