@@ -1,4 +1,4 @@
-FROM python:3.11.5-slim AS python
+FROM python:3.12.4-slim@sha256:eb37f58646a901dc7727cf448cae36daaefaba79de33b5058dab79aa4c04aefb AS python
 
 FROM python AS app
 RUN apt update
