@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
     paths:
       - docs/**
       - .github/workflows/docs-trigger-build.yaml
@@ -17,7 +16,7 @@ jobs:
 
     steps:
       - name: Trigger Repository Dispatch in docs
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.PRIVATE_REPO_ACCESS_PAT }}
           repository: ZeitOnline/docs
