@@ -12,7 +12,7 @@
     src: nginx.conf
     dest: /usr/local/etc/nginx/nginx.conf
 
-- { include: ssl.yml }
+- include_tasks: ssl.yml
 
 - name: make sure nginx is running or reloaded
   service:
@@ -20,4 +20,9 @@
     state: started
     enabled: true
 
-- { include: acme.yml, tags: acme, when: ploy_use_acme == "true" }
+- include_tasks:
+    file: acme.yml
+    apply:
+      tags:
+        - acme
+      when: ploy_use_acme == "true"
