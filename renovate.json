@@ -2,5 +2,29 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "dependencyDashboard": true,
   "lockFileMaintenance": { "enabled": true },
-  "schedule": ["before 5am every weekday"]
+  "schedule": ["before 5am every weekday"],
+  "ignorePaths": ["k8s/**"],
+  "packageRules":
+  [
+    {
+      "description": "Group (minor) Python package updates into single PRs",
+      "groupName": "pipenv",
+      "automerge": true,
+      "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance"],
+      "matchManagers": ["pipenv"]
+    },
+    {
+      "description": "Group (minor) Node package updates into single PRs",
+      "groupName": "node",
+      "automerge": true,
+      "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance"],
+      "matchManagers": ["npm"]
+    },
+    {
+      "description": "Auto-merge updates for Docker & 'pre-commit'",
+      "automerge": true,
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "matchManagers": ["dockerfile", "pre-commit"]
+    }
+  ]
 }
