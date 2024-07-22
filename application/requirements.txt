@@ -3,7 +3,7 @@ click==8.1.7
 colander==2.0
 cssselect==1.2.0
 diazo==1.5.0
-future==0.18.3
+future==1.0.0
 humanfriendly==10.0
 hupper==1.12.1
 iso8601==2.1.0
