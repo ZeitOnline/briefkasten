@@ -253,3 +253,11 @@ When visiting the page, enter some text into the form and add one or more attach
 You should then see a success message along with a link to the feedback page for this submission.
 
 In addition each editor email configured in ``ploy.conf`` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
+
+Ploy locally with pipenv
+------------------------
+
+On a MacOS with fish shell navigate to `/deployment` folder and generate inside the folder an `etc/ploy.conf`. Then run the script with Pipenv and set LDFLAGS and CPPFLAGS variables (i think you have to install `brew install openssl xz gdbm`)::
+
+    ⋊> ~/b/b/deployment $ ln -s   ../../../etc/staging.conf ploy.conf    
+    ⋊> ~/b/b/deployment $ set -gx LDFLAGS "-L$(brew --prefix)/lib" && set -gx CPPFLAGS "-I$(brew --prefix)/include" && pipenv sync
