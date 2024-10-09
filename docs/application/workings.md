@@ -1,5 +1,4 @@
-The life cycle of a submission
-******************************
+# The life cycle of a submission
 
 Users entrusting us with sensitive data is the key concern of the software and when and getting it straight where this data is stored for how long in what form is crucial.
 
