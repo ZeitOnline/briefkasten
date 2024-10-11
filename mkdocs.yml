@@ -1,0 +1,13 @@
+INHERIT: /zon/common_config.yaml
+site_name: Briefkasten
+repo_url: https://github.com/ZeitOnline/briefkasten
+
+nav:
+    - index.md
+    - Deployment:
+          - index.md
+          - monitoring.md
+    - Application:
+          - develop.md
+          - workings.md
+          - i18n.md
