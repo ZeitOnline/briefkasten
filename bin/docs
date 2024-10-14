@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR/.."
+zon_mkdocs_image="europe-west3-docker.pkg.dev/zeitonline-engineering/docker-zon/zon-mkdocs:latest"
+
+docker pull $zon_mkdocs_image
+
+COMMAND=${1:-html}
+case $COMMAND in
+    serve)
+        docker run --rm -it -p 8000:8000 -v ${PWD}:/docs $zon_mkdocs_image
+    ;;
+    html)
+        docker run --rm -v ${PWD}:/docs $zon_mkdocs_image build --site-dir public
+    ;;
+    *)
+        echo "Unrecognized command: $COMMAND"
+        exit 1
+    ;;
+esac
