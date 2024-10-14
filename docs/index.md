@@ -8,10 +8,10 @@ Upon successful upload the submitter receives a unique URL with a token that he 
 
 The implementation doesn't just contain the application itself but includes a complete deployment setup following what we believe to be best practices so that anybody should be able to host their own secure `briefkasten` with minimal setup pain.
 
-Deployment
+[Deployment](deployment/index.md)
 
 > This section contains all the information on how to install, configure and run your own instance of the briefkasten stack.
 
-Application
+[Application](application/develop.md)
 
 > This section contains information on the inner workings of the application and how to develop or extend it or how to create a custom theme for it.
