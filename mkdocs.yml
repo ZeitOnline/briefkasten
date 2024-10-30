@@ -1,5 +1,5 @@
 INHERIT: /zon/common_config.yaml
-site_name: Briefkasten
+site_name: briefkasten
 repo_url: https://github.com/ZeitOnline/briefkasten
 
 nav:
