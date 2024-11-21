@@ -7,7 +7,7 @@ future==0.18.3
 humanfriendly==10.0
 hupper==1.12.1
 iso8601==2.1.0
-itsdangerous==2.1.2
+itsdangerous==2.2.0
 Jinja2==3.1.4
 lxml==4.9.4
 MarkupSafe==2.1.3
