@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0c88677984178dbd4e73b98d55e1acd38c13f27f7caefd39287d0e7dcde21a18"
+            "sha256": "4b5386ff8114bcca6a9d8b5d17cea82c03b66fb29652366bd9828b93bfd1f766"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -300,9 +300,13 @@
             "version": "==2.12.0"
         },
         "ploy": {
-            "git": "https://github.com/witsch/ploy.git",
+            "hashes": [
+                "sha256:2868ad8ab5a348532daeb139a49fbfddc5a783ef1dc878fbe28e0a102d582faf",
+                "sha256:55240de7393090945f728a31123dea2d131c07261c7b071a361a4de7f6ce8e2a"
+            ],
+            "index": "pypi",
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6'",
-            "ref": "953b8a0a0606e10b282c0bf201dfc00f14466287"
+            "version": "==2.0.1"
         },
         "ploy-ansible": {
             "hashes": [
