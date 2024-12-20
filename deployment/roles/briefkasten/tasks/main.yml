@@ -5,8 +5,8 @@
     state: present
     cached: yes
   with_items:
-    - py39-supervisor
-    - py39-virtualenv
+    - py311-supervisor
+    - py311-virtualenv
     - rsync
     - libxslt
     - sudo
