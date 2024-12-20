@@ -71,10 +71,11 @@
     validate: "visudo -cf %s"
 
 - name: request initial certificate (this may take a while)
-  command: "sudo -u acme /usr/local/sbin/acme.sh --server letsencrypt --issue --webroot /letsencrypt --domain {{ploy_fqdn}} --home /var/db/acme/.acme.sh"
+  command: "sudo -u acme /usr/local/sbin/acme.sh --server letsencrypt --issue --webroot /letsencrypt --domain {{ploy_fqdn}} --home /var/db/acme/.acme.sh" --force
   args:
     chdir: /var/db/acme
     creates: "/var/db/acme/certs/{{ploy_fqdn}}/fullchain.cer"
+  tags: acme_initial
 
 - name: install certificate
   command: "sudo -u acme /usr/local/sbin/acme.sh --install-cert -d {{ploy_fqdn}} --key-file /usr/local/etc/nginx/certs/briefkasten.key --fullchain-file /usr/local/etc/nginx/certs/briefkasten.crt"
