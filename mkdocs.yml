@@ -3,7 +3,7 @@ site_name: briefkasten
 repo_url: https://github.com/ZeitOnline/briefkasten
 
 nav:
-    - index.md
+    - README.md
     - Deployment:
         - deployment/index.md
         - deployment/monitoring.md
