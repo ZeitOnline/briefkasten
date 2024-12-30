@@ -73,7 +73,7 @@
       tags: cleanser_clones
     # grant worker's pyramid user ssh access
     - name: copy keyfile
-      command: cp {{ jails_dir }}/worker/usr/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      command: cp {{ jails_dir }}/worker/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
       args:
         creates: "{{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys"
       tags: cleanser_clones
@@ -87,7 +87,7 @@
     - name: configure known_hosts for cleanser jails
       template:
         src: templates/worker_known_hosts
-        dest: "{{ jails_dir }}/worker/usr/home/{{appuser}}/.ssh/known_hosts"
+        dest: "{{ jails_dir }}/worker/home/{{appuser}}/.ssh/known_hosts"
         owner: "{{appuserid}}"
         mode: "0600"
       tags: cleanser_clones
@@ -96,7 +96,7 @@
   user: root
   tasks:
     - name: fix ownership of known_hosts
-      command: chown pyramid /usr/home/pyramid/.ssh/known_hosts
+      command: chown pyramid /home/pyramid/.ssh/known_hosts
       tags: cleanser_clones
 
 - hosts: briefkasten-cleanser
