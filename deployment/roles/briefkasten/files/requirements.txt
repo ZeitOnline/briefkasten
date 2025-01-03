@@ -24,7 +24,7 @@ six==1.16.0
 translationstring==1.4
 venusian==3.1.1
 watchdog==3.0.0
-WebOb==1.8.8
+WebOb==1.8.9
 zope.deprecation==5.0
 zope.interface==6.4.post2
 briefkasten
