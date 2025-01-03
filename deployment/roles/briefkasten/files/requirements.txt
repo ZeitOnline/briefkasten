@@ -1,4 +1,4 @@
-Chameleon==4.5.4
+Chameleon==4.6.0
 click==8.1.8
 colander==2.0
 cssselect==1.2.0
