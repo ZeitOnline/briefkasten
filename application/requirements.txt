@@ -18,7 +18,7 @@ plaster-pastedeploy==1.0.1
 pyramid==2.0.2
 pyramid-chameleon==0.3
 python-gnupg==0.5.3
-PyYAML==6.0.1
+PyYAML==6.0.2
 repoze.xmliter==0.6.1
 six==1.17.0
 translationstring==1.4
