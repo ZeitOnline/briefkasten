@@ -80,4 +80,4 @@ def reset_jails(confirm=True, keep_cleanser_master=True):
         for jail in jails:
             fab.run('ezjail-admin delete -fw {jail}'.format(jail=jail))
         # remove authorized keys for no longer existing key (they are regenerated for each new worker)
-        fab.run('rm /usr/jails/cleanser/usr/home/cleanser/.ssh/authorized_keys')
+        fab.run('rm /usr/jails/cleanser/home/cleanser/.ssh/authorized_keys')

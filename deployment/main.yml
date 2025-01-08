@@ -53,7 +53,7 @@
         createhome: yes
     - name: create cleanser .ssh
       file:
-        path: /usr/home/cleanser/.ssh
+        path: /home/cleanser/.ssh
         owner: cleanser
         mode: "700"
         state: directory
@@ -73,12 +73,12 @@
       tags: cleanser_clones
     # grant worker's pyramid user ssh access
     - name: copy keyfile
-      command: cp {{ jails_dir }}/worker/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      command: cp {{ jails_dir }}/worker/home/pyramid/.ssh/id_rsa.pub {{ jails_dir }}/cleanser/home/cleanser/.ssh/authorized_keys
       args:
-        creates: "{{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys"
+        creates: "{{ jails_dir }}/cleanser/home/cleanser/.ssh/authorized_keys"
       tags: cleanser_clones
     - name: fix permissions on keyfile
-      command: chmod 600 {{ jails_dir }}/cleanser/usr/home/cleanser/.ssh/authorized_keys
+      command: chmod 600 {{ jails_dir }}/cleanser/home/cleanser/.ssh/authorized_keys
       tags: cleanser_clones
     - name: read ssh pub host key
       shell: sed -E -e 's:[^ ]+$::' {{ jails_dir }}/cleanser/etc/ssh/ssh_host_rsa_key.pub
@@ -103,7 +103,7 @@
   user: root
   tasks:
     - name: ensure ownership of scripts
-      command: chown -R cleanser /usr/home/cleanser
+      command: chown -R cleanser /home/cleanser
       tags: cleanser_clones
     - name: Upload cleanser scripts
       copy:
