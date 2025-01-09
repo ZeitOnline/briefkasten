@@ -1,5 +1,32 @@
-# 0.3.13 - Unreleased
+# 0.3.13 - 2025-01-09
 
+- docs: convert change log to markdown
+- chore(deps): sync dependencies between `Pipfile` and `requirements.txt`
+- fix: adjust path to 'cleaner' home directory to make ssh work
+- fix: change pyramid's home directory in playbooks
+- chore(deps): upgrade application & deployment dependencies
+- chore: upgrade to FreeBSD 14.2
+- chore(deps): switch to a more recent Python (3.11)
+- docs: migrate to mkdocs
+- docs: convert documentation to Markdown
+- docs: add section about how to run ploy with 'pipenv'
+- fix(ci): use `include_tasks` instead of the deprecated `ansible.builtin.include`
+- ZO-4618: set `Strict-Transport-Security` header (HSTS)
+- ZO-942: configure 'setuptools' and 'pytest' via `pyproject.toml`
+- chore(watchdog): remove explicit package dependencies
+- chore(watchdog): clean up package dependencies
+- ZO-3365: split up and refactor test submission and receiver
+- fix: fix expressions used for conditionals
+- fix: use fix for connection timing handling in 'ploy'
+- fix: use `extra_zfs_properties` parameter with the 'zfs' module
+- chore: remove explicit package dependencies
+- chore: use 'renovate' instead of 'dependabot'
+- chore: drop 'setuptools-git-version'
+- chore: use 'pipenv' to upgrade package dependencies
+- fix: expand user directory in path to GPG keys
+- style: fix various 'flake8' warnings
+- chore: add 'pre-commit' configuration
+- chore: log submission requests more verbosely
 
 # 0.3.12 - 2023-06-02
 
