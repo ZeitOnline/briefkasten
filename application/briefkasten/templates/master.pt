@@ -18,7 +18,7 @@
     </metal:content>
     </div>
     <p id="version-info" class="subtext">
-        <a href="https://github.com/ZeitOnline/briefkasten/blob/master/CHANGES.rst">Version ${version}</a>
+        <a href="https://github.com/ZeitOnline/briefkasten/blob/master/CHANGELOG.md">Version ${version}</a>
     </p>
 </body>
 </html>
