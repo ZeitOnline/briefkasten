@@ -110,11 +110,11 @@
         },
         "legacy-cgi": {
             "hashes": [
-                "sha256:8eacc1522d9f76451337a4b5a0abf494158d39250754b0d1bc19a14c6512af9b",
-                "sha256:f2ada99c747c3d72a473a6aaff6259a61f226b06fe9f3106e495ab83fd8f7a42"
+                "sha256:9952471ceb304043b104c22d00b4f333cac27a6abe446d8a528fc437cf13c85f",
+                "sha256:a7b83afb1baf6ebeb56522537c5943ef9813cf933f6715e88a803f7edbce0bff"
             ],
-            "markers": "python_version >= '3.10' and python_version < '4.0'",
-            "version": "==2.6.1"
+            "markers": "python_version >= '3.10'",
+            "version": "==2.6.2"
         },
         "lxml": {
             "hashes": [
@@ -514,11 +514,11 @@
         },
         "zope.deprecation": {
             "hashes": [
-                "sha256:28c2ee983812efb4676d33c7a8c6ade0df191c1c6d652bbbfe6e2eeee067b2d4",
-                "sha256:b7c32d3392036b2145c40b3103e7322db68662ab09b7267afe1532a9d93f640f"
+                "sha256:46bed4611fb53edc731aadeb64b28308bcb848f4cc150c60c948d078f7108721",
+                "sha256:60f957b964d8f947a4a592c647d51ce0f4f844d1f041657956ddde0d9fa9a76a"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==5.0"
+            "markers": "python_version >= '3.9'",
+            "version": "==5.1"
         },
         "zope.interface": {
             "hashes": [
