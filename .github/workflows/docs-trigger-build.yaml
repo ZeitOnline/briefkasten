@@ -1,5 +1,4 @@
 name: Trigger docs main build
-
 on:
   push:
     branches:
@@ -7,13 +6,12 @@ on:
     paths:
       - docs/**
       - .github/workflows/docs-trigger-build.yaml
-
+      - mkdocs.yml
 jobs:
   trigger:
     name: Trigger
     runs-on: zon-ubuntu-general-dind
     if: contains(github.repository, 'ZeitOnline')
-
     steps:
       - name: Trigger Repository Dispatch in docs
         uses: peter-evans/repository-dispatch@v3
