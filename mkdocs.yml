@@ -1,13 +1,13 @@
 INHERIT: /zon/common_config.yaml
-site_name: briefkasten
-repo_url: https://github.com/ZeitOnline/briefkasten
-
 nav:
-    - README.md
-    - Deployment:
-        - deployment/index.md
-        - deployment/monitoring.md
-    - Application:
-        - application/develop.md
-        - application/workings.md
-        - application/i18n.md
+- README.md
+- Deployment:
+  - deployment/index.md
+  - deployment/monitoring.md
+- Application:
+  - application/develop.md
+  - application/workings.md
+  - application/i18n.md
+repo_url: https://github.com/ZeitOnline/briefkasten
+site_name: briefkasten
+team: team-engagement
