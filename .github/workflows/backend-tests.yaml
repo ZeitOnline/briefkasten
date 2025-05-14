@@ -3,16 +3,19 @@ on:
   workflow_call:
   workflow_dispatch:
   push:
+    branches-ignore:
+      - 'main'
     paths:
-      - '.github/workflows/backend-*.yaml'
+      - '.github/workflows/backend-tests.yaml'
       - '.dockerignore'
       - 'Dockerfile'
       - 'testing.yaml'
       - 'application/briefkasten/**'
       - 'application/Pipfile**'
+      - 'application/pyproject.toml'
       - 'application/requirements.txt'
       - 'application/setup.*'
       - 'application/tox.ini'
 jobs:
   build:
-    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@095f279e82a56b4b8d49b8ab614ce347fb7b5e93 # 1.18
+    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@d35d9e9db2653670cf3adfea52ee35f8c85c7862 # 2.2.1
