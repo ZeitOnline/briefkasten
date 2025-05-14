@@ -14,6 +14,9 @@ jobs:
     uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@d35d9e9db2653670cf3adfea52ee35f8c85c7862 # 2.2.1
     needs:
       - linter
+    secrets: inherit
+    with:
+      targets: app    # dummy target in order to run "release-please"
   notify:
     uses: zeitonline/gh-action-workflows/.github/workflows/release-notification.yaml@d35d9e9db2653670cf3adfea52ee35f8c85c7862 # 2.2.1
     needs:
