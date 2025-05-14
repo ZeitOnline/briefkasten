@@ -37,6 +37,7 @@ repos:
     - "--ignore=I001,I003,I005,I900,C408,PT013,R504,S001,S101,T101,T201"
     - "--per-file-ignores=
       appserver.py:E800,S108
+      commands.py:A004
       conf.py:A001,E265,E800
       debug_ttw.py:E800
       dropbox.py:R503,R505,S103,S404,S602,S701
