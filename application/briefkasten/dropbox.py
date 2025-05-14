@@ -9,13 +9,10 @@ from os import makedirs, mkdir, chmod, environ, listdir, remove, stat
 from os.path import exists, isdir, join, splitext, getmtime, split, expanduser
 from datetime import datetime
 from random import SystemRandom
+from smtplib import SMTP
 from zipfile import ZipFile, ZIP_STORED
 from subprocess import call
-from .notifications import (
-    checkRecipient,
-    sendMultiPart,
-    setup_smtp_factory
-)
+from .notifications import checkRecipient, composeMessages
 
 allchars = '23456qwertasdfgzxcvbQWERTASDFGZXCVB789yuiophjknmYUIPHJKLNM'
 
@@ -65,10 +62,6 @@ class DropboxContainer(object):
             clean=self.fs_archive_cleansed,
             dirty=self.fs_archive_dirty,
         )
-
-        # set smtp instance defensively, to not overwrite mocked version from test settings:
-        if 'smtp' not in self.settings:
-            self.settings['smtp'] = setup_smtp_factory(**self.settings)
 
         # setup GPG
         gnupghome = self.settings['fs_pgp_pubkeys']
@@ -342,20 +335,41 @@ class Dropbox(object):
         self.status = u'270 creating final encrypted backup of cleansed attachments'
         return self._create_encrypted_zip(source='clean', fs_target_dir=self.container.fs_archive_cleansed)
 
+    def _setup_smtp(self):
+        """ create an `smtplib.SMTP` instance from `mail.*` settings """
+        if 'smtp' in self.settings:
+            return self.settings['smtp']    # use (mocked) smtp instance from test settings
+        smtp = SMTP(
+            host=self.settings.get('mail.host', 'localhost'),
+            port=int(self.settings.get('mail.port', 587)),
+            timeout=float(self.settings.get('mail.timeout', 60)),
+        )
+        smtp.starttls()
+        if 'mail.user' in self.settings:
+            smtp.login(self.settings.get('mail.user'), self.settings.get('mail.password'))
+        return smtp
+
     def _notify_editors(self):
         if self.send_attachments:
             attachments = self.fs_cleansed_attachments
         else:
             attachments = []
-        return sendMultiPart(
-            self.settings['smtp'],
+        messages = list(composeMessages(
             self.gpg_context,
             self.settings['mail.default_sender'],
             self.editors,
             u'Drop %s' % self.drop_id,
             self._notification_text,
             attachments
-        )
+        ))
+        smtp = self._setup_smtp()
+        for message in messages:
+            # TODO: need to catch exception?
+            # yes :-) we need to adjust the status accordingly (>500 so it will be destroyed)
+            smtp.send_message(message)
+        smtp.quit()
+        smtp.close()
+        return len(messages)
 
     #
     # helper properties:
