@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "briefkasten"
-version = "0.3.13"
+version = "0.3.14"
 maintainers = [{name = 'Tom Lazar', email = 'tom@tomster.org'}]
 description = "a reasonably secure web application for submitting content anonymously"
 dependencies = [
