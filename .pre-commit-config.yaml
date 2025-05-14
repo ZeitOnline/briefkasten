@@ -46,3 +46,9 @@ repos:
       */briefkasten/testing.py:S701,T102
       */briefkasten/tests/test_*.py:S105,S106,S324,ECE001
       */briefkasten_watchdog/__init__.py:G001,G004,G200,N802"
+- repo: https://github.com/compilerla/conventional-pre-commit
+  rev: v4.2.0
+  hooks:
+    - id: conventional-pre-commit
+      stages: [commit-msg]
+      args: ["--verbose"]
