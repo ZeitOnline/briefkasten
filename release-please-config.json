@@ -4,6 +4,13 @@
   "packages": {
     ".": {
       "release-type": "python",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "application/pyproject.toml",
+          "jsonpath": "$.project.version"
+        }
+      ],
       "include-v-in-tag": false
     }
   }
