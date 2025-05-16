@@ -35,6 +35,9 @@ mail.default_sender: {{ploy_mail_sender}}
 {% if ploy_mail_password is defined %}
 mail.user:  {{ploy_mail_user}}
 mail.password: {{ploy_mail_password}}
+{% elif ploy_mail_password_file is defined %}
+mail.user: {{ploy_mail_user}}
+mail.password: {{ lookup('ploy_crypted', playbook_dir + ploy_mail_password_file) }}
 {% endif %}
 num_workers: {{ploy_cleanser_count}}
 attachment_size_threshold: {{ ploy_attachment_size_threshold }}
