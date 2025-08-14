@@ -7,7 +7,7 @@ from pyramid.renderers import get_renderer
 from pyramid.response import FileResponse
 from briefkasten import _, is_equal
 
-title = "ZEIT ONLINE Briefkasten"
+title = "DIE ZEIT Briefkasten"
 version = pkg_resources.get_distribution("briefkasten").version
 
 

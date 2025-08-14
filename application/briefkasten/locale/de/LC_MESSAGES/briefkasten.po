@@ -80,7 +80,7 @@ msgstr "Zurück zur Startseite"
 #: briefkasten/templates/fingerprint.pt:9
 msgid "Your submission is uploaded over a secured connection."
 msgstr ""
-"Die Übermittlung Ihrer hochgeladenen Texte und Dokumente an ZEIT ONLINE "
+"Die Übermittlung Ihrer hochgeladenen Texte und Dokumente an DIE ZEIT "
 "erfolgt über eine verschlüsselte Verbindung."
 
 #: briefkasten/templates/fingerprint.pt:10

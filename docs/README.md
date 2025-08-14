@@ -1,4 +1,4 @@
-# ZEIT Online Briefkasten
+# DIE ZEIT Briefkasten
 
 The `briefkasten` (German for letterbox) is a reasonably secure web application for submitting content anonymously.
 
