@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/ZeitOnline/briefkasten/compare/0.3.14...0.4.0) (2025-08-29)
+
+
+### Features
+
+* **mail:** allow to store the smtp password encrypted ([69c408f](https://github.com/ZeitOnline/briefkasten/commit/69c408f1a62fec85da12e7adeea5d137262cbbc5))
+
+
+### Bug Fixes
+
+* update the company name ([cfda8d2](https://github.com/ZeitOnline/briefkasten/commit/cfda8d28602891de55de40a1f372096d23a80484))
+
 ## [0.3.14](https://github.com/ZeitOnline/briefkasten/compare/0.3.13...0.3.14) (2025-05-14)
 
 
