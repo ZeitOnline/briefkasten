@@ -14,7 +14,7 @@ jobs:
     if: contains(github.repository, 'ZeitOnline')
     steps:
       - name: Trigger Repository Dispatch in docs
-        uses: peter-evans/repository-dispatch@5fc4efd1a4797ddb68ffd0714a238564e4cc0e6f # v4
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
         with:
           token: ${{ secrets.PRIVATE_REPO_ACCESS_PAT }}
           repository: ZeitOnline/docs
