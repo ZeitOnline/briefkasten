@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/ZeitOnline/briefkasten/compare/0.4.0...0.5.0) (2026-01-07)
+
+
+### Features
+
+* **deployment:** switch to `uv` for managing dependencies ([#458](https://github.com/ZeitOnline/briefkasten/issues/458)) ([2bed149](https://github.com/ZeitOnline/briefkasten/commit/2bed149f73a384c70afbe1b071d38fe877b384b9))
+
 ## [0.4.0](https://github.com/ZeitOnline/briefkasten/compare/0.3.14...0.4.0) (2025-08-29)
 
 
