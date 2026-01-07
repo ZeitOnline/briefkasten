@@ -5,6 +5,7 @@ requires-python = ">=3.11,<3.12"
 dependencies = [
     "ansible<5",
     "bsdploy",
+    "keyring",
     "ploy",
     "ploy-ec2",
 ]
