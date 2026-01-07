@@ -27,5 +27,5 @@ venusian==3.1.1
 watchdog==6.0.0
 WebOb==1.8.9
 zope.deprecation==6.0
-zope.interface==7.2
+zope.interface==8.1.1
 briefkasten
