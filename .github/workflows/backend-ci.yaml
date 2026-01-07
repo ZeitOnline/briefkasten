@@ -9,16 +9,16 @@ concurrency:
   cancel-in-progress: true
 jobs:
   linter:
-    uses: zeitonline/gh-action-workflows/.github/workflows/pre-commit.yaml@e802aa322f73bcdda80adb540d193436716e4415 # 2.5.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/pre-commit.yaml@4241bed0752a9d591a002a07a1e46dd0514cf951 # 2.10.1
   build:
-    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@e802aa322f73bcdda80adb540d193436716e4415 # 2.5.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@4241bed0752a9d591a002a07a1e46dd0514cf951 # 2.10.1
     needs:
       - linter
     secrets: inherit
     with:
       targets: $none  # dummy target in order to run "release-please"
   notify:
-    uses: zeitonline/gh-action-workflows/.github/workflows/release-notification.yaml@e802aa322f73bcdda80adb540d193436716e4415 # 2.5.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/release-notification.yaml@4241bed0752a9d591a002a07a1e46dd0514cf951 # 2.10.1
     needs:
       - build
     if: needs.build.outputs.release_created
