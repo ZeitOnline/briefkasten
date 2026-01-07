@@ -14,6 +14,13 @@
       "matchManagers": ["pipenv"]
     },
     {
+      "description": "Group (minor) Python package updates into single PRs",
+      "groupName": "uv",
+      "automerge": true,
+      "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance"],
+      "matchManagers": ["pep621"]
+    },
+    {
       "description": "Group (minor) Node package updates into single PRs",
       "groupName": "node",
       "automerge": true,
