@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "522d64ae40a963e51716969e19712ffa3bde23cfb88c673406be233e9a902907"
+            "sha256": "99a38c2c7c442352f9b0da6435f1b8ea960d47c99aeba11767e4c15eb6bd4e8f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,18 +18,20 @@
     "default": {
         "ansible": {
             "hashes": [
-                "sha256:88af9479e81a3931bb3a1b8c4eeb252cd4f38c03daafd6a5aa120d6b0d70d45c"
+                "sha256:0563dfd33ebd28caf6ccdc7a6d22a7fdafbd9c9c42fefcae5179616a53a35211",
+                "sha256:daafa5c528317f60f68033ad70c59733f4a7548b6255759183cfc7cf422c7fda"
             ],
             "index": "pypi",
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==4.10.0"
+            "markers": "python_version >= '3.11'",
+            "version": "==12.2.0"
         },
         "ansible-core": {
             "hashes": [
-                "sha256:9159cc3b85e2d115f62f975b5155d96466e2a09a1c2e9b91de0c781f9089fc54"
+                "sha256:888db6593f2fd42cd05bdbe546704d9c969dce99e3373a54498f6dbefcfa1917",
+                "sha256:f218e2e8ce4cc95216c48c73badd9789f1dd6ea47e15667213491fb79589316c"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-            "version": "==2.11.12"
+            "markers": "python_version >= '3.11'",
+            "version": "==2.19.4"
         },
         "attrs": {
             "hashes": [
@@ -587,10 +589,11 @@
         },
         "resolvelib": {
             "hashes": [
-                "sha256:8113ae3ed6d33c6be0bcbf03ffeb06c0995c099b7b8aaa5ddf2e9b3b3df4e915",
-                "sha256:9b9b80d5c60e4c2a8b7fbf0712c3449dc01d74e215632e5199850c9eca687628"
+                "sha256:7d08a2022f6e16ce405d60b68c390f054efcfd0477d4b9bd019cc941c28fad1c",
+                "sha256:fb06b66c8da04172d9e72a21d7d06186d8919e32ae5ab5cdf5b9d920be805ac2"
             ],
-            "version": "==0.5.4"
+            "markers": "python_version >= '3.9'",
+            "version": "==1.2.1"
         },
         "ruamel.yaml": {
             "hashes": [
