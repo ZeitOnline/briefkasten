@@ -1,0 +1,13 @@
+[project]
+name = "briefkasten-deployment"
+version = "0.4.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "ansible<5",
+    "bsdploy",
+    "ploy",
+    "ploy-ec2",
+]
+
+[tool.uv.sources]
+bsdploy = { git = "https://github.com/witsch/bsdploy.git", rev = "use-extra-zfs-properties" }
