@@ -11,4 +11,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-bsdploy = { git = "https://github.com/witsch/bsdploy.git", rev = "use-extra-zfs-properties" }
+bsdploy = { git = "https://github.com/witsch/bsdploy.git", rev = "4029c5fa1059d9cf932fdf1366ed663c088bf659" }
