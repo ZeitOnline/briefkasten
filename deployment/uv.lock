@@ -114,7 +114,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "ansible", specifier = "<5" },
-    { name = "bsdploy", git = "https://github.com/witsch/bsdploy.git?rev=use-extra-zfs-properties" },
+    { name = "bsdploy", git = "https://github.com/witsch/bsdploy.git?rev=4029c5fa1059d9cf932fdf1366ed663c088bf659" },
     { name = "keyring" },
     { name = "ploy" },
     { name = "ploy-ec2" },
@@ -123,7 +123,7 @@ requires-dist = [
 [[package]]
 name = "bsdploy"
 version = "3.0.0"
-source = { git = "https://github.com/witsch/bsdploy.git?rev=use-extra-zfs-properties#be81c5b1863e2114433a0102c781918b09993b17" }
+source = { git = "https://github.com/witsch/bsdploy.git?rev=4029c5fa1059d9cf932fdf1366ed663c088bf659#4029c5fa1059d9cf932fdf1366ed663c088bf659" }
 dependencies = [
     { name = "ansible" },
     { name = "backports-lzma" },
