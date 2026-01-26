@@ -12,3 +12,14 @@ dependencies = [
 
 [tool.uv.sources]
 bsdploy = { git = "https://github.com/witsch/bsdploy.git", rev = "use-extra-zfs-properties" }
+
+[tool.ruff]
+line-length = 92
+target-version = "py314"
+
+
+[tool.ruff.lint]
+select = ["A", "B", "C4", "E", "EXE", "F", "FIX", "G", "PT", "S", "T10", "T20", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"appserver.py" = ["S108"]
