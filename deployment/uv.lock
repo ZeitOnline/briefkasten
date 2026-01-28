@@ -4,16 +4,28 @@ requires-python = "==3.11.*"
 
 [[package]]
 name = "ansible"
-version = "4.10.0"
+version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ansible-core" },
+    { name = "ansible-base" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/f8/071905c6a67592d0852a9f340f6ab9226861eeeb97fdf4068642b22edcf3/ansible-4.10.0.tar.gz", hash = "sha256:88af9479e81a3931bb3a1b8c4eeb252cd4f38c03daafd6a5aa120d6b0d70d45c", size = 36832606, upload-time = "2021-12-14T21:04:23.159Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/f3/7e7e3647d58b266768a000b5830c7fca7c02eac4e724e9b23309b735f9b2/ansible-3.4.0.tar.gz", hash = "sha256:ca34e2c0c3f92cad5e528c94c133e620845feb11cc62f42e98d28271fe5bd924", size = 31898355, upload-time = "2021-05-11T21:32:33.524Z" }
+
+[[package]]
+name = "ansible-base"
+version = "2.10.17"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cryptography" },
+    { name = "jinja2" },
+    { name = "packaging" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fe/56/b18bf0167aa6e2ab195d0c2736992a3a9aeca1ddbefebee554226d211267/ansible-base-2.10.17.tar.gz", hash = "sha256:ef925882ca8d4c3c2ccd091cde199e0c869024ccad0d07a337dcf207bff32f34", size = 6135744, upload-time = "2022-01-31T20:35:24.348Z" }
 
 [[package]]
 name = "ansible-core"
-version = "2.11.12"
+version = "2.16.14rc1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -22,7 +34,10 @@ dependencies = [
     { name = "pyyaml" },
     { name = "resolvelib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/98/ea/2935bf0864196cd2c9d14548e399a110f48b3540664ddc462b39ff0b822d/ansible-core-2.11.12.tar.gz", hash = "sha256:9159cc3b85e2d115f62f975b5155d96466e2a09a1c2e9b91de0c781f9089fc54", size = 7118115, upload-time = "2022-05-23T16:04:44.032Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/62/1fb0555ead2f1ee48cd681f57633f6c3ea3499e2ad31428d52771579e401/ansible_core-2.16.14rc1.tar.gz", hash = "sha256:9957e880fdb2685aece141d50f21d62acabd6a984fa75948fb32a9d2b50d4eed", size = 3163002, upload-time = "2024-11-25T18:58:03.025Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/db/f14e36187997b6fb42bbd284eab76fa1cafdd0d99fbbed8655e0fe9816db/ansible_core-2.16.14rc1-py3-none-any.whl", hash = "sha256:731fdd4d1bd8a20cebd7c919006582983a2397df5dea7b24056e08acf5c14ab3", size = 2254260, upload-time = "2024-11-25T18:58:01.294Z" },
+]
 
 [[package]]
 name = "attrs"
