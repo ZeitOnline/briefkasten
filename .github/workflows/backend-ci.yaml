@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   linter:
-    uses: zeitonline/gh-action-workflows/.github/workflows/pre-commit.yaml@f17cf763525166b0862b3bd4ed89850e29e44f3a # 2.11.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/lefthook.yaml@f17cf763525166b0862b3bd4ed89850e29e44f3a # 2.11.0
   build:
     uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@f17cf763525166b0862b3bd4ed89850e29e44f3a # 2.11.0
     needs:
