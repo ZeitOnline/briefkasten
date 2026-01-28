@@ -21,3 +21,11 @@ watchdog = "briefkasten_watchdog:cli"
 
 [tool.setuptools]
 packages = ["briefkasten_watchdog"]
+
+[tool.ruff]
+line-length = 102
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["A", "B", "C4", "E", "EXE", "F", "FIX", "G", "PT", "S", "T10", "T20", "UP"]
+ignore = ["C408", "FIX002", "G001", "G004", "UP025"]
