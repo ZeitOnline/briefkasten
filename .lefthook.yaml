@@ -1,0 +1,8 @@
+pre-commit:
+  parallel: true
+  commands:
+    editorconfig:
+      run: uvx --quiet --from editorconfig-checker ec {staged_files}
+    ruff:
+      glob: "*.{py}"
+      run: uvx --quiet ruff check --exit-non-zero-on-fix {staged_files}

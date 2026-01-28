@@ -1,4 +1,3 @@
-# coding: utf-8
 from fabric import api as fab
 from fabric.api import env, task
 from bsdploy.fabfile_mfsbsd import bootstrap as mfsbootstrap
@@ -27,8 +26,9 @@ def get_vars():
 
 @task
 def reset_cleansers(confirm=True):
-    """destroys all cleanser slaves and their rollback snapshots, as well as the initial master
-    snapshot - this allows re-running the jailhost deployment to recreate fresh cleansers."""
+    """destroys all cleanser slaves and their rollback snapshots, as well as the initial
+    master snapshot - this allows re-running the jailhost deployment to recreate fresh
+    cleansers."""
 
     if value_asbool(confirm) and not yesno("""\nObacht!
             This will destroy any existing and or currently running cleanser jails.
@@ -42,13 +42,13 @@ def reset_cleansers(confirm=True):
     fab.run('ezjail-admin stop worker')
     # stop and nuke the cleanser slaves
     for cleanser_index in range(cleanser_count):
-        cindex = '{:02d}'.format(cleanser_index + 1)
-        fab.run('ezjail-admin stop cleanser_{cindex}'.format(cindex=cindex))
+        cindex = f'{cleanser_index + 1:02d}'
+        fab.run(f'ezjail-admin stop cleanser_{cindex}')
         with fab.warn_only():
-            fab.run('zfs destroy tank/jails/cleanser_{cindex}@jdispatch_rollback'.format(cindex=cindex))
-            fab.run('ezjail-admin delete -fw cleanser_{cindex}'.format(cindex=cindex))
-            fab.run('umount -f /usr/jails/cleanser_{cindex}'.format(cindex=cindex))
-            fab.run('rm -rf /usr/jails/cleanser_{cindex}'.format(cindex=cindex))
+            fab.run(f'zfs destroy tank/jails/cleanser_{cindex}@jdispatch_rollback')
+            fab.run(f'ezjail-admin delete -fw cleanser_{cindex}')
+            fab.run(f'umount -f /usr/jails/cleanser_{cindex}')
+            fab.run(f'rm -rf /usr/jails/cleanser_{cindex}')
 
     with fab.warn_only():
         # remove master snapshot
@@ -78,6 +78,7 @@ def reset_jails(confirm=True, keep_cleanser_master=True):
 
     with fab.warn_only():
         for jail in jails:
-            fab.run('ezjail-admin delete -fw {jail}'.format(jail=jail))
-        # remove authorized keys for no longer existing key (they are regenerated for each new worker)
+            fab.run(f'ezjail-admin delete -fw {jail}')
+        # remove authorized keys for no longer existing key
+        # (they are regenerated for each new worker)
         fab.run('rm /usr/jails/cleanser/home/cleanser/.ssh/authorized_keys')

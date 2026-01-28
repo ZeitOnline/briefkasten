@@ -39,3 +39,18 @@ packages = ["briefkasten"]
 
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers --cov=briefkasten --cov-report=term --cov-report=html --doctest-modules"
+
+[tool.ruff]
+line-length = 132
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["A", "B", "C4", "E", "EXE", "F", "FIX", "G", "PT", "S", "T10", "T20", "UP"]
+ignore = ["C408", "FIX002", "T201", "UP009", "UP015", "UP025", "UP031"]
+
+[tool.ruff.lint.per-file-ignores]
+"briefkasten/__init__.py" = [ "B904", "B905" ]
+"briefkasten/commands.py" = [ "A004" ]
+"briefkasten/dropbox.py" = [ "S103", "S602", "S701", "UP004", "UP024" ]
+"briefkasten/testing.py" = [ "FIX003", "PT001", "PT003", "PT013", "PT021", "S701", "UP026" ]
+"briefkasten/tests/*.py" = [ "B018", "PT003", "PT013", "S101", "S105", "S106", "S324", "UP026" ]

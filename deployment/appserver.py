@@ -1,4 +1,3 @@
-# coding: utf-8
 from os import path
 from fabric import api as fab
 from fabric.api import env, task
@@ -33,7 +32,7 @@ def upload_theme():
         rsync(
             "-av",
             "--delete",
-            "%s/" % local_theme_path,
+            f"{local_theme_path}/",
             "{{host_string}}:{themes_dir}/{ploy_theme_name}".format(**AV),
         )
         briefkasten_ctl("restart")
@@ -45,24 +44,24 @@ def upload_pgp_keys():
     get_vars()
     upload_target = "/tmp/pgp_pubkeys.tmp"
     with fab.settings(fab.hide("running")):
-        fab.run("rm -rf %s" % upload_target)
-        fab.run("mkdir %s" % upload_target)
+        fab.run(f"rm -rf {upload_target}")
+        fab.run(f"mkdir {upload_target}")
         local_key_path = path.join(
             fab.env["config_base"], fab.env.instance.config["local_pgpkey_path"]
         )
         remote_key_path = "/var/briefkasten/pgp_pubkeys/".format(**AV)
-        rsync("-av", local_key_path, "{host_string}:%s" % upload_target)
-        fab.run("chown -R %s %s" % (AV["appuser"], remote_key_path))
-        fab.run("chmod 700 %s" % remote_key_path)
+        rsync("-av", local_key_path, f"{{host_string}}:{upload_target}")
+        fab.run("chown -R {} {}".format(AV["appuser"], remote_key_path))
+        fab.run(f"chmod 700 {remote_key_path}")
         with fab.shell_env(GNUPGHOME=remote_key_path):
             # gpg is stingy with exit code 0:
             with fab.warn_only():
                 fab.sudo(
-                    """gpg --import %s/*.*""" % upload_target,
+                    f"""gpg --import {upload_target}/*.*""",
                     user=AV["appuser"],
                     shell_escape=False,
                 )
-        fab.run("rm -rf %s" % upload_target)
+        fab.run(f"rm -rf {upload_target}")
 
 
 @task
@@ -93,7 +92,8 @@ def briefkasten_ctl(action="restart"):
 @task
 def update_backend(use_pypi=False, index="dev", build=True, user=None, version=None):
     """
-    Install the backend from the given devpi index at the given version on the target host and restart the service.
+    Install the backend from the given devpi index at the given version on the target host
+    and restart the service.
 
     If version is None, it defaults to the latest version
 
@@ -107,11 +107,12 @@ def update_backend(use_pypi=False, index="dev", build=True, user=None, version=N
         if value_asbool(use_pypi):
             command = "bin/pip install --upgrade %s"
         else:
-            command = "bin/pip install --upgrade --pre -i {ploy_default_publish_devpi}/briefkasten/{index}/+simple/ %s".format(
-                index=index, user=user, **AV
+            command = (
+                f"bin/pip install --upgrade --pre -i "
+                f"{AV['ploy_default_publish_devpi']}/briefkasten/{index}/+simple/ %s"
             )
         if version:
-            app_command = "%s==%s" % (command, version)
+            app_command = f"{command}=={version}"
         else:
             app_command = command
         fab.sudo(app_command % 'briefkasten')
@@ -128,9 +129,7 @@ def use_devpi(index="dev"):
     get_vars()
     publish_devpi = AV.get("ploy_default_publish_devpi")
     return fab.local(
-        "devpi use {base_url}/briefkasten/{index}".format(
-            index=index, base_url=publish_devpi
-        ),
+        f"devpi use {publish_devpi}/briefkasten/{index}",
         capture=True,
     )
 
@@ -140,4 +139,4 @@ def login_devpi(index="dev", user=None):
     use_devpi(index=index)
     if user is None:
         user = fab.env["user"]
-    fab.local("devpi login {user}".format(user=user))
+    fab.local(f"devpi login {user}")
