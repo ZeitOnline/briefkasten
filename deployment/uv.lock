@@ -4,16 +4,19 @@ requires-python = "==3.11.*"
 
 [[package]]
 name = "ansible"
-version = "4.10.0"
+version = "12.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/f8/071905c6a67592d0852a9f340f6ab9226861eeeb97fdf4068642b22edcf3/ansible-4.10.0.tar.gz", hash = "sha256:88af9479e81a3931bb3a1b8c4eeb252cd4f38c03daafd6a5aa120d6b0d70d45c", size = 36832606, upload-time = "2021-12-14T21:04:23.159Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d4/df/60253bfc1f87e3d5b52a06723cc15270428dab113a878cd162ab3923db4e/ansible-12.3.0.tar.gz", hash = "sha256:02721f6fb432ddd47f1044ac49b04b5e9ae08890bd427def8df3db1607aeec51", size = 52065271, upload-time = "2025-12-09T21:04:42.344Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dc/91/ed9ff629465050d4bdbc9da33d348156736b8778733f97a3627daae4f9ce/ansible-12.3.0-py3-none-any.whl", hash = "sha256:cd156f82fa87f7a899212b0efa9f7ca3a24d609212de9f78428a572eb01e5414", size = 54354494, upload-time = "2025-12-09T21:04:36.923Z" },
+]
 
 [[package]]
 name = "ansible-core"
-version = "2.11.12"
+version = "2.19.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -22,7 +25,10 @@ dependencies = [
     { name = "pyyaml" },
     { name = "resolvelib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/98/ea/2935bf0864196cd2c9d14548e399a110f48b3540664ddc462b39ff0b822d/ansible-core-2.11.12.tar.gz", hash = "sha256:9159cc3b85e2d115f62f975b5155d96466e2a09a1c2e9b91de0c781f9089fc54", size = 7118115, upload-time = "2022-05-23T16:04:44.032Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/f7/030452764ef32f11ab7abe61a49ca6ccee777217253753f87b85aafd6183/ansible_core-2.19.5.tar.gz", hash = "sha256:d03660ff32ba8a5ae40a82148cb24b38a35d26c0155621ddd9148b7562fd8be2", size = 3412598, upload-time = "2025-12-09T16:48:44.079Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/aa/547b4c30e72d801bd53b75c0233eb125978b5280b149f00b58d6c8ea26aa/ansible_core-2.19.5-py3-none-any.whl", hash = "sha256:7fa6c052bad2c294284b960d240b4cd227060fd2e3836d381db44d2bcfcdf4b7", size = 2415436, upload-time = "2025-12-09T16:48:42.677Z" },
+]
 
 [[package]]
 name = "attrs"
@@ -113,7 +119,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ansible", specifier = "<5" },
+    { name = "ansible", specifier = "<13" },
     { name = "bsdploy", git = "https://github.com/witsch/bsdploy.git?rev=use-extra-zfs-properties" },
     { name = "keyring" },
     { name = "ploy" },
