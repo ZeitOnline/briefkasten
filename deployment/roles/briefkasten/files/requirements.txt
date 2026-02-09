@@ -21,7 +21,7 @@ pyramid-chameleon==0.3
 python-gnupg==0.5.6
 PyYAML==6.0.3
 repoze.xmliter==1.0
-setuptools==80.9.0
+setuptools==82.0.0
 translationstring==1.4
 venusian==3.1.1
 watchdog==6.0.0
