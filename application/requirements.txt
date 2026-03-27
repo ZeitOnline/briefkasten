@@ -16,7 +16,7 @@ Paste==3.10.1
 PasteDeploy==3.1.0
 plaster==1.1.2
 plaster-pastedeploy==1.0.1
-pyramid==2.0.2
+pyramid==2.1
 pyramid-chameleon==0.3
 python-gnupg==0.5.6
 PyYAML==6.0.3
