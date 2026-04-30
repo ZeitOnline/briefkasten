@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import shutil
+from os.path import abspath, dirname, join
+from urllib.parse import unquote
+
+from _pytest.assertion.rewrite import AssertionRewritingHook
 from cgi import FieldStorage
 from jinja2 import Environment, FileSystemLoader
-from os.path import abspath, dirname, join
 from mock import Mock
-from pkg_resources import register_loader_type, DefaultProvider
+from pkg_resources import DefaultProvider, register_loader_type
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pytest import fixture
-from _pytest.assertion.rewrite import AssertionRewritingHook
-from urllib.parse import unquote
 from webtest import TestApp
 
 # XXX Pytest somehow breaks `pkg_resources.get_provider` by preventing its
@@ -17,37 +18,37 @@ from webtest import TestApp
 register_loader_type(AssertionRewritingHook, DefaultProvider)
 
 
+def test():
+    return "Test"
+
+
 def asset_path(*parts):
-    return abspath(join(dirname(__file__), 'tests', *parts))
+    return abspath(join(dirname(__file__), "tests", *parts))
 
 
-jinja_env = Environment(
-    loader=FileSystemLoader(asset_path()))
+jinja_env = Environment(loader=FileSystemLoader(asset_path()))
 
 
 @fixture(scope="function")
 def gpghome(tmpdir):
-    fs_gpghome = join(tmpdir.strpath, 'gpghome')
-    shutil.copytree(asset_path('gpghome'), fs_gpghome)
+    fs_gpghome = join(tmpdir.strpath, "gpghome")
+    shutil.copytree(asset_path("gpghome"), fs_gpghome)
     return fs_gpghome
 
 
 @fixture(scope="function")
 def dropbox_container(request, tmpdir, gpghome):
     from briefkasten.dropbox import DropboxContainer
+
     # initialize empty directory with settings from template:
     fs_drop_root = tmpdir.strpath
-    with open(join(fs_drop_root, 'settings.yaml'), 'w') as fs_settings:
-        fs_settings.write(
-            jinja_env.get_template('drop_root_template/settings.yaml').render(
-                fs_pgp_pubkeys=gpghome
-            )
-        )
+    with open(join(fs_drop_root, "settings.yaml"), "w") as fs_settings:
+        fs_settings.write(jinja_env.get_template("drop_root_template/settings.yaml").render(fs_pgp_pubkeys=gpghome))
     dropbox_container = DropboxContainer(
         root=fs_drop_root,
         settings=dict(
             smtp=Mock(),
-            fs_bin_path=asset_path('bin'),
+            fs_bin_path=asset_path("bin"),
         ),
     )
     request.addfinalizer(dropbox_container.destroy)
@@ -57,16 +58,16 @@ def dropbox_container(request, tmpdir, gpghome):
 @fixture
 def settings(dropbox_container, gpghome):
     return {
-        'appserver_root_url': '/briefkasten/',
-        'fs_dropbox_root': dropbox_container.fs_root,
-        'fs_bin_path': asset_path('bin'),
-        'post_secret': u's3cr3t',
+        "appserver_root_url": "/briefkasten/",
+        "fs_dropbox_root": dropbox_container.fs_root,
+        "fs_bin_path": asset_path("bin"),
+        "post_secret": "s3cr3t",
     }
 
 
 @fixture()
 def config(request, settings):
-    """ Sets up a Pyramid `Configurator` instance suitable for testing. """
+    """Sets up a Pyramid `Configurator` instance suitable for testing."""
     config = setUp(settings=settings)
     request.addfinalizer(tearDown)
     return config
@@ -74,14 +75,15 @@ def config(request, settings):
 
 @fixture
 def app(config):
-    """ Returns WSGI application wrapped in WebTest's testing interface. """
+    """Returns WSGI application wrapped in WebTest's testing interface."""
     from . import configure
+
     return configure({}, **config.registry.settings).make_wsgi_app()
 
 
 @fixture
 def browser(app, request):
-    extra_environ = dict(HTTP_HOST='example.com')
+    extra_environ = dict(HTTP_HOST="example.com")
     browser = TestApp(app, extra_environ=extra_environ)
     return browser
 
@@ -91,11 +93,12 @@ def dummy_request(config):
     return DummyRequest()
 
 
-@fixture(scope='session')
+@fixture(scope="session")
 def testing():
-    """ Returns the `testing` module. """
+    """Returns the `testing` module."""
     from sys import modules
-    return modules[__name__]    # `testing.py` has already been imported
+
+    return modules[__name__]  # `testing.py` has already been imported
 
 
 def route_url(name, **kwargs):
