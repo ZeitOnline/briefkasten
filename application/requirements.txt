@@ -25,6 +25,6 @@ setuptools==80.10.2
 translationstring==1.4
 venusian==3.1.1
 watchdog==6.0.0
-WebOb==1.8.9
+WebOb==1.8.10
 zope.deprecation==6.0
 zope.interface==8.2
