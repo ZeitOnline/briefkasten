@@ -1,5 +1,5 @@
 Chameleon==4.6.0
-click==8.3.1
+click==8.4.1
 colander==2.0
 cssselect==1.4.0
 diazo==2.0.6
