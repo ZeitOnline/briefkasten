@@ -9,23 +9,23 @@ concurrency:
   cancel-in-progress: true
 jobs:
   linter:
-    uses: zeitonline/gh-action-workflows/.github/workflows/lefthook.yaml@0e9360ebe8baf323a1bfd03567237f05bfb239df # 3.0.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/lefthook.yaml@d0c1b354a122f39a58bdb7d1cfa87ae3c0aa7532 # 3.0.2
   # run 'release-please' first
   release-please:
     needs: linter
-    uses: zeitonline/gh-action-workflows/.github/workflows/release-please.yaml@0e9360ebe8baf323a1bfd03567237f05bfb239df # 3.0.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/release-please.yaml@d0c1b354a122f39a58bdb7d1cfa87ae3c0aa7532 # 3.0.2
     secrets: inherit
   # without release: run tests
   build:
     needs: release-please
     if: ${{ ! needs.release-please.outputs.release_created }}
-    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@0e9360ebe8baf323a1bfd03567237f05bfb239df # 3.0.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@d0c1b354a122f39a58bdb7d1cfa87ae3c0aa7532 # 3.0.2
     secrets: inherit
   # with release: notify
   notify:
     needs: release-please
     if: needs.release-please.outputs.release_created
-    uses: zeitonline/gh-action-workflows/.github/workflows/release-notification.yaml@0e9360ebe8baf323a1bfd03567237f05bfb239df # 3.0.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/release-notification.yaml@d0c1b354a122f39a58bdb7d1cfa87ae3c0aa7532 # 3.0.2
     secrets: inherit
     with:
       environment: production
