@@ -3,7 +3,7 @@ name = "briefkasten-deployment"
 version = "0.4.0"
 requires-python = ">=3.11,<3.12"
 dependencies = [
-    "ansible<5",
+    "ansible<13",
     "bsdploy",
     "keyring",
     "ploy",
