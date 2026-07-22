@@ -8,7 +8,7 @@ dependencies = [
     "keyring",
     "ploy",
     "ploy-ec2",
-    "setuptools<82",
+    "setuptools<84",
 ]
 
 [tool.uv.sources]
