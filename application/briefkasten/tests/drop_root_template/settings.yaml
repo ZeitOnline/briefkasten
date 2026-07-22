@@ -5,7 +5,7 @@ dropbox_editor_url_format: 'http://example.com/briefkasten/dropbox/%s/%s'
 dropbox_dirty_archive_url_format: 'file://tmp/dirty/%s.zip'
 test_submission_secret: changeme
 testing_secret: 'changemetoo'
-debug: True
+debug: true
 editors:
   - editor@briefkasten.dtfh.de
 admins:

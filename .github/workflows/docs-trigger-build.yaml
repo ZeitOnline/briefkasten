@@ -1,3 +1,4 @@
+---
 name: Trigger docs main build
 on:
   push:

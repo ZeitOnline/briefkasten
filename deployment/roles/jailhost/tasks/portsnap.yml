@@ -1,3 +1,4 @@
+---
 - name: custom portsnap configuration
   lineinfile:
     dest: /etc/portsnap.conf

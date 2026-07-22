@@ -29,4 +29,5 @@ lint = [
     "editorconfig-checker>=3.6.1",
     "lefthook>=2.1.10",
     "ruff>=0.15.22",
+    "yamllint>=1.38.0",
 ]

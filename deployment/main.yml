@@ -7,10 +7,10 @@
       args:
         creates: "/usr/jails/{{item}}"
       with_items:
-      - worker
-      - webserver
-      - appserver
-      - cleanser
+        - worker
+        - webserver
+        - appserver
+        - cleanser
       tags: jails
 
 - hosts: briefkasten-webserver
@@ -43,10 +43,10 @@
         name: "{{ item }}"
         state: present
       with_items:
-      - zip
-      - netpbm
-      - ghostscript10
-      - libreoffice
+        - zip
+        - netpbm
+        - ghostscript10
+        - libreoffice
     - name: create cleanser user
       user:
         name: cleanser
@@ -156,8 +156,8 @@
         group: wheel
         mode: "0755"
       tags:
-      - cleanser_clones
-      - jdispatch
+        - cleanser_clones
+        - jdispatch
     - name: configure jdispatch tool
       template:
         src: templates/jdispatch.conf
@@ -175,23 +175,23 @@
         owner: root
         group: wheel
       tags:
-      - jdispatch
+        - jdispatch
     - name: make sure jdispatch tool is running and enabled
       service:
         name: jdispatch
         state: started
         enabled: true
       tags:
-      - jdispatch
+        - jdispatch
     - name: enable cronjob for jdispatch (as 'reaper')
       cron:
         name: "make sure long-running cleanser jails are reaped"
         job: "/usr/local/bin/jdispatch"
         minute: "*/3"
       tags:
-      - jdispatch
+        - jdispatch
   roles:
     - role: zabbix-agent
       when: ploy_enable_zabbix == "true"
       tags:
-      - zabbix-agent
+        - zabbix-agent

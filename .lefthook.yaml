@@ -1,3 +1,4 @@
+---
 pre-commit:
   parallel: true
   commands:
@@ -6,3 +7,6 @@ pre-commit:
     ruff:
       glob: "*.{py}"
       run: uvx --quiet ruff check --exit-non-zero-on-fix {staged_files}
+    yamllint:
+      glob: "*.{yaml,yml}"
+      run: yamllint {staged_files}
