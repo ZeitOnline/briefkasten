@@ -23,3 +23,10 @@ select = ["A", "B", "C4", "E", "EXE", "F", "FIX", "G", "PT", "S", "T10", "T20", 
 
 [tool.ruff.lint.per-file-ignores]
 "appserver.py" = ["S108"]
+
+[dependency-groups]
+lint = [
+    "editorconfig-checker>=3.6.1",
+    "lefthook>=2.1.10",
+    "ruff>=0.15.22",
+]

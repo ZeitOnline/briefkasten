@@ -10,6 +10,9 @@ concurrency:
 jobs:
   linter:
     uses: zeitonline/gh-action-workflows/.github/workflows/lefthook.yaml@89c86adf124007d97fae113c3e0c176e9c8391c6 # 4.1.0
+    with:
+      setup-command: |
+        uv sync --active --frozen --only-group lint --project deployment/
   # run 'release-please' first
   release-please:
     needs: linter
