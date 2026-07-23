@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0](https://github.com/ZeitOnline/briefkasten/compare/0.4.0...0.5.0) (2026-07-23)
+
+
+### Features
+
+* **ci:** use updated GHA workflows ([11e33b7](https://github.com/ZeitOnline/briefkasten/commit/11e33b73afbf3bf6779e9cd5a6e8c342ebec714a))
+* **deployment:** switch to `uv` for managing dependencies ([#458](https://github.com/ZeitOnline/briefkasten/issues/458)) ([2bed149](https://github.com/ZeitOnline/briefkasten/commit/2bed149f73a384c70afbe1b071d38fe877b384b9))
+* use 'lefthook' to run code checks via git hooks ([#468](https://github.com/ZeitOnline/briefkasten/issues/468)) ([13a4922](https://github.com/ZeitOnline/briefkasten/commit/13a4922ebea2b52a5847138cd79896787782180b))
+
 ## [0.4.0](https://github.com/ZeitOnline/briefkasten/compare/0.3.14...0.4.0) (2025-08-29)
 
 
