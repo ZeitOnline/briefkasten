@@ -5,8 +5,8 @@
     state: present
     cached: yes
   with_items:
-    - py311-supervisor
-    - py311-virtualenv
+    - py312-supervisor
+    - py312-virtualenv
     - rsync
     - libxslt
     - sudo
@@ -48,7 +48,7 @@
     extra_args: "--upgrade"
   with_items:
     - pip
-    - setuptools
+    - "setuptools<82"
 
 - name: install python eggs
   pip:
