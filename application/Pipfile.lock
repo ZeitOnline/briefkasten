@@ -377,11 +377,11 @@
         },
         "pyramid": {
             "hashes": [
-                "sha256:2e6585ac55c147f0a51bc00dadf72075b3bdd9a871b332ff9e5e04117ccd76fa",
-                "sha256:372138a738e4216535cc76dcce6eddd5a1aaca95130f2354fb834264c06f18de"
+                "sha256:0aa62604221f6a8ac6e77a0faa02a5b7a294d6675f15581d8d416dffe2ac98e7",
+                "sha256:5a24bc1b5f9e0f0d1c0b6ddd1111e84c15dac44a07e3c1d24e74dd9bb4fc22eb"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==2.0.2"
+            "markers": "python_version >= '3.10'",
+            "version": "==2.1"
         },
         "pyramid-chameleon": {
             "hashes": [
@@ -485,11 +485,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:025bccbbf0fa05b6192bc64ae1e7b16e001fd6d6d4d5de03c97b1c1ade523bef",
-                "sha256:29b23c360f22f414dc7336bb39178cc7bcbf6021ed2733cde173f09dba19abb3"
+                "sha256:487b53915f52501f0a79ccfd0c02c165ffe06631443a886740b91af4b7a5845a",
+                "sha256:fdd925d5c5d9f62e4b74b30d6dd7828ce236fd6ed998a08d81de62ce5a6310d6"
             ],
-            "markers": "python_version >= '3.10'",
-            "version": "==83.0.0"
+            "markers": "python_version >= '3.9'",
+            "version": "==81.0.0"
         },
         "translationstring": {
             "hashes": [
