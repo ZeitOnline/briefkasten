@@ -7,6 +7,7 @@ name = "briefkasten"
 version = "0.4.0"
 maintainers = [{name = 'Tom Lazar', email = 'tom@tomster.org'}]
 description = "a reasonably secure web application for submitting content anonymously"
+requires-python = ">=3.12"
 dependencies = [
     "Pyramid <2.2",
     "pyramid_chameleon",
@@ -21,6 +22,14 @@ dependencies = [
     "Paste",
     "watchdog",
     "PyYAML",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "mock",
+    "webtest",
 ]
 
 [project.entry-points."paste.app_factory"]

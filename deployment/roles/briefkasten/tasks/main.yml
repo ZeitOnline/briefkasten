@@ -11,6 +11,7 @@
     - libxslt
     - sudo
     - gnupg
+    - uv
 
 - name: create application user
   # this creates /home/pyramid/.ssh/id_rsa{.pub}
@@ -27,32 +28,32 @@
     owner: "{{appuser}}"
     mode: "775"
 
-- name: init virtualenv in application directory
-  command: virtualenv .
-  args:
-    chdir: "{{apphome}}"
-    creates: "{{apphome}}/bin/python"
-
 - name: upload requirements
   copy:
-    src: requirements.txt
+    src: "../../../../application/{{item}}"
     dest: "{{apphome}}/"
     owner: "root"
     mode: "644"
+  with_items:
+    - pyproject.toml
+    - uv.lock
   tags: update-briefkasten
 
-- name: update pip & co
-  pip:
-    name: "{{item}}"
-    virtualenv: "{{apphome}}"
-    extra_args: "--upgrade"
-  with_items:
-    - pip
-    - "setuptools<82"
-
 - name: install python eggs
-  pip:
-    virtualenv: "{{apphome}}"
-    extra_args: "--upgrade"
-    requirements: "{{apphome}}/requirements.txt"
+  command: "uv sync --frozen --no-install-project"
+  args:
+    chdir: "{{apphome}}"
+  tags: update-briefkasten
+
+- name: install briefkasten
+  command: "uv pip install --no-deps briefkasten"
+  args:
+    chdir: "{{apphome}}"
+  tags: update-briefkasten
+
+- name: symlink `bin/` directory
+  file:
+    src: "{{apphome}}/.venv/bin"
+    dest: "{{apphome}}/bin"
+    state: link
   tags: update-briefkasten
