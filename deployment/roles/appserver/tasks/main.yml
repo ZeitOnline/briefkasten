@@ -17,11 +17,11 @@
 
 - name: upload frontend theme
   # requires ploy-ssh to be in $PATH
-  synchronize:
-    src: "../../{{ploy_local_theme_path}}"
-    dest: "{{themes_dir}}/{{ploy_theme_name}}"
-    rsync_opts:
-      - "-e ploy-ssh"
+  delegate_to: localhost
+  command: >
+    rsync -av --delete -e ploy-ssh
+    ../../{{ploy_local_theme_path}}/
+    {{inventory_hostname}}:{{themes_dir}}/{{ploy_theme_name}}/
   notify: restart application
   tags: update-theme
   when: ploy_use_diazo == "true"
