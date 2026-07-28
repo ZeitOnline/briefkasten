@@ -14,7 +14,7 @@ on:
       - 'application/briefkasten/**'
       - 'application/Pipfile**'
       - 'application/pyproject.toml'
-      - 'application/requirements.txt'
+      - 'application/uv.lock'
       - 'application/setup.*'
       - 'application/tox.ini'
 jobs:
