@@ -4,12 +4,14 @@
   "lockFileMaintenance": { "enabled": true },
   "schedule": ["before 5am every weekday"],
   "ignorePaths": ["k8s/**"],
+  "prCreation": "not-pending",
   "packageRules":
   [
     {
       "description": "Group (minor) Python package updates into single PRs",
       "groupName": "uv",
       "automerge": true,
+      "minimumReleaseAge": "7 days",
       "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance"],
       "matchManagers": ["pep621"]
     },
@@ -17,12 +19,15 @@
       "description": "Group (minor) Node package updates into single PRs",
       "groupName": "node",
       "automerge": true,
+      "minimumReleaseAge": "7 days",
       "matchUpdateTypes": ["minor", "patch", "lockFileMaintenance"],
       "matchManagers": ["npm"]
     },
     {
       "description": "Auto-merge updates for Docker & 'pre-commit'",
       "automerge": true,
+      "minimumReleaseAge": "7 days",
+      "minimumReleaseAgeBehaviour": "timestamp-optional",
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "matchManagers": ["dockerfile", "pre-commit"]
     }
