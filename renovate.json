@@ -4,6 +4,7 @@
   "lockFileMaintenance": { "enabled": true },
   "schedule": ["before 5am every weekday"],
   "ignorePaths": ["k8s/**"],
+  "addLabels": ["renovate: {{manager}}"],
   "platformAutomerge": false,
   "prCreation": "not-pending",
   "packageRules":
