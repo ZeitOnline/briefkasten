@@ -4,10 +4,11 @@ version = "0.4.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "ansible",
-    "ansible-core<2.17",
+    "ansible-core<2.15",
     "bsdploy",
     "keyring",
     "ploy",
+    "ploy-ansible",
     "ploy-ec2",
     "setuptools<82",
 ]
@@ -15,6 +16,7 @@ dependencies = [
 [tool.uv.sources]
 bsdploy = { git = "https://github.com/witsch/bsdploy.git", rev = "use-extra-zfs-properties" }
 ploy = { git = "https://github.com/witsch/ploy.git", rev = "python-3.12-fixes" }
+ploy-ansible = { git = "https://github.com/ployground/ploy_ansible.git", rev = "d8e54684989ccbdd5ba5aa7c0a4eaa20c9cc3176" }
 
 [tool.ruff]
 line-length = 92
