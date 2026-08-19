@@ -24,6 +24,8 @@ configure-jails: export OS_ACTIVITY_MODE = disable
 configure-jails:
 	${ploy} playbook main.yml
 
+upload-pgp-keys: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY = YES
+upload-pgp-keys: export OS_ACTIVITY_MODE = disable
 upload-pgp-keys:
 	${ploy} do briefkasten-worker upload_pgp_keys
 	${ploy} playbook main.yml -t update-config -t update-pgp
@@ -41,6 +43,8 @@ update-app:
 update-theme:
 	${ploy} do briefkasten-appserver upload_theme
 
+update-config: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY = YES
+update-config: export OS_ACTIVITY_MODE = disable
 update-config:
 	${ploy} playbook main.yml -t update-config -t update-pgp
 
