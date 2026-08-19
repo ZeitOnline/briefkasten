@@ -16,6 +16,8 @@ start-jails:
 	ploy start briefkasten-appserver
 	ploy start briefkasten-cleanser
 
+configure-jails: export OBJC_DISABLE_INITIALIZE_FORK_SAFETY = YES
+configure-jails: export OS_ACTIVITY_MODE = disable
 configure-jails:
 	ploy playbook main.yml
 
