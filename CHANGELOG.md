@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.0](https://github.com/ZeitOnline/briefkasten/compare/0.4.0...0.5.0) (2026-08-20)
+
+
+### Features
+
+* **ci:** use updated GHA workflows ([11e33b7](https://github.com/ZeitOnline/briefkasten/commit/11e33b73afbf3bf6779e9cd5a6e8c342ebec714a))
+* **deployment:** switch to `uv` for managing dependencies ([#458](https://github.com/ZeitOnline/briefkasten/issues/458)) ([2bed149](https://github.com/ZeitOnline/briefkasten/commit/2bed149f73a384c70afbe1b071d38fe877b384b9))
+* use 'lefthook' to run code checks via git hooks ([#468](https://github.com/ZeitOnline/briefkasten/issues/468)) ([13a4922](https://github.com/ZeitOnline/briefkasten/commit/13a4922ebea2b52a5847138cd79896787782180b))
+
+
+### Bug Fixes
+
+* **deps:** use development version of `ploy_ansible` ([a147472](https://github.com/ZeitOnline/briefkasten/commit/a147472a5ef34ed6a0292d1433177c2b9a26ded7))
+* make `pkg bootstrap` run non-interactively ([864e88d](https://github.com/ZeitOnline/briefkasten/commit/864e88d2fa5bd9fc20fe0aead95d3ca85c4f5aa3))
+
 ## [0.4.0](https://github.com/ZeitOnline/briefkasten/compare/0.3.14...0.4.0) (2025-08-29)
 
 
