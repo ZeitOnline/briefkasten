@@ -126,3 +126,16 @@ def receive(dbm_path, pattern, max_process_secs):
                                     token.decode(), datetime.fromtimestamp(sent), max_process_secs)
     # start http server passing the handler
     receive_test_submissions(handler)
+
+
+@cli.command(context_settings=dict(auto_envvar_prefix='BKWD'))
+@option('--dbm-path', default='drops', help='path to dbm database for storing drops')
+@option('--days', default=7, help='number of days to keep')
+def prune(dbm_path, days):
+    """ Prune old test submission tokens """
+    cutoff = str(time() - days * 86_400).encode()
+    with dbm_open(dbm_path, 'c') as db:
+        old = [token for token in db.keys() if db[token] < cutoff]
+        for token in old:
+            del db[token]
+    log.info("Pruned %s old tokens", len(old))
