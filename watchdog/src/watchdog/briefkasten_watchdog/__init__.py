@@ -17,8 +17,16 @@ log.setLevel(environ.get('BKWD_LOG_LEVEL', 'info').upper())
 
 REGISTRY = CollectorRegistry()
 last_success = Gauge(
-    'job_last_briefkasten_watchdog_success_unixtime',
+    'briefkasten_watchdog_last_success_unixtime',
     'Last time a briefkasten watchdog job successfully finished',
+    registry=REGISTRY)
+last_test_submission = Gauge(
+    'briefkasten_watchdog_last_test_submission_unixtime',
+    'Unix timestamp of the last test submission',
+    registry=REGISTRY)
+pending_test_submission_count = Gauge(
+    'briefkasten_watchdog_pending_test_submission_count',
+    'Number of test submissions that have not been acknowledged yet',
     registry=REGISTRY)
 
 
@@ -74,10 +82,19 @@ def receive_test_submissions(handler):
         httpd.serve_forever()
 
 
-def push_to_prometheus(config):
+def update_metrics(dbm_path):
+    with dbm_open(dbm_path, 'c') as db:
+        sent_dates = list(map(float, db.values()))
+    pending_test_submission_count.set(len(sent_dates))
+    last_test_submission.set(max(sent_dates, default=0))
+
+
+def push_to_prometheus():
+    gateway_url = environ.get('BKWD_PROMETHEUS_PUSH_GATEWAY_URL')
+    environment = environ.get('BKWD_ENVIRONMENT')
     push_to_gateway(
-        config['prometheus_push_gateway_url'],
-        job="briefkasten_watchdog_{environment}".format(**config),
+        gateway_url,
+        job=f"briefkasten_watchdog_{environment}",
         registry=REGISTRY)
 
 
@@ -95,7 +112,9 @@ def submit(app_url, testing_secret, dbm_path):
     log.debug("Performing test submissions against %s", app_url)
     token = perform_submission(app_url, testing_secret)
     with dbm_open(dbm_path, 'c') as db:
-        db[token.encode()] = str(time())
+        db[token] = str(time())
+    update_metrics(dbm_path)
+    push_to_prometheus()
     log.info("Created drop with token %s", token)
 
 
@@ -124,6 +143,8 @@ def receive(dbm_path, pattern, max_process_secs):
                         log.warning("[Slow test submission] The submission with token '%s' "
                                     "which was submitted on %s was not received after %d seconds.",
                                     token.decode(), datetime.fromtimestamp(sent), max_process_secs)
+            update_metrics(dbm_path)
+            push_to_prometheus()
     # start http server passing the handler
     receive_test_submissions(handler)
 
@@ -133,9 +154,11 @@ def receive(dbm_path, pattern, max_process_secs):
 @option('--days', default=7, help='number of days to keep')
 def prune(dbm_path, days):
     """ Prune old test submission tokens """
-    cutoff = str(time() - days * 86_400).encode()
+    cutoff = time() - days * 86_400
     with dbm_open(dbm_path, 'c') as db:
-        old = [token for token in db.keys() if db[token] < cutoff]
+        old = [token for token in db.keys() if float(db[token]) < cutoff]
         for token in old:
             del db[token]
+    update_metrics(dbm_path)
+    push_to_prometheus()
     log.info("Pruned %s old tokens", len(old))
