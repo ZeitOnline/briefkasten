@@ -90,8 +90,8 @@ def update_metrics(dbm_path):
 
 
 def push_to_prometheus():
-    gateway_url = environ.get('BKWD_prometheus_push_gateway_url')
-    environment = environ.get('BKWD_environment')
+    gateway_url = environ.get('BKWD_PROMETHEUS_PUSH_GATEWAY_URL')
+    environment = environ.get('BKWD_ENVIRONMENT')
     push_to_gateway(
         gateway_url,
         job=f"briefkasten_watchdog_{environment}",
