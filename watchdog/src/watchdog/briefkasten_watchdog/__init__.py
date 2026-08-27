@@ -17,7 +17,7 @@ log.setLevel(environ.get('BKWD_LOG_LEVEL', 'info').upper())
 
 REGISTRY = CollectorRegistry()
 last_success = Gauge(
-    'job_last_briefkasten_watchdog_success_unixtime',
+    'briefkasten_watchdog_last_success_unixtime',
     'Last time a briefkasten watchdog job successfully finished',
     registry=REGISTRY)
 last_test_submission = Gauge(
