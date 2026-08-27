@@ -112,7 +112,7 @@ def submit(app_url, testing_secret, dbm_path):
     log.debug("Performing test submissions against %s", app_url)
     token = perform_submission(app_url, testing_secret)
     with dbm_open(dbm_path, 'c') as db:
-        db[token.encode()] = str(time())
+        db[token] = str(time())
     update_metrics(dbm_path)
     push_to_prometheus()
     log.info("Created drop with token %s", token)
@@ -154,9 +154,9 @@ def receive(dbm_path, pattern, max_process_secs):
 @option('--days', default=7, help='number of days to keep')
 def prune(dbm_path, days):
     """ Prune old test submission tokens """
-    cutoff = str(time() - days * 86_400).encode()
+    cutoff = time() - days * 86_400
     with dbm_open(dbm_path, 'c') as db:
-        old = [token for token in db.keys() if db[token] < cutoff]
+        old = [token for token in db.keys() if float(db[token]) < cutoff]
         for token in old:
             del db[token]
     update_metrics(dbm_path)
