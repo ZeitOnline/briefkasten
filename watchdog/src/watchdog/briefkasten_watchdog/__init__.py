@@ -1,4 +1,4 @@
-from click import group, option
+from click import echo, group, option
 from datetime import datetime
 from dbm import open as dbm_open
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -147,6 +147,16 @@ def receive(dbm_path, pattern, max_process_secs):
             push_to_prometheus()
     # start http server passing the handler
     receive_test_submissions(handler)
+
+
+@cli.command(context_settings=dict(auto_envvar_prefix='BKWD'))
+@option('--dbm-path', default='drops', help='path to dbm database for storing drops')
+def dump(dbm_path):
+    """ List pending test submission tokens ordered by creation time """
+    with dbm_open(dbm_path, 'c') as db:
+        pending = sorted((float(db[token]), token.decode()) for token in db.keys())
+    for sent, token in pending:
+        echo(f'{token}\t{datetime.fromtimestamp(sent):%Y-%m-%d %H:%M:%S}')
 
 
 @cli.command(context_settings=dict(auto_envvar_prefix='BKWD'))
