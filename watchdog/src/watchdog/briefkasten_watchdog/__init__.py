@@ -89,12 +89,17 @@ def update_metrics(dbm_path):
     last_test_submission.set(max(sent_dates, default=0))
 
 
-def push_to_prometheus():
+def push_to_prometheus(command):
+    """ Push the registry, using the name of the given command as an additional
+        grouping key.  A push replaces everything stored under its grouping key,
+        so without this the short-lived commands would overwrite the metrics of
+        the long-running receiver with their own (unset) default values. """
     gateway_url = environ.get('BKWD_PROMETHEUS_PUSH_GATEWAY_URL')
     environment = environ.get('BKWD_ENVIRONMENT')
     push_to_gateway(
         gateway_url,
         job=f"briefkasten_watchdog_{environment}",
+        grouping_key=dict(command=command),
         registry=REGISTRY)
 
 
@@ -114,7 +119,7 @@ def submit(app_url, testing_secret, dbm_path):
     with dbm_open(dbm_path, 'c') as db:
         db[token] = str(time())
     update_metrics(dbm_path)
-    push_to_prometheus()
+    push_to_prometheus('submit')
     log.info("Created drop with token %s", token)
 
 
@@ -144,7 +149,7 @@ def receive(dbm_path, pattern, max_process_secs):
                                     "which was submitted on %s was not received after %d seconds.",
                                     token.decode(), datetime.fromtimestamp(sent), max_process_secs)
             update_metrics(dbm_path)
-            push_to_prometheus()
+            push_to_prometheus('receive')
     # start http server passing the handler
     receive_test_submissions(handler)
 
@@ -170,5 +175,5 @@ def prune(dbm_path, days):
         for token in old:
             del db[token]
     update_metrics(dbm_path)
-    push_to_prometheus()
+    push_to_prometheus('prune')
     log.info("Pruned %s old tokens", len(old))
