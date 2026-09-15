@@ -116,6 +116,8 @@ def submit(app_url, testing_secret, dbm_path):
     """ Perform test submission """
     log.debug("Performing test submissions against %s", app_url)
     token = perform_submission(app_url, testing_secret)
+    if token is None:
+        raise SystemExit(1)
     with dbm_open(dbm_path, 'c') as db:
         db[token] = str(time())
     update_metrics(dbm_path)
