@@ -121,7 +121,7 @@ requires-dist = [
     { name = "ansible-core", specifier = "<2.15" },
     { name = "bsdploy", git = "https://github.com/witsch/bsdploy.git?rev=use-extra-zfs-properties" },
     { name = "keyring" },
-    { name = "ploy", git = "https://github.com/witsch/ploy.git?rev=python-3.12-fixes" },
+    { name = "ploy", git = "https://github.com/witsch/ploy.git?rev=8bc64df814c91a43c5f0c1fc9729ab61dd870251" },
     { name = "ploy-ansible", git = "https://github.com/ployground/ploy_ansible.git?rev=d8e54684989ccbdd5ba5aa7c0a4eaa20c9cc3176" },
     { name = "ploy-ec2" },
     { name = "setuptools", specifier = "<82" },
@@ -396,7 +396,7 @@ wheels = [
 [[package]]
 name = "ploy"
 version = "2.1.0.dev0"
-source = { git = "https://github.com/witsch/ploy.git?rev=python-3.12-fixes#ba3dc37564ae96611c5c6ab37e52bc7ebdf86ffa" }
+source = { git = "https://github.com/witsch/ploy.git?rev=8bc64df814c91a43c5f0c1fc9729ab61dd870251#8bc64df814c91a43c5f0c1fc9729ab61dd870251" }
 dependencies = [
     { name = "attrs" },
     { name = "lazy" },
