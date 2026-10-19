@@ -19,4 +19,4 @@ on:
       - 'application/tox.ini'
 jobs:
   build:
-    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@f9996e6319d9fe72056ba3eb2d1378748c479f64 # 4.7.0
+    uses: zeitonline/gh-action-workflows/.github/workflows/build-test-push.yaml@7c0cccffb89e545f3c37312433c7810432107003 # 4.7.3
