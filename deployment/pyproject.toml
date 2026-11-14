@@ -4,7 +4,7 @@ version = "0.4.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "ansible",
-    "ansible-core<2.15",
+    "ansible-core<2.17",
     "bsdploy",
     "keyring",
     "ploy",
