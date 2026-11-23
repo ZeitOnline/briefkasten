@@ -1,1 +1,0 @@
-../docs/application/develop.rst

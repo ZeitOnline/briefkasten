@@ -5,8 +5,9 @@ nav:
   - Deployment:
       - deployment/index.md
       - deployment/monitoring.md
-  - Application:
+  - Anwendung:
       - application/develop.md
+      - application/configuration.md
       - application/workings.md
       - application/i18n.md
 repo_url: https://github.com/ZeitOnline/briefkasten

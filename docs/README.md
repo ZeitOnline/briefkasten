@@ -1,17 +1,28 @@
 # DIE ZEIT Briefkasten
 
-The `briefkasten` (German for letterbox) is a reasonably secure web application for submitting content anonymously.
+Der `briefkasten` ist eine – soweit sinnvoll möglich – sichere Webanwendung, über die Inhalte anonym an die Redaktion übermittelt werden können.
 
-It allows to upload attachments which are then sanitized of a number of meta-data which could compromise the submitters identity. Next, the sanitized files are encrypted via GPG and sent via email to a pre-configured list of recipients. The original (potentially 'dirty') files are then deleted from the file system of the server. Thus, neither should admins with access to the server be able to access any submissions, nor should any of the recipients have access to the unsanitized raw material.
+Hochgeladene Anhänge werden in einer abgeschotteten Umgebung von Metadaten bereinigt, die die Identität der einreichenden Person verraten könnten. Anschließend werden Nachricht und bereinigte Anhänge mit PGP verschlüsselt und per E-Mail an eine festgelegte Liste von Redaktionsmitgliedern geschickt. Die Originaldateien werden danach vom Server gelöscht. Damit sollen weder Admins mit Zugriff auf den Server an die Einreichungen gelangen, noch soll die Redaktion Zugriff auf das unbereinigte Rohmaterial haben.
 
-Upon successful upload the submitter receives a unique URL with a token that he or she can use to access any replies the recipients may post. That reply is the only data persisted on the server.
+Nach dem Absenden erhält die einreichende Person eine eindeutige URL, unter der sie den Status ihrer Einreichung und Antworten der Redaktion abrufen kann. Auf dem Server bleiben danach nur der Status, ein Zugangstoken für die Redaktion und deren Antworten – sowie, falls so konfiguriert, verschlüsselte Archive der Anhänge. Was genau wann gespeichert und gelöscht wird, beschreibt [Der Lebenszyklus einer Einreichung](application/workings.md).
 
-The implementation doesn't just contain the application itself but includes a complete deployment setup following what we believe to be best practices so that anybody should be able to host their own secure `briefkasten` with minimal setup pain.
+Das Projekt enthält nicht nur die Anwendung selbst, sondern auch ein vollständiges Deployment-Setup für FreeBSD-Jails, so dass jede\*r mit überschaubarem Aufwand einen eigenen `briefkasten` betreiben kann.
+
+## Aufbau des Repositorys
+
+| Verzeichnis | Inhalt |
+|---|---|
+| `application/` | die Webanwendung (Pyramid) samt Worker, Bereinigungsskripten und Themes |
+| `deployment/` | Installation und Konfiguration eines FreeBSD-Hosts mit ploy, Ansible und Fabric |
+| `watchdog/` | End-to-End-Überwachung einer laufenden Instanz |
+| `docs/` | diese Dokumentation |
+
+## Dokumentation
 
 [Deployment](deployment/index.md)
 
-> This section contains all the information on how to install, configure and run your own instance of the briefkasten stack.
+> Installation, Konfiguration und Betrieb einer eigenen Instanz; dazu das [Monitoring](deployment/monitoring.md).
 
-[Application](application/develop.md)
+[Anwendung](application/develop.md)
 
-> This section contains information on the inner workings of the application and how to develop or extend it or how to create a custom theme for it.
+> Lokale Entwicklung, Tests und eigene Themes; dazu die [Konfiguration](application/configuration.md), [Der Lebenszyklus einer Einreichung](application/workings.md) und die [Internationalisierung](application/i18n.md).

@@ -1,35 +1,70 @@
-# The life cycle of a submission
+# Der Lebenszyklus einer Einreichung
 
-Users entrusting us with sensitive data is the key concern of the software and when and getting it straight where this data is stored for how long in what form is crucial.
+Dass Menschen uns sensible Daten anvertrauen, ist das zentrale Anliegen dieser Software. Entscheidend ist daher, genau festzuhalten, wo diese Daten wie lange in welcher Form gespeichert werden.
 
-The stages are numbered with a three digit integer code, allowing to group and sort them.
+Jeder Drop hat einen Status, der in `drops/<drop_id>/status` im Dropbox-Container steht. Er beginnt mit einem dreistelligen Code, so dass sich die Stufen gruppieren und sortieren lassen. Die Rückmeldeseite und die Redaktionsseite zeigen diesen Status an.
 
-Status codes beginning with `0` mean that the submission is still being handled by the web application (and implies that it is still unencrypted)
+## In der Webanwendung
 
-The life of a submission begins with the POST of the client browser succeeding.
-Any attachments are first stored in memory before writing them to disk into a dedicated dropbox directory.
-At this point the submission has the status `010 received` and is readable in plaintext by any attacker who gains access to the application jail.
+Das Leben einer Einreichung beginnt, wenn der Browser das Formular lädt. Es enthält ein signiertes Token mit einer neuen Drop-ID, das nur eine begrenzte Zeit gültig ist (`post_token_max_age_seconds`).
 
-Next, the web application hands off the submission to an external processing script, which immediately either errors out or acknowledges the receipt of the drop directory.
+Lädt der Browser (per JavaScript) Anhänge hoch oder schickt er das Formular ab, legt die Webanwendung das Verzeichnis `drops/<drop_id>/` an (Status `010 created`) und schreibt die Nachricht nach `message`, die Anhänge nach `attach/` und ein zufälliges Editor-Token nach `editor_token`.
+**Ab hier liegt die Einreichung im Klartext auf der Festplatte** – im Deployment im gemeinsamen Dataset von Appserver- und Worker-Jail.
 
-The error case at this stage means that the cleansing setup is seriously broken and the web application will take it upon itself to delete the attachments immediately to avoid exposing them in plaintext unduly.
-(TODO: a cronjob on the jailhost should additionally monitor for dropboxes in the 'submitted' or 'submitted failed' state for longer than a given threshold)
+Mit dem Absenden legt die Webanwendung eine leere Datei `submissions/<drop_id>` an und setzt den Status auf `020 submitted`. Danach leitet sie auf die Rückmeldeseite `dropbox/<drop_id>` weiter. Ein Drop im Status `020` oder höher nimmt keine weiteren Daten mehr an.
 
-If the submission was successful (the process script returns `0` as exit code) the dropbox is considered to be `020 submitted`.
+## Im Worker
 
-Once submitted, the cleanser performs basic sanity checking. If that fails for whatever reason it will set the status to `500 cleanser init failure`. Since it's basically being able to accept the attachments it will delete the attachment itself (TODO: confirm with @erdgeist)
+Der `worker` bemerkt die neue Datei in `submissions/` und verarbeitet den Drop. Drops ohne Anhänge werden direkt verarbeitet, Drops mit Anhängen in einem Pool aus `num_workers` Prozessen.
 
-If the process script determines that the cleansing setup is intact (whether locally or via one or more cleanser jails) it will set the status to `100 processing`.
-The submission still resides in plaintext inside the application jail.
+Hat der Drop Anhänge:
 
-The process will now initiate the cleansing, either locally or by submitting it to a cleanser jail. Either way, once the submission is sucessful, the status will change to `200 quarantined`, and the submission is (finally) no longer readable inside the application jail.
+1. `100 processor running`, dann `101 creating initial encrypted backup`: Die Originalanhänge werden zusammen mit der Nachricht in ein ZIP gepackt und für alle Redaktionsmitglieder mit gültigem Schlüssel verschlüsselt (`dirty.zip.pgp`). Hat niemand einen gültigen Schlüssel, kann nichts verschlüsselt werden; der Drop endet dann mit `500 no valid keys at all` oder `605 smtp failure`.
+2. `105 processing attachments`: `process-attachments.sh` aus `fs_bin_path` wird aufgerufen. Im Deployment holt sich das Skript über `jdispatch` eine freie Cleanser-Jail (`201`), kopiert das Drop-Verzeichnis per `scp` dorthin (`203`) und lässt die Anhänge dort bereinigen (`204`): Word-Dokumente werden zu PDF, PDFs und Bilder werden neu erzeugt, Textdateien werden kopiert. Danach wird das Ergebnis nach `clean/` zurückkopiert und die Cleanser-Jail auf einen sauberen Snapshot zurückgesetzt.
+3. Das Skript hinterlässt einen der folgenden Zustände:
+    - einen Code unter `500` – die Bereinigung war erfolgreich,
+    - `800 Not cleansible` – mindestens ein Dateityp ist unbekannt und wurde unverändert kopiert,
+    - `5xx` – die Bereinigung ist fehlgeschlagen, z. B. `502 No remote cleanser available`, `504`/`505` beim Kopieren, `520 cleanser timeout failure` oder `540 Error while cleasing file of type …`.
+4. Sind die bereinigten Anhänge größer als `attachment_size_threshold`, werden sie nicht per E-Mail verschickt, sondern verschlüsselt in `archive_cleansed/` abgelegt (`270 creating final encrypted backup of cleansed attachments`).
+5. Ist `dropbox_dirty_archive_url_format` konfiguriert, wird bei `5xx` und `800` das verschlüsselte Backup der Originale nach `archive_dirty/` verschoben; bei `5xx` wird der Status dann auf `490 cleanser failure but notify success` gesetzt.
 
-If submission has failed the status will be set to `501 cleanser submission failure` and the attachments will be deleted.
+Anschließend wird die Redaktion benachrichtigt, sofern der Status unter `500` liegt oder `800` ist: Jedes Redaktionsmitglied mit gültigem Schlüssel bekommt eine eigene, mit seinem Schlüssel verschlüsselte E-Mail mit der Nachricht, den Links zur Redaktionsseite und zu den Archiven sowie gegebenenfalls den bereinigten Anhängen. Das Ergebnis:
 
-Now we are left with three possible outcomes: success, failure during cleansing or timeout:
+- `900 success` – die E-Mails wurden verschickt,
+- `605 smtp failure` – es konnte keine einzige E-Mail erstellt werden (kein Redaktionsmitglied mit gültigem Schlüssel),
+- `610 smtp error (…)` – der Versand ist fehlgeschlagen.
 
-- `510 cleanser processing failure`
-- `520 cleanser timeout failure`
-- `900 success`
+Bei einem Fehler in der Bereinigung ohne konfiguriertes Archiv der Originale wird die Redaktion nicht benachrichtigt.
 
-In all cases except `900` the attachments will have been deleted from the fileystem of the briefkasten host.
+## Was danach übrig bleibt
+
+Unabhängig vom Ergebnis löscht der Worker am Ende `message`, `dirty.zip.pgp`, `attach/` und `clean/`. Im Drop-Verzeichnis bleiben nur:
+
+- `status`,
+- `editor_token`,
+- Antworten der Redaktion in `replies/`, die die einreichende Person auf der Rückmeldeseite lesen kann.
+
+Dazu kommen, falls konfiguriert, die verschlüsselten Archive in `archive_cleansed/` und `archive_dirty/`. Sie werden vom Briefkasten nicht automatisch gelöscht.
+
+Der `janitor` löscht Drop-Verzeichnisse, deren Status sich seit mehr als 365 Tagen nicht geändert hat; Drops des [Watchdogs](../deployment/monitoring.md) schon nach einem Tag.
+
+## Übersicht der Statuscodes
+
+| Code | Gesetzt von | Bedeutung |
+|---|---|---|
+| `010 created` | Webanwendung | Drop-Verzeichnis angelegt |
+| `020 submitted` | Webanwendung | Formular abgeschickt, wartet auf den Worker |
+| `100 processor running` | Worker | Verarbeitung eines Drops mit Anhängen begonnen |
+| `101 creating initial encrypted backup` | Worker | Originalanhänge werden verschlüsselt gesichert |
+| `105 processing attachments` | Worker | `process-attachments.sh` läuft |
+| `201`–`204` | `process-attachments.sh` | Cleanser-Jail zugeteilt, Daten kopiert, Bereinigung läuft |
+| `270 creating final encrypted backup of cleansed attachments` | Worker | bereinigte Anhänge werden archiviert statt verschickt |
+| `490 cleanser failure but notify success` | Worker | Bereinigung fehlgeschlagen, Originale archiviert, Redaktion wird benachrichtigt |
+| `500 no valid keys at all` | Worker | kein Redaktionsmitglied hat einen gültigen Schlüssel |
+| `501`–`505`, `520`, `540` | `process-attachments.sh` | Bereinigung fehlgeschlagen |
+| `605 smtp failure` | Worker | keine E-Mail erstellt |
+| `610 smtp error (…)` | Worker | Versand fehlgeschlagen, mit Traceback |
+| `800 Not cleansible` | `process-attachments.sh` | mindestens ein Anhang konnte nicht bereinigt werden; wird trotzdem verschickt |
+| `900 success` | Worker | Redaktion benachrichtigt |
+
+Lokal und in den Tests ersetzt ein Mock-Skript die Bereinigung; es meldet `299 Cleansed` (oder auf Wunsch `540`/`800`).

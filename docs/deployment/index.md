@@ -1,232 +1,217 @@
-# Overview
+# Deployment
 
-While we could simply provide pre-built installation images, this would defeat the whole idea of running a trustworthy, open source dropbox in the first place, because then you and your submitters would have to blindly trust these binaries without being able to verify their integrity.
+Wir könnten einfach fertige Installations-Images bereitstellen. Das würde aber der Idee widersprechen, eine vertrauenswürdige Open-Source-Dropbox zu betreiben: Man selbst und die einreichenden Personen müssten diesen Binaries dann blind vertrauen, ohne ihre Integrität prüfen zu können.
 
-Instead the idea is to use as little pre-built ingredients as possible and aquire them from trusted sources (i.e. from the official FreeBSD repositories). In essence we provide you with a grocery list of ingredients along with a recipe and let you do all the shopping and cooking yourself instead of serving a pre-cooked meal!
+Stattdessen werden so wenige vorgefertigte Bestandteile wie möglich verwendet und aus vertrauenswürdigen Quellen bezogen (den offiziellen FreeBSD-Repositorys). Im Grunde bekommt man eine Einkaufsliste mit Zutaten und ein Rezept und kocht selbst, statt ein Fertiggericht serviert zu bekommen.
 
-An instance of the briefkasten is deployed by running scripts on a *control host* (i.e. your local machine) which then configure and install it on a *target host* (i.e. virtual machine for development and testing, on dedicated hardware for production).
+Eine Briefkasten-Instanz wird deployt, indem man auf einem *Control Host* (dem eigenen Rechner) Kommandos ausführt, die einen *Target Host* installieren und konfigurieren (eine virtuelle Maschine für Tests oder eigene Hardware für die Produktion).
+Dazu bootet der *Target Host* zunächst ein [mfsBSD](https://mfsbsd.vx.sk)-Image, wird dann remote mit FreeBSD installiert und anschließend mit [ploy](https://github.com/ployground/ploy), [bsdploy](https://github.com/ployground/bsdploy), Ansible und Fabric eingerichtet.
+Alle Dateien dafür liegen im Verzeichnis `deployment/` des Repositorys.
 
-During this process the *target host* will boot from a FreeBSD installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
+## Aufbau
 
-# tl;dr
+Auf dem *Target Host* (FreeBSD 15.1, ZFS-Pool `tank`, verschlüsselt mit GELI) laufen mehrere [ezjail](https://erdgeist.org/arts/software/ezjail/)-Jails:
 
-The short version is:
+| Jail | IP | Aufgabe |
+|---|---|---|
+| `webserver` | 10.0.0.1 | nginx; terminiert HTTPS und leitet `approot_url` und `/metrics` an den Appserver weiter |
+| `appserver` | 10.0.0.2 | die Webanwendung (`pserve`, Port 6543), nimmt Einreichungen entgegen |
+| `cleanser` | 10.0.0.3 | Vorlage für die Cleanser-Jails `cleanser_01` … `cleanser_05`, die die Anhänge bereinigen |
+| `worker` | 10.0.0.4 | der `worker` aus der Anwendung: verschlüsselt die Drops, lässt sie bereinigen und verschickt die E-Mails; außerdem läuft hier täglich der `janitor` |
 
-> 1. *populate \`\`etc\`\`* with a custom `ploy.conf`, some `pgp_pubkeys` and a certificate and key for the webserver `briefkasten.crt` and `briefkasten.key`
-> 2. *make sure the host is booted into mfsBSD* (if you're using virtualbox, run `ploy start briefkasten-vbox`).
-> 3. `make bootstrap`
-> 4. `source bin/activate`
-> 5. `make configure-host`
-> 6. `make start-jails`
-> 7. `make configure-jails`
-> 8. `make upload-pgp-keys`
+Appserver und Worker teilen sich das ZFS-Dataset `tank/data/briefkasten`, das in beiden Jails unter `/var/briefkasten` eingehängt ist (Dropbox-Container in `/var/briefkasten/drop_root`, PGP-Schlüssel in `/var/briefkasten/pgp_pubkeys`).
 
-# Obtaining the sources
+Die Cleanser-Jails sind ZFS-Klone der Jail `cleanser`. Das Werkzeug `jdispatch` auf dem Host teilt dem Worker für jeden Drop eine freie Cleanser-Jail zu und setzt sie nach der Benutzung (oder nach `cleanser_timeout_secs`) auf einen sauberen Snapshot zurück. Wie ein Drop dabei durchlaufen wird, steht unter [Der Lebenszyklus einer Einreichung](../application/workings.md).
 
-You need to clone the entire project onto the *control host* but will then work only inside `deployment` (where this README is located):
+## Kurzfassung
 
-```
-git clone https://github.com/tomster/briefkasten.git
-cd briefkasten/deployment
-```
+Im Verzeichnis `deployment/`:
 
-# Installing the requirements on the control host
+1. `uv sync`
+2. `etc/` befüllen: `ploy.conf`, PGP-Schlüssel in `etc/pgp_pubkeys/`, `briefkasten.crt` und `briefkasten.key` (siehe [Setup konfigurieren](#setup-konfigurieren))
+3. den *Target Host* in mfsBSD booten (bei VirtualBox: `uv run ploy -c etc/ploy.conf start briefkasten-vbox`)
+4. `uv run make bootstrap`, danach den SSH-Fingerprint in `etc/ploy.conf` eintragen
+5. `uv run make configure-host`
+6. `uv run make start-jails`
+7. `uv run make configure-jails`
+8. `uv run make upload-pgp-keys`
 
-The *control host* needs **Python 2.7** with `virtualenv` and `make`.
+## Voraussetzungen auf dem Control Host
 
-On most Linux distributions you should get all of the above by installing `python-virtualenv` (i.e. `apt install python-virtualenv`).
+- Python 3.12 (`deployment/pyproject.toml` verlangt `>=3.12,<3.13`)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- `make`, `rsync` und `ssh`
+- für Tests auf einer lokalen VM: [VirtualBox](https://www.virtualbox.org) mit den Kommandozeilenwerkzeugen im `PATH`
 
-Under Mac OS X using [homebrew](http://brew.sh) is the recommended way (`brew install python` should do the trick.) (The Python installation that's part of Mac OS X ships without `virtualenv` and is out-dated. It's best to ignore it entirely.
-
-Under FreeBSD install `devel/py-virtualenv`.
-
-Note, you might need to symlink `/usr/local/include/gmp.h` to `/usr/local/include/python2.7/gmp.h`
-
-# Configuring your setup
-
-Before we can continue, we need to configure your setup on the *control host*. The deployment scripts require four assets, most of which need to reside inside `etc`.
-
-In practice it is advisable to keep the entire `etc` under separate version control – it contains everything that distinguishes your particular setup from a generic one. A good start is to copy `etc.sample` to `etc` and perform a `git init` inside it. YMMV.
-
-## ploy.conf – the main configuration file
-
-Create your own configuration directory inside:
+Quellcode holen und die Deployment-Werkzeuge installieren:
 
 ```
-$ mkdir etc
+$ git clone https://github.com/ZeitOnline/briefkasten.git
+$ cd briefkasten/deployment
+$ uv sync
 ```
 
-Create a copy from the provided example:
+`uv sync` legt in `deployment/.venv` ein virtualenv mit ploy, bsdploy, ploy_ansible und Ansible an (teils aus Git-Forks, siehe `[tool.uv.sources]` in `pyproject.toml`).
+Alle `make`-Targets rufen `ploy` auf und werden deshalb mit `uv run make …` ausgeführt (oder nach `source .venv/bin/activate` mit `make …`).
+
+Die `make`-Targets verwenden standardmäßig `etc/ploy.conf`. Eine andere Konfiguration lässt sich mit `config=` auswählen, z. B. `uv run make configure-host config=etc/staging.conf`. Das funktioniert bei allen Targets außer bei Schritten, die `ploy-ssh` benutzen – etwa dem Theme-Upload in `configure-jails`, der immer `etc/ploy.conf` verwendet.
+
+## Setup konfigurieren
+
+Alles, was ein konkretes Setup von einem generischen unterscheidet, liegt in `deployment/etc/`. Das Verzeichnis ist von Git ausgeschlossen; es empfiehlt sich, es separat zu versionieren. Ein guter Start ist eine Kopie von `etc.sample`:
 
 ```
-$ cp etc.sample/plain.conf etc/ploy.conf
+$ cp -R etc.sample etc
 ```
 
-If you want to use VirtualBox to try out the installation on a local virtual machine, you can copy `etc.sample/vbox.conf` instead, which contains a ready-to-use setup.
+### ploy.conf
 
-You will (at least) need to provide values in the `[ez-master:briefkasten]` section for the following keys:
+`etc.sample` enthält zwei Vorlagen:
 
-> - host
-> - port
+- `plain.conf` für einen bestehenden Host (Produktion),
+- `vbox.conf` für eine lokale VirtualBox-VM.
 
-Note that you cannot specify the SSH fingerprint at this time yet, you need to wait until after `bootstrap-host` has run (see below)
+Die passende Vorlage nach `etc/ploy.conf` kopieren. Beide erweitern `deployment/base.conf`, das die Standardwerte enthält und dessen Kommentare die Optionen ausführlich beschreiben.
 
-And in the `[macro:ez-base]` section for these:
+!!! warning "Abweichungen in den Vorlagen"
+    - Die Vorlagen setzen `ansible-fqdn`. Schlüssel mit dem Präfix `ansible-` werden aber als Ansible-Variable ohne `ploy_`-Präfix weitergereicht (hier `fqdn`), während nginx, Let's Encrypt und die Links in den E-Mails `ploy_fqdn` verwenden. Den Hostnamen deshalb als `fqdn = …` setzen.
+    - `plain.conf` setzt `local_theme_path = ../application/themes/fileuploader/`. Der Pfad ist relativ zu `etc/`, richtig ist `../../application/themes/fileuploader/`.
+    - `post_secret` und `watchdog_imap_recipient` fehlen in `plain.conf` und müssen ergänzt werden; `test_submission_secret` wird nicht verwendet.
+    - Der Kommentar in `base.conf` nennt `dropbox_failed_archive_url_format` und `dropbox_failed_archive_path`; die Rollen lesen `dropbox_dirty_archive_url_format` und `dropbox_dirty_archive_path`.
 
-> - ansible-fqdn
-> - approot_url
-> - editors
-> - admins
-> - mail_sender
-> - local_theme_path
-> - theme_name
+Im Abschnitt `[ez-master:briefkasten]` müssen mindestens gesetzt werden:
 
-Look inside the file for details, it should be self explanatory.
+- `ip` (und gegebenenfalls `port`) des *Target Hosts*
+- `fingerprint` – der SSH-Fingerprint, den `make bootstrap` ausgibt (siehe [Target Host bootstrappen](#target-host-bootstrappen))
 
-## SSH public key
+Im Abschnitt `[macro:ez-base]` werden die Einstellungen der Anwendung festgelegt. Ploy reicht sie als Ansible-Variablen `ploy_<name>` an die Rollen weiter, die daraus die `briefkasten.ini` des Appservers und die `settings.yaml` des Dropbox-Containers erzeugen (siehe [Konfiguration](../application/configuration.md)):
 
-This key (usually `~/.ssh/idenity.pub`) will be installed on the *target host* during bootstrapping and will enable access to it.
+| Schlüssel | Standard | Beschreibung |
+|---|---|---|
+| `fqdn` | `briefkasten.virtualbox` | Hostname des Briefkastens; wird für nginx, Let's Encrypt und die Links in den E-Mails verwendet |
+| `approot_url` | `/briefkasten/` | URL-Pfad der Anwendung, muss mit `/` enden |
+| `editors` | – | Empfänger\*innen der Einreichungen, durch Leerzeichen getrennt; für jede Adresse muss ein PGP-Schlüssel vorhanden sein |
+| `admins` | – | Admin-Adressen, durch Leerzeichen getrennt |
+| `mail_sender` | – | Absenderadresse der E-Mails |
+| `mail_host`, `mail_port` | `localhost`, `25` | SMTP-Server (die Anwendung verwendet immer `STARTTLS`) |
+| `mail_user`, `mail_password` | – | SMTP-Zugangsdaten; alternativ `mail_password_file` mit einer von ploy verschlüsselten Datei |
+| `post_secret` | – | **Pflicht**; signiert die Formular-Tokens und dient zugleich als Secret für Testeinreichungen des [Watchdogs](monitoring.md) |
+| `watchdog_imap_recipient` | – | **Pflicht**; Empfänger der Testeinreichungen des Watchdogs |
+| `root_email` | – | Adresse, an die E-Mails an `root` weitergeleitet werden |
+| `local_theme_path` | `../../application/themes/default/` | Pfad zum Diazo-Theme auf dem Control Host, relativ zu `etc/`, mit `/` am Ende |
+| `theme_name` | `default` | Name des Themes auf dem Server |
+| `use_diazo` | `true` | Theme per Diazo anwenden; bei `false` wird nur `theme_package` verwendet |
+| `theme_package` | `briefkasten` | Python-Paket mit den Templates, siehe [Templates ersetzen](../application/develop.md#templates-ersetzen) |
+| `attachment_size_threshold` | `1Gb` | bereinigte Anhänge bis zu dieser Größe werden per E-Mail verschickt |
+| `dropbox_cleansed_archive_url_format`, `dropbox_cleansed_archive_path` | – | Archiv der bereinigten Anhänge, siehe [Konfiguration](../application/configuration.md#drop-verarbeitung-settingsyaml) |
+| `dropbox_dirty_archive_url_format`, `dropbox_dirty_archive_path` | – | Archiv der Originalanhänge, wenn die Bereinigung fehlschlägt. **Achtung:** Damit können einreichende Personen unbeabsichtigt Metadaten an die Redaktion weitergeben |
+| `cleanser_timeout_secs` | `180` | wie lange eine Bereinigung dauern darf, bevor die Cleanser-Jail zurückgesetzt wird |
+| `use_acme` | `false` | Zertifikat über Let's Encrypt beziehen, siehe [SSL-Zertifikat](#ssl-zertifikat-fur-den-webserver) |
+| `enable_zabbix`, `zabbix_host` | `false` | Zabbix-Agent auf dem Host installieren (im Abschnitt `[ez-master:briefkasten]`) |
 
-You need to place it inside `etc/authorized_keys`.
+!!! note
+    In `base.conf` sind auch `post_token_max_age_seconds` und `drop_ttl_days` dokumentiert. Die Rollen übernehmen `post_token_max_age_seconds` aber nicht in die `briefkasten.ini` (es gilt der Standard von 300 Sekunden), und der `janitor` wertet `drop_ttl_days` nicht aus (Drops werden nach 365 Tagen gelöscht).
 
-## Editorial PGP keys
+Die Anzahl der Cleanser-Jails (`ploy_cleanser_count`, Standard 5) und weitere Werte für den Host stehen in `deployment/group_vars/all.yml`.
 
-For each email address configured as recipient of the submissions in `ploy.conf` you must provide a matching public PGP key which will be used to encrypt the submissions.
+### SSH-Schlüssel
 
-These need to reside inside `etc/pgp_pubkeys/` and are expected to end in `*.gpg`. You can use one key per editor or any public keyring format that is understood by `gnupg`.
+Beim Bootstrapping wird ein öffentlicher SSH-Schlüssel als `authorized_keys` für `root` auf dem *Target Host* installiert. bsdploy sucht ihn als Datei `authorized_keys` im Verzeichnis `bootstrap-files` (`etc/bootstrap-files/`, bei `vbox.conf` `deployment/bootstrap-files/vbox/`) und greift sonst auf `~/.ssh/identity.pub`, `~/.ssh/id_rsa.pub`, `~/.ssh/id_dsa.pub` oder `~/.ssh/id_ecdsa.pub` zurück.
 
-## SSL certificate for the webserver
+### PGP-Schlüssel der Redaktion
 
-The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It is expected in `etc/briefkasten.crt` and `etc/briefkasten.key` respectively, `etc.sample` contains a self-signed pair for development and testing purposes.
+Für jede Adresse in `editors` (und `admins`) muss ein öffentlicher PGP-Schlüssel in `etc/pgp_pubkeys/` liegen. `make upload-pgp-keys` lädt alle Dateien aus diesem Verzeichnis in die Worker-Jail und importiert sie dort in den Keyring unter `/var/briefkasten/pgp_pubkeys`. Ob die Schlüssel gültig sind und wann sie ablaufen, prüft der `janitor` (siehe [Monitoring](monitoring.md)).
 
-In the most common scenario the public facing HTTP server is not identical with the webserver of this setup (IOW the briefkasten is running behind a proxy and is reachable via a subpath such as `` /briefkasten` `` it is entirely reasonable to provide a self-signed key/certificate pair since its only purpose is to ensure that the HTTP traffic between the proxy and the briefkasten is encrypted.
+### SSL-Zertifikat für den Webserver
 
-If, however you wish to expose the briefkasten directly to the public, we provide support for using Letsencrypt, specifically using the acme.sh client and the [DDNS alias update method](https://github.com/Neilpang/acme.sh/wiki/DNS-alias-mode).
-To use it, set the following in the `ez-base` section of your configuration:
+nginx spricht ausschließlich HTTPS und erwartet Zertifikat und Schlüssel in `etc/briefkasten.crt` und `etc/briefkasten.key`. `etc.sample` enthält ein selbstsigniertes Paar für Entwicklung und Tests.
+
+Läuft der Briefkasten hinter einem Proxy und ist nur über einen Unterpfad wie `/briefkasten/` öffentlich erreichbar, reicht ein selbstsigniertes Paar: Es soll nur den Verkehr zwischen Proxy und Briefkasten verschlüsseln.
+
+Soll der Briefkasten direkt öffentlich erreichbar sein, kann das Zertifikat über Let's Encrypt mit dem Client acme.sh und der [DNS-Alias-Methode](https://github.com/acmesh-official/acme.sh/wiki/DNS-alias-mode) bezogen werden. Dazu in `[macro:ez-base]` setzen:
 
 ```
 use_acme = true
-acme_domain = <the alias domain you are using>
-acme_key = <the key with which the dns update needs to be signed with>
-acme_ddns_server = <the IP or hostname of the nameserver>
+acme_domain = <die verwendete Alias-Domain>
+acme_key = <der Schlüssel, mit dem das DNS-Update signiert wird>
+acme_ddns_server = <IP oder Hostname des Nameservers>
 ```
 
-# Booting the target host into FreeBSD
+## Target Host in mfsBSD booten
 
-Next we will need to boot the *target host* into the FreeBSD installer. Since an official vanilla installer from freebsd.org would require quite a bit more manual configuration we instead use a slightly modified version of this called [MFSBSD](http://mfsbsd.vx.sk) – it basically attempts to configure the network via DHCP and has SSH enabled for `root` with a defined password of `mfsroot`.
+Statt des offiziellen FreeBSD-Installers wird [mfsBSD](https://mfsbsd.vx.sk) verwendet: Es konfiguriert das Netzwerk per DHCP und erlaubt SSH-Logins als `root` mit dem Passwort `mfsroot`. Von dort installiert bsdploy FreeBSD 15.1 (`ezjail-install-release` und `bootstrap-bsd-url` in `base.conf`).
 
-## Installation using Virtualbox
+### Mit VirtualBox
 
-This is the recommended way for testing and developing, as it allows for 100% automation. You need [VirtualBox](https://www.virtualbox.org) with the command line tools available in your path.
-
-- `bin/ploy start briefkasten-vbox` – this will download the ISO image, create a virtual machine and boot it from the image
-- wait till the login prompt - we're now booted into the MFSBSD installer
-- Continue with **Bootstrapping the host**
-
-## Installation using VMWare
-
-First download the image:
+Für Tests und Entwicklung, da es sich vollständig automatisieren lässt. Mit `etc/ploy.conf` als Kopie von `vbox.conf`:
 
 ```
-mkdir downloads
-bin/ploy-download  http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img 72664ced483bc69ae27bb1467bca0e678e1d6440 downloads/
+$ uv run ploy -c etc/ploy.conf start briefkasten-vbox
 ```
 
-This downloads the ISO image into the `downloads` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password `root/mfsroot`. Use `ifconfig` to get the assigned IP address (or assign one manually) and enter it into `ploy.conf`.
+Das lädt das mfsBSD-ISO herunter, legt eine VM an und bootet sie. Die VM ist per SSH über `127.0.0.1:47030` erreichbar und bekommt im Host-only-Netz die Adresse `192.168.56.160` (siehe `bootstrap-files/vbox/rc.conf`). Weiter mit [Target Host bootstrappen](#target-host-bootstrappen).
 
-- Continue with **Bootstrapping the host**
+### Auf eigener Hardware
 
-## Installation on physical hardware
+Für die Produktion. Die Maschine braucht mindestens 2 GB RAM und 10 GB Festplatte.
 
-This is the recommended setup for production. The machine doesn't need to be particularly powerful, but it will require at least 2Gb RAM and 10Gb disk space to compile the packages.
+1. Ein aktuelles mfsBSD-Image samt Prüfsummen von [mfsbsd.vx.sk](https://mfsbsd.vx.sk) herunterladen und mit `shasum` prüfen.
+2. Das Image auf einen USB-Stick schreiben (unter macOS: Gerät mit `diskutil list` ermitteln, `diskutil unmountDisk /dev/diskN`, dann `sudo dd if=<image> of=/dev/diskN bs=1m`).
+3. Den *Target Host* vom Stick booten und als `root` mit dem Passwort `mfsroot` anmelden.
+4. Mit `ifconfig` die IP-Adresse ermitteln (ohne DHCP in `/etc/rc.conf` setzen) und mit `gpart list` die Festplatten. Die IP-Adresse in `etc/ploy.conf` eintragen; die Festplatten stehen als `root_devices` in `group_vars/all.yml`.
 
-Download the MFSBSD ISO image and checksum:
-
-```
-cd downloads
-wget http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img
-wget http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img.sums.txt
-```
-
-Verify the integrity of the downloaded image:
+## Target Host bootstrappen
 
 ```
-shasum mfsbsd-se-10.2-RELEASE-amd64.img
+$ uv run make bootstrap
 ```
 
-Make sure the output matches the one in the downloaded text. Next you will need to create a bootable medium from that image.
+installiert FreeBSD auf den *Target Host*. Die Rückfragen mit `y` beantworten; danach startet der Host neu.
+Am Ende gibt das Skript den Fingerprint des neuen SSH-Daemons aus. Dieser **muss** im Abschnitt `[ez-master:briefkasten]` als `fingerprint = …` eingetragen werden.
 
-### Creating a bootable USB medium (Mac OSX)
-
-For the time being we only provide instructions for Mac OS X, sorry! If you run Linux you probably already know how to do this, anyway :-)
-
-- Run `diskutil list` to see which drives are currently in your system.
-- insert your medium
-- re-run `diskutil list` and notice which number it has been assigned (N)
-- run `diskutil unmountDisk /dev/diskN`
-- run `` `sudo dd if=mfsbsd-se-10.2-RELEASE-amd64.img of=/dev/diskN bs=1m ``
-- run `diskutil unmountDisk /dev/diskN`
-
-Insert the USB stick into the *target host* and boot from it. Log in as `root` using the pre-configured password `mfsroot`. Either note the name of the ethernet interface and the IP address it has been given by running `ifconfig` or set them to the desired values in `/etc/rc.conf` if you do not have a DHCP environment.
-
-Run `gpart list` and note the device name of the hard drive(s). Enter this values into your `etc/ploy.conf`.
-
-Return into the deployment directory `cd ..`.
-
-# Bootstrapping the target host
-
-Either way you now should have *target host* booted into MFSBSD with a known IP address which has been entered into `etc/ploy.conf` and we can continue.
-
-The functionality of the briefkasten has been split into three jails: a **webserver** jail which only contains the frontend, an **appserver** jail which contains the web application that handles the submissions and a separate **cleanser** jail that only deals with sanitizing and anonymizing any submitted attachments.
-
-Since we have a running host we can prepare for these jails like so:
-
-- run `make bootstrap` on the *control host*
-- answer `y` for the questions coming up. the host will reboot automatically after the script has run.
-- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the `[ez-master:briefkasten]` section of your `ploy.conf` as `fingerprint =`.
-- in the meantime the *target host* has probably finished rebooting. Now run `make configure-host`
-
-Anyway, now we have all requirements in place to install the jails.
-
-Before we continue, we need to activate the so-called Python `virtualenv` that has been created as a side-effect of the initial Make target. This will allow the subsequent commands to find the installed helper tools without them having to be installed globally. To activate the `virtualenv` do this:
+Sobald der Host neu gestartet ist:
 
 ```
-$ source bin/activate
+$ uv run make configure-host
 ```
 
-# Installing the jails
+Das richtet den Jail-Host ein (ZFS-Datasets, ezjail, Weiterleitung der `root`-E-Mails).
 
-First start and create the (empty) jails `make start-jails`, then configure them: `make configure-jails`.
-
-Finally, you need to upload and install the PGG keys of the editors and admins: `make upload-pgp-keys`.
-
-You now should be able to visit the configured https URL in your browser. In the case of virtualbox `https://localhost:47023/briefkasten/submit`.
-
-# Testing the installation
-
-Once all steps have been completed successfully you should be able to visit the briefkasten in a webbrowser.
-
-in the case of testing via virtualbox the url would be [https://localhost:47023/briefkasten/](https://localhost:47023/briefkasten/).
-
-Note, that the above URL will only work for a configuration based on `vbox.conf`, for other setups you must substitute the IP address and port accordingly.
-
-In some cases the URL above does not work on VirtualBox based systems, in that case you need to find out which IP address the VirtualBox instance has received, like so:
+## Jails installieren
 
 ```
-# ploy ssh briefkasten 'ifconfig em0'
-em0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> metric 0 mtu 1500
-        options=9b<RXCSUM,TXCSUM,VLAN_MTU,VLAN_HWTAGGING,VLAN_HWCSUM>
-        ether 08:00:27:02:07:9b
-        inet 192.168.56.160 netmask 0xffffff00 broadcast 192.168.56.255
-        nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
-        media: Ethernet autoselect (1000baseT <full-duplex>)
-        status: active
+$ uv run make start-jails
+$ uv run make configure-jails
+$ uv run make upload-pgp-keys
 ```
 
-Note the entry labelled `inet` and use the IP address there (and port 443), i.e. `https://192.168.56.160/briefkasten/`.
+- `start-jails` legt die Jails `worker`, `webserver`, `appserver` und `cleanser` an und startet sie.
+- `configure-jails` führt das Playbook `main.yml` aus: Es installiert die Anwendung mit uv aus `application/pyproject.toml` und `application/uv.lock`, konfiguriert nginx, supervisord, Worker und Appserver, lädt das Theme hoch, erzeugt die Cleanser-Klone und richtet `jdispatch` ein.
+- `upload-pgp-keys` importiert die Schlüssel der Redaktion und aktualisiert die Konfiguration.
 
-When visiting the page, enter some text into the form and add one or more attachments, then submit the form.
+## Installation testen
 
-You should then see a success message along with a link to the feedback page for this submission.
+Der Briefkasten ist jetzt unter `https://<fqdn><approot_url>` erreichbar, bei VirtualBox unter [https://192.168.56.160/briefkasten/](https://192.168.56.160/briefkasten/).
 
-In addition each editor email configured in `ploy.conf` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
+Klappt das bei VirtualBox nicht, die tatsächliche Adresse der VM ermitteln:
+
+```
+$ uv run ploy -c etc/ploy.conf ssh briefkasten 'ifconfig em0'
+```
+
+und die Adresse aus der Zeile `inet` verwenden.
+
+Auf der Seite einen Text eingeben, einen oder mehrere Anhänge hinzufügen und das Formular abschicken. Es sollte eine Erfolgsmeldung mit einem Link zur Rückmeldeseite erscheinen. Jede Adresse aus `editors` sollte eine verschlüsselte E-Mail mit dem Text und den bereinigten Anhängen erhalten (ein Word-Dokument z. B. als PDF).
+
+## Aktualisieren und Betrieb
+
+| Kommando | Zweck |
+|---|---|
+| `uv run make update-config` | `briefkasten.ini` und `settings.yaml` nach Änderungen an `ploy.conf` neu erzeugen und die Dienste neu starten |
+| `uv run make upload-pgp-keys` | neue oder geänderte PGP-Schlüssel hochladen |
+| `uv run make update-theme` | das Theme aus `local_theme_path` erneut hochladen und den Appserver neu starten |
+| `uv run make update-app` | die Anwendung aus dem devpi-Index `briefkasten/dev` (`default_publish_devpi`) neu installieren; mit `build=true` (Standard) wird sie vorher lokal gebaut und hochgeladen, mit `use_pypi=true` von PyPI installiert |
+| `uv run make login-devpi` | am devpi-Server anmelden (für `update-app`) |
+| `uv run make reset-host` | **löscht** alle Jails und Cleanser-Klone, um sie neu aufzusetzen (mit Rückfrage) |
+
+Webanwendung und Worker laufen unter supervisord (`briefkasten_frontend` und `briefkasten_worker`). Die Ausgabe des Workers landet in `/var/briefkasten/log/` der Worker-Jail; die Webanwendung protokolliert nichts.
