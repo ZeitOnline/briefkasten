@@ -2,55 +2,69 @@
 
 While we could simply provide pre-built installation images, this would defeat the whole idea of running a trustworthy, open source dropbox in the first place, because then you and your submitters would have to blindly trust these binaries without being able to verify their integrity.
 
-Instead the idea is to use as little pre-built ingredients as possible and aquire them from trusted sources (i.e. from the official FreeBSD repositories). In essence we provide you with a grocery list of ingredients along with a recipe and let you do all the shopping and cooking yourself instead of serving a pre-cooked meal!
+Instead the idea is to use as few pre-built ingredients as possible and acquire them from trusted sources (i.e. from the official FreeBSD repositories). In essence we provide you with a grocery list of ingredients along with a recipe and let you do all the shopping and cooking yourself instead of serving a pre-cooked meal!
 
-An instance of the briefkasten is deployed by running scripts on a *control host* (i.e. your local machine) which then configure and install it on a *target host* (i.e. virtual machine for development and testing, on dedicated hardware for production).
+An instance of the briefkasten is deployed by running scripts on a *control host* (i.e. your local machine) which then configure and install it on a *target host* (i.e. a virtual machine for development and testing, or dedicated hardware for production).
 
-During this process the *target host* will boot from a FreeBSD installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself on the *target host* with a minimal configuration, boot into that system and then finalize the installation.
+During this process the *target host* will boot from a FreeBSD installer medium (ISO image or USB stick), then (remotely) receive instructions to install itself with a minimal configuration, boot into that system and then finalize the installation.
+
+The deployment is based on [ploy](https://github.com/ployground/ploy), [bsdploy](https://github.com/ployground/bsdploy) and [Ansible](https://www.ansible.com).
 
 # tl;dr
 
 The short version is:
 
-> 1. *populate \`\`etc\`\`* with a custom `ploy.conf`, some `pgp_pubkeys` and a certificate and key for the webserver `briefkasten.crt` and `briefkasten.key`
-> 2. *make sure the host is booted into mfsBSD* (if you're using virtualbox, run `ploy start briefkasten-vbox`).
-> 3. `make bootstrap`
-> 4. `source bin/activate`
-> 5. `make configure-host`
-> 6. `make start-jails`
-> 7. `make configure-jails`
-> 8. `make upload-pgp-keys`
+1. *populate `etc`* with a custom `ploy.conf`, an `authorized_keys` file, some `pgp_pubkeys` and a certificate and key for the webserver `briefkasten.crt` and `briefkasten.key`
+2. `uv sync --frozen`
+3. `source .venv/bin/activate`
+4. *make sure the host is booted into mfsBSD* (if you're using VirtualBox, run `ploy start briefkasten-vbox`)
+5. `make bootstrap`
+6. `make configure-host`
+7. `make start-jails`
+8. `make configure-jails`
+9. `make upload-pgp-keys`
 
 # Obtaining the sources
 
 You need to clone the entire project onto the *control host* but will then work only inside `deployment` (where this README is located):
 
 ```
-git clone https://github.com/tomster/briefkasten.git
+git clone https://github.com/ZeitOnline/briefkasten.git
 cd briefkasten/deployment
 ```
 
 # Installing the requirements on the control host
 
-The *control host* needs **Python 2.7** with `virtualenv` and `make`.
+The *control host* needs:
 
-On most Linux distributions you should get all of the above by installing `python-virtualenv` (i.e. `apt install python-virtualenv`).
+- [uv](https://docs.astral.sh/uv/) for installing the deployment tools – it will also take care of installing a suitable Python version (currently Python 3.12) if none is available
+- `make` and `rsync`
+- the development headers of `liblzma`, which are needed to build one of the dependencies (i.e. `brew install xz` on macOS or `apt install liblzma-dev` on Debian/Ubuntu)
+- optionally [VirtualBox](https://www.virtualbox.org) for running a local test instance
 
-Under Mac OS X using [homebrew](http://brew.sh) is the recommended way (`brew install python` should do the trick.) (The Python installation that's part of Mac OS X ships without `virtualenv` and is out-dated. It's best to ignore it entirely.
+Then install the deployment tools (`ploy`, `bsdploy`, `ansible` etc.) into a virtual environment:
 
-Under FreeBSD install `devel/py-virtualenv`.
+```
+$ uv sync --frozen
+```
 
-Note, you might need to symlink `/usr/local/include/gmp.h` to `/usr/local/include/python2.7/gmp.h`
+and activate it, so that the subsequent commands can find the installed tools without them having to be installed globally:
+
+```
+$ source .venv/bin/activate
+```
+
+All of the following commands assume that this virtual environment is active.
 
 # Configuring your setup
 
-Before we can continue, we need to configure your setup on the *control host*. The deployment scripts require four assets, most of which need to reside inside `etc`.
+Before we can continue, we need to configure your setup on the *control host*. The deployment scripts require four assets, all of which need to reside inside `etc`.
 
 In practice it is advisable to keep the entire `etc` under separate version control – it contains everything that distinguishes your particular setup from a generic one. A good start is to copy `etc.sample` to `etc` and perform a `git init` inside it. YMMV.
 
 ## ploy.conf – the main configuration file
 
-Create your own configuration directory inside:
+Create your own configuration directory:
 
 ```
 $ mkdir etc
@@ -66,26 +80,31 @@ If you want to use VirtualBox to try out the installation on a local virtual mac
 
 You will (at least) need to provide values in the `[ez-master:briefkasten]` section for the following keys:
 
-> - host
-> - port
+- `ip`
+- `fingerprint`
 
-Note that you cannot specify the SSH fingerprint at this time yet, you need to wait until after `bootstrap-host` has run (see below)
+Note that you cannot specify the SSH fingerprint at this time yet, you need to wait until after `make bootstrap` has run (see below).
 
 And in the `[macro:ez-base]` section for these:
 
-> - ansible-fqdn
-> - approot_url
-> - editors
-> - admins
-> - mail_sender
-> - local_theme_path
-> - theme_name
+- `ansible-fqdn` – the hostname under which the webserver is reached
+- `approot_url` – the URL path under which the briefkasten is hosted
+- `editors` – the email addresses of the recipients of the submissions
+- `admins` – the email addresses of the admins, who get notified when a submission fails
+- `mail_sender` – the sender address of all emails
+- `post_secret` – a secret used to sign the submission URLs (there is deliberately no default value)
+- `test_submission_secret` – a secret used to identify test submissions by the watchdog (see [Monitoring](monitoring.md))
+- `local_theme_path` and `theme_name` – the theme to use (see [Customization](../application/develop.md#customization))
 
-Look inside the file for details, it should be self explanatory.
+By default emails are sent via `localhost` on port 25 without authentication. To use another SMTP server, set `mail_host`, `mail_port`, `mail_user` and `mail_password`. Instead of storing the password in plain text, you can also provide it encrypted via `mail_password_file` (see [ploy_ansible's lookup plugins](https://github.com/ployground/ploy_ansible#ansible-lookup-plugins)).
+
+Optionally, you can set `root_email` to forward the system emails of the *target host* to an external address.
+
+`base.conf` contains the defaults for all other settings, i.e. the FreeBSD release to install, the timeout for cleansing attachments or the size threshold above which attachments are archived instead of being sent via email. Look inside the files for details, they should be self explanatory.
 
 ## SSH public key
 
-This key (usually `~/.ssh/idenity.pub`) will be installed on the *target host* during bootstrapping and will enable access to it.
+This key (usually `~/.ssh/id_ed25519.pub` or `~/.ssh/id_rsa.pub`) will be installed on the *target host* during bootstrapping and will enable access to it.
 
 You need to place it inside `etc/authorized_keys`.
 
@@ -99,10 +118,9 @@ These need to reside inside `etc/pgp_pubkeys/` and are expected to end in `*.gpg
 
 The webserver will be configured to communicate exclusively via HTTPS – to this end you will need to provide a suitable certificate/key pair. It is expected in `etc/briefkasten.crt` and `etc/briefkasten.key` respectively, `etc.sample` contains a self-signed pair for development and testing purposes.
 
-In the most common scenario the public facing HTTP server is not identical with the webserver of this setup (IOW the briefkasten is running behind a proxy and is reachable via a subpath such as `` /briefkasten` `` it is entirely reasonable to provide a self-signed key/certificate pair since its only purpose is to ensure that the HTTP traffic between the proxy and the briefkasten is encrypted.
+In the most common scenario the public facing HTTP server is not identical with the webserver of this setup (IOW the briefkasten is running behind a proxy and is reachable via a subpath such as `/briefkasten/`). In this case it is entirely reasonable to provide a self-signed key/certificate pair since its only purpose is to ensure that the HTTP traffic between the proxy and the briefkasten is encrypted.
 
-If, however you wish to expose the briefkasten directly to the public, we provide support for using Letsencrypt, specifically using the acme.sh client and the [DDNS alias update method](https://github.com/Neilpang/acme.sh/wiki/DNS-alias-mode).
-To use it, set the following in the `ez-base` section of your configuration:
+If, however, you wish to expose the briefkasten directly to the public, we provide support for using [Let's Encrypt](https://letsencrypt.org) via the [acme.sh](https://github.com/acmesh-official/acme.sh) client. The certificate is issued using the webroot mode, i.e. the configured `fqdn` must be reachable publicly via HTTP. To use it, set the following in the `ez-base` section of your configuration:
 
 ```
 use_acme = true
@@ -111,102 +129,85 @@ acme_key = <the key with which the dns update needs to be signed with>
 acme_ddns_server = <the IP or hostname of the nameserver>
 ```
 
+The certificate will then be renewed automatically via a cron job.
+
 # Booting the target host into FreeBSD
 
-Next we will need to boot the *target host* into the FreeBSD installer. Since an official vanilla installer from freebsd.org would require quite a bit more manual configuration we instead use a slightly modified version of this called [MFSBSD](http://mfsbsd.vx.sk) – it basically attempts to configure the network via DHCP and has SSH enabled for `root` with a defined password of `mfsroot`.
+Next we will need to boot the *target host* into the FreeBSD installer. Since an official vanilla installer from freebsd.org would require quite a bit more manual configuration we instead use a slightly modified version of this called [mfsBSD](https://mfsbsd.vx.sk) – it basically attempts to configure the network via DHCP and has SSH enabled for `root` with a defined password of `mfsroot`.
 
-## Installation using Virtualbox
+mfsBSD is only used for bootstrapping, the FreeBSD release that will actually be installed on the *target host* is configured in `base.conf` (`ezjail-install-release` and `bootstrap-bsd-url`). Use the "special edition" (`mfsbsd-se-*`) image of a recent release from the [mfsBSD download page](https://mfsbsd.vx.sk/files/).
+
+## Installation using VirtualBox
 
 This is the recommended way for testing and developing, as it allows for 100% automation. You need [VirtualBox](https://www.virtualbox.org) with the command line tools available in your path.
 
-- `bin/ploy start briefkasten-vbox` – this will download the ISO image, create a virtual machine and boot it from the image
-- wait till the login prompt - we're now booted into the MFSBSD installer
-- Continue with **Bootstrapping the host**
+- `ploy start briefkasten-vbox` – this will download the ISO image, create a virtual machine and boot it from the image
+- wait till the login prompt - we're now booted into the mfsBSD installer
+- continue with **Bootstrapping the target host**
 
-## Installation using VMWare
+## Installation using other virtualization software
 
-First download the image:
+Download an mfsBSD ISO image along with its checksum file from the [mfsBSD download page](https://mfsbsd.vx.sk/files/) and verify the integrity of the downloaded image (see below). Then create a virtual machine and boot it from that image. At the login prompt log in with username/password `root/mfsroot`. Use `ifconfig` to get the assigned IP address (or assign one manually) and enter it into `ploy.conf`.
 
-```
-mkdir downloads
-bin/ploy-download  http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img 72664ced483bc69ae27bb1467bca0e678e1d6440 downloads/
-```
-
-This downloads the ISO image into the `downloads` folder. In VMWare create a virtual machine and boot it from that image. At the login prompt log in with username/password `root/mfsroot`. Use `ifconfig` to get the assigned IP address (or assign one manually) and enter it into `ploy.conf`.
-
-- Continue with **Bootstrapping the host**
+- continue with **Bootstrapping the target host**
 
 ## Installation on physical hardware
 
-This is the recommended setup for production. The machine doesn't need to be particularly powerful, but it will require at least 2Gb RAM and 10Gb disk space to compile the packages.
+This is the recommended setup for production. The machine doesn't need to be particularly powerful, but it will require at least 2 GB RAM and 10 GB disk space.
 
-Download the MFSBSD ISO image and checksum:
-
-```
-cd downloads
-wget http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img
-wget http://mfsbsd.vx.sk/files/images/10/amd64/mfsbsd-se-10.2-RELEASE-amd64.img.sums.txt
-```
-
-Verify the integrity of the downloaded image:
+Download an mfsBSD image (`*.img`) along with its checksum file (`*.sums.txt`) from the [mfsBSD download page](https://mfsbsd.vx.sk/files/) and verify the integrity of the downloaded image:
 
 ```
-shasum mfsbsd-se-10.2-RELEASE-amd64.img
+shasum -a 256 mfsbsd-se-<version>-RELEASE-amd64.img
 ```
 
-Make sure the output matches the one in the downloaded text. Next you will need to create a bootable medium from that image.
+Make sure the output matches the one in the downloaded text file. Next you will need to create a bootable medium from that image.
 
-### Creating a bootable USB medium (Mac OSX)
+### Creating a bootable USB medium
 
-For the time being we only provide instructions for Mac OS X, sorry! If you run Linux you probably already know how to do this, anyway :-)
+On macOS:
 
-- Run `diskutil list` to see which drives are currently in your system.
+- run `diskutil list` to see which drives are currently in your system
 - insert your medium
 - re-run `diskutil list` and notice which number it has been assigned (N)
 - run `diskutil unmountDisk /dev/diskN`
-- run `` `sudo dd if=mfsbsd-se-10.2-RELEASE-amd64.img of=/dev/diskN bs=1m ``
+- run `sudo dd if=mfsbsd-se-<version>-RELEASE-amd64.img of=/dev/diskN bs=1m`
 - run `diskutil unmountDisk /dev/diskN`
+
+On Linux, identify the device of the USB medium (i.e. via `lsblk`) and write the image using `sudo dd if=mfsbsd-se-<version>-RELEASE-amd64.img of=/dev/sdX bs=1M`.
 
 Insert the USB stick into the *target host* and boot from it. Log in as `root` using the pre-configured password `mfsroot`. Either note the name of the ethernet interface and the IP address it has been given by running `ifconfig` or set them to the desired values in `/etc/rc.conf` if you do not have a DHCP environment.
 
-Run `gpart list` and note the device name of the hard drive(s). Enter this values into your `etc/ploy.conf`.
-
-Return into the deployment directory `cd ..`.
+Run `gpart list` and note the device name of the hard drive(s). Enter these values into your `etc/ploy.conf`.
 
 # Bootstrapping the target host
 
-Either way you now should have *target host* booted into MFSBSD with a known IP address which has been entered into `etc/ploy.conf` and we can continue.
+Either way you now should have the *target host* booted into mfsBSD with a known IP address which has been entered into `etc/ploy.conf` and we can continue.
 
-The functionality of the briefkasten has been split into three jails: a **webserver** jail which only contains the frontend, an **appserver** jail which contains the web application that handles the submissions and a separate **cleanser** jail that only deals with sanitizing and anonymizing any submitted attachments.
+The functionality of the briefkasten has been split into several jails: a **webserver** jail which only contains the frontend, an **appserver** jail which contains the web application that handles the submissions, a **worker** jail which processes the submissions and sends them to the editors and a number of separate **cleanser** jails that only deal with sanitizing and anonymizing any submitted attachments.
 
 Since we have a running host we can prepare for these jails like so:
 
 - run `make bootstrap` on the *control host*
-- answer `y` for the questions coming up. the host will reboot automatically after the script has run.
-- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in in the `[ez-master:briefkasten]` section of your `ploy.conf` as `fingerprint =`.
+- answer `y` for the questions coming up. The host will reboot automatically after the script has run.
+- at the end of the script run, the script will output the fingerprint it has generated for the SSH daemon on the host. You *must* enter that in the `[ez-master:briefkasten]` section of your `ploy.conf` as `fingerprint =`.
 - in the meantime the *target host* has probably finished rebooting. Now run `make configure-host`
 
-Anyway, now we have all requirements in place to install the jails.
-
-Before we continue, we need to activate the so-called Python `virtualenv` that has been created as a side-effect of the initial Make target. This will allow the subsequent commands to find the installed helper tools without them having to be installed globally. To activate the `virtualenv` do this:
-
-```
-$ source bin/activate
-```
+Now we have all requirements in place to install the jails.
 
 # Installing the jails
 
 First start and create the (empty) jails `make start-jails`, then configure them: `make configure-jails`.
 
-Finally, you need to upload and install the PGG keys of the editors and admins: `make upload-pgp-keys`.
+Finally, you need to upload and install the PGP keys of the editors and admins: `make upload-pgp-keys`.
 
-You now should be able to visit the configured https URL in your browser. In the case of virtualbox `https://localhost:47023/briefkasten/submit`.
+If `ploy` crashes on macOS with `ERROR! A worker was found in a dead state`, setting the environment variable `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` might help. The `make` targets already take care of that.
 
 # Testing the installation
 
-Once all steps have been completed successfully you should be able to visit the briefkasten in a webbrowser.
+Once all steps have been completed successfully you should be able to visit the briefkasten in a web browser.
 
-in the case of testing via virtualbox the url would be [https://localhost:47023/briefkasten/](https://localhost:47023/briefkasten/).
+In the case of testing via VirtualBox the URL would be [https://localhost:47023/briefkasten/](https://localhost:47023/briefkasten/).
 
 Note, that the above URL will only work for a configuration based on `vbox.conf`, for other setups you must substitute the IP address and port accordingly.
 
@@ -229,4 +230,12 @@ When visiting the page, enter some text into the form and add one or more attach
 
 You should then see a success message along with a link to the feedback page for this submission.
 
-In addition each editor email configured in `ploy.conf` should receive an email with the text of the submission and the cleansed attachments. (for example, if you upload a word document it will be sent to the editors as PDF etc.).
+In addition each editor email configured in `ploy.conf` should receive an email with the text of the submission and the cleansed attachments (for example, if you upload a Word document it will be sent to the editors as PDF etc.).
+
+# Updating an existing installation
+
+After changing your configuration, the PGP keys or the theme, the following `make` targets can be used to update a running installation:
+
+- `make update-config` – re-applies the configuration of the application and the PGP keys
+- `make upload-pgp-keys` – uploads and imports the PGP keys from `etc/pgp_pubkeys/`
+- `make update-theme` – uploads the theme configured via `local_theme_path` and restarts the application
