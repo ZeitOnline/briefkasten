@@ -171,13 +171,3 @@ $ uvx ruff check
 
 Releases erstellt [release-please](https://github.com/googleapis/release-please) aus den [Conventional Commits](https://www.conventionalcommits.org/) auf `main`; dabei werden auch die Version in `application/pyproject.toml` und das `CHANGELOG.md` aktualisiert.
 
-## Dokumentation
-
-Diese Dokumentation liegt in `docs/` und wird mit MkDocs gebaut.
-Für eine lokale Vorschau:
-
-```
-$ bin/docs serve
-```
-
-und [http://localhost:8000](http://localhost:8000) öffnen.
