@@ -174,7 +174,7 @@ Releases erstellt [release-please](https://github.com/googleapis/release-please)
 ## Dokumentation
 
 Diese Dokumentation liegt in `docs/` und wird mit MkDocs gebaut.
-Für eine lokale Vorschau (benötigt Zugriff auf das interne Docker-Image `zon-mkdocs`):
+Für eine lokale Vorschau:
 
 ```
 $ bin/docs serve

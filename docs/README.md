@@ -1,4 +1,4 @@
-# DIE ZEIT Briefkasten
+# Briefkasten
 
 Der `briefkasten` ist eine – soweit sinnvoll möglich – sichere Webanwendung, über die Inhalte anonym an die Redaktion übermittelt werden können.
 
