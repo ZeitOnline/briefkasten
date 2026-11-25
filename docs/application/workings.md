@@ -41,7 +41,9 @@ If anything goes wrong during processing, the status will be set to one of the f
 - `540` – an attachment could not be cleansed due to an error
 - `800 Not cleansible` – at least one attachment has a file type that isn't supported
 
-Optionally, the original (uncleansed) attachments of failed submissions can be archived in encrypted form, see `dropbox_dirty_archive_url_format` in the deployment configuration. In this case the status will be set to `490 cleanser failure but notify success` and the editors will be notified.
+Optionally, the original (uncleansed) attachments of failed submissions can be archived in encrypted form, see `dropbox_dirty_archive_url_format` in the deployment configuration. In this case the status passes through `490 cleanser failure but notify success`, the editors are notified with a link to the archive and the final status is `900 success`.
+
+A submission with the status `800` is sent to the editors in either case and keeps that status: with a link to the archive if one is configured, otherwise with its attachments in the email.
 
 ## Notifying the editors
 

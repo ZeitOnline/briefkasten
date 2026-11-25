@@ -114,7 +114,7 @@ $ uv run janitor --root var/drop_root/
 
 ## Code checks
 
-The repository contains a [lefthook](https://lefthook.dev) configuration (`.lefthook.yaml`) which runs [ruff](https://docs.astral.sh/ruff/), `yamllint` and an EditorConfig check on staged files before each commit. To enable the git hooks, run the following in the root of the repository:
+The repository contains a [lefthook](https://lefthook.dev) configuration (`.lefthook.yaml`) which runs [ruff](https://docs.astral.sh/ruff/), `yamllint` and an EditorConfig check on staged files before each commit. `ruff` and the EditorConfig check are run via `uvx`, while `yamllint` needs to be available on the `PATH` (i.e. via `uv tool install yamllint`). To enable the git hooks, run the following in the root of the repository:
 
 ```
 $ uvx lefthook install

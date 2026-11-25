@@ -87,13 +87,12 @@ Note that you cannot specify the SSH fingerprint at this time yet, you need to w
 
 And in the `[macro:ez-base]` section for these:
 
-- `ansible-fqdn` – the hostname under which the webserver is reached
+- `fqdn` – the hostname under which the webserver is reached
 - `approot_url` – the URL path under which the briefkasten is hosted
 - `editors` – the email addresses of the recipients of the submissions
 - `admins` – the email addresses of the admins, who get notified when a submission fails
 - `mail_sender` – the sender address of all emails
-- `post_secret` – a secret used to sign the submission URLs (there is deliberately no default value)
-- `test_submission_secret` – a secret used to identify test submissions by the watchdog (see [Monitoring](monitoring.md))
+- `post_secret` – a secret used to sign the submission URLs (there is deliberately no default value). The same value identifies test submissions by the watchdog (see [Monitoring](monitoring.md)).
 - `local_theme_path` and `theme_name` – the theme to use (see [Customization](../application/develop.md#customization))
 
 By default emails are sent via `localhost` on port 25 without authentication. To use another SMTP server, set `mail_host`, `mail_port`, `mail_user` and `mail_password`. Instead of storing the password in plain text, you can also provide it encrypted via `mail_password_file` (see [ploy_ansible's lookup plugins](https://github.com/ployground/ploy_ansible#ansible-lookup-plugins)).
@@ -124,10 +123,12 @@ If, however, you wish to expose the briefkasten directly to the public, we provi
 
 ```
 use_acme = true
-acme_domain = <the alias domain you are using>
-acme_key = <the key with which the dns update needs to be signed with>
+acme_domain = <the name of the nsupdate key>
+acme_key = <the secret of the nsupdate key>
 acme_ddns_server = <the IP or hostname of the nameserver>
 ```
+
+The `acme_*` values are written to the nsupdate configuration of acme.sh and need to be defined, although issuing and renewing the certificate in webroot mode does not use them.
 
 The certificate will then be renewed automatically via a cron job.
 
