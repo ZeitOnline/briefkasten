@@ -5,6 +5,7 @@ nav:
   - Deployment:
       - deployment/index.md
       - deployment/monitoring.md
+      - deployment/qemu.md
   - Application:
       - application/develop.md
       - application/workings.md
