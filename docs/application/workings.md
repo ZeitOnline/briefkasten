@@ -1,35 +1,54 @@
 # The life cycle of a submission
 
-Users entrusting us with sensitive data is the key concern of the software and when and getting it straight where this data is stored for how long in what form is crucial.
+Submitters entrusting the operators of a `briefkasten` with sensitive data is the key concern of the software, and getting it straight where this data is stored, for how long and in what form is crucial.
 
-The stages are numbered with a three digit integer code, allowing to group and sort them.
+Each stage of a submission is recorded in a status file inside its drop directory. The stages are numbered with a three digit integer code, allowing to group and sort them:
 
-Status codes beginning with `0` mean that the submission is still being handled by the web application (and implies that it is still unencrypted)
+- `0xx` – the submission is still being handled by the web application (which implies that it is still unencrypted)
+- `1xx` – `4xx` – the submission is being processed
+- `5xx` – processing has failed
+- `6xx` – sending the submission to the editors has failed
+- `800` – at least one attachment could not be cleansed
+- `900` – success
+
+## Receiving the submission
 
 The life of a submission begins with the POST of the client browser succeeding.
-Any attachments are first stored in memory before writing them to disk into a dedicated dropbox directory.
-At this point the submission has the status `010 received` and is readable in plaintext by any attacker who gains access to the application jail.
+Any attachments are first stored in memory before writing them to disk into a dedicated drop directory.
+At this point the submission has the status `010 created` and is readable in plaintext by any attacker who gains access to the application jail.
 
-Next, the web application hands off the submission to an external processing script, which immediately either errors out or acknowledges the receipt of the drop directory.
+Next, the web application puts the submission into the submission queue, which sets the status to `020 submitted`.
 
-The error case at this stage means that the cleansing setup is seriously broken and the web application will take it upon itself to delete the attachments immediately to avoid exposing them in plaintext unduly.
-(TODO: a cronjob on the jailhost should additionally monitor for dropboxes in the 'submitted' or 'submitted failed' state for longer than a given threshold)
+## Processing
 
-If the submission was successful (the process script returns `0` as exit code) the dropbox is considered to be `020 submitted`.
+The `worker` process watches the submission queue and picks up new submissions. Submissions without attachments are sent to the editors right away.
 
-Once submitted, the cleanser performs basic sanity checking. If that fails for whatever reason it will set the status to `500 cleanser init failure`. Since it's basically being able to accept the attachments it will delete the attachment itself (TODO: confirm with @erdgeist)
+For submissions with attachments the status changes to `100 processor running`. The worker first creates an encrypted backup of the original attachments (`101 creating initial encrypted backup`) and then hands them to the sanitizing scripts (`105 processing attachments`). The actual cleansing happens in one of the separate cleanser jails, which is reflected by the following statuses:
 
-If the process script determines that the cleansing setup is intact (whether locally or via one or more cleanser jails) it will set the status to `100 processing`.
-The submission still resides in plaintext inside the application jail.
+- `201`/`202` – a cleanser jail has been acquired and the data is being copied to it
+- `203` – the attachments are being processed by the cleanser
+- `204` – the attachments are in quarantine on the cleanser
 
-The process will now initiate the cleansing, either locally or by submitting it to a cleanser jail. Either way, once the submission is sucessful, the status will change to `200 quarantined`, and the submission is (finally) no longer readable inside the application jail.
+If the cleansed attachments exceed the configured size threshold, an encrypted archive of them is created outside of the drop directory (`270 creating final encrypted backup of cleansed attachments`) and the editors will receive a link to it instead of the attachments themselves.
 
-If submission has failed the status will be set to `501 cleanser submission failure` and the attachments will be deleted.
+## Failures
 
-Now we are left with three possible outcomes: success, failure during cleansing or timeout:
+If anything goes wrong during processing, the status will be set to one of the following codes:
 
-- `510 cleanser processing failure`
+- `500 no valid keys at all` – none of the editors has a valid PGP key
+- `501` – `505` – the cleansing setup is broken (i.e. the drop directory isn't accessible, no cleanser is available or copying the data from or to the cleanser failed)
 - `520 cleanser timeout failure`
-- `900 success`
+- `540` – an attachment could not be cleansed due to an error
+- `800 Not cleansible` – at least one attachment has a file type that isn't supported
 
-In all cases except `900` the attachments will have been deleted from the fileystem of the briefkasten host.
+Optionally, the original (uncleansed) attachments of failed submissions can be archived in encrypted form, see `dropbox_dirty_archive_url_format` in the deployment configuration. In this case the status passes through `490 cleanser failure but notify success`, the editors are notified with a link to the archive and the final status is `900 success`.
+
+A submission with the status `800` is sent to the editors in either case and keeps that status: with a link to the archive if one is configured, otherwise with its attachments in the email.
+
+## Notifying the editors
+
+Finally, the (cleansed) submission is encrypted for and sent to each of the editors via email. If this succeeds, the status will be set to `900 success`, otherwise to `605 smtp failure` or `610 smtp error`.
+
+## Cleaning up
+
+In all cases the message and the attachments will be deleted from the drop directory once processing is complete. The only data kept on the server is the status file and any replies the editors may post for the submitter. Drop directories that haven't changed for a year (or for a day in the case of test submissions by the watchdog) are removed entirely by the `janitor`, which additionally checks the editors' PGP keys for upcoming expiry.
