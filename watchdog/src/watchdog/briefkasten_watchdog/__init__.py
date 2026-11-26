@@ -15,19 +15,26 @@ basicConfig(format='%(asctime)s %(levelname)s %(message)s')
 log = getLogger(__name__)
 log.setLevel(environ.get('BKWD_LOG_LEVEL', 'info').upper())
 
-REGISTRY = CollectorRegistry()
 last_success = Gauge(
     'briefkasten_watchdog_last_success_unixtime',
     'Last time a briefkasten watchdog job successfully finished',
-    registry=REGISTRY)
+    registry=None)
 last_test_submission = Gauge(
     'briefkasten_watchdog_last_test_submission_unixtime',
     'Unix timestamp of the last test submission',
-    registry=REGISTRY)
+    registry=None)
 pending_test_submission_count = Gauge(
     'briefkasten_watchdog_pending_test_submission_count',
     'Number of test submissions that have not been acknowledged yet',
-    registry=REGISTRY)
+    registry=None)
+
+# Only the receiver knows about successful deliveries; the other commands
+# would push `last_success` as 0 and trigger the `TestDeliveryFailed` alert.
+COLLECTORS = dict(
+    submit=(last_test_submission, pending_test_submission_count),
+    receive=(last_success, last_test_submission, pending_test_submission_count),
+    prune=(last_test_submission, pending_test_submission_count),
+)
 
 
 def perform_submission(app_url, testing_secret):
@@ -100,7 +107,14 @@ def push_to_prometheus(command):
         gateway_url,
         job=f"briefkasten_watchdog_{environment}",
         grouping_key=dict(command=command),
-        registry=REGISTRY)
+        registry=registry_for(command))
+
+
+def registry_for(command):
+    registry = CollectorRegistry()
+    for collector in COLLECTORS[command]:
+        registry.register(collector)
+    return registry
 
 
 @group()
