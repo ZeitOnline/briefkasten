@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0](https://github.com/ZeitOnline/briefkasten/compare/0.5.0...0.6.0) (2026-11-26)
+
+
+### Features
+
+* **watchdog:** extend prometheus metrics ([#534](https://github.com/ZeitOnline/briefkasten/issues/534)) ([86bc703](https://github.com/ZeitOnline/briefkasten/commit/86bc703851be3c772baaede5116ef5abae23dcfd))
+
+
+### Bug Fixes
+
+* **watchdog:** push metrics under a per-command grouping key ([c2e0a4c](https://github.com/ZeitOnline/briefkasten/commit/c2e0a4c3b6191bce33c4c76362b53b97ef481096))
+
+
+### Documentation
+
+* update documentation to the current state of the project ([#561](https://github.com/ZeitOnline/briefkasten/issues/561)) ([aef5283](https://github.com/ZeitOnline/briefkasten/commit/aef5283c116be0ea92d8d98289b70478223fd929))
+
 ## [0.5.0](https://github.com/ZeitOnline/briefkasten/compare/0.4.0...0.5.0) (2026-08-20)
 
 
