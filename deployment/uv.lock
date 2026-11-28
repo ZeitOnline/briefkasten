@@ -118,7 +118,7 @@ lint = [
 [package.metadata]
 requires-dist = [
     { name = "ansible" },
-    { name = "ansible-core", specifier = "<2.15" },
+    { name = "ansible-core", specifier = "<2.17" },
     { name = "bsdploy", git = "https://github.com/witsch/bsdploy.git?rev=use-extra-zfs-properties" },
     { name = "keyring" },
     { name = "ploy", git = "https://github.com/witsch/ploy.git?rev=python-3.12-fixes" },
